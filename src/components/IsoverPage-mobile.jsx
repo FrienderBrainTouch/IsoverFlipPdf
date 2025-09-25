@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Isover3DModel from './Isover3DModel';
 
 /**
  * IsoverPage-mobile 컴포넌트
@@ -19,6 +20,28 @@ function IsoverPageMobile({ onBack = null }) {
   const [mainScreenVisible, setMainScreenVisible] = useState(false); // 본 화면 표시 여부
   const [imageScale, setImageScale] = useState(1.2); // 중앙 이미지 스케일 (120%에서 시작)
   const [imageOpacity, setImageOpacity] = useState(0); // 중앙 이미지 투명도
+
+  // 3D 모델 뷰어 상태 관리 (표지 페이지에서만 표시)
+  const [show3DModel, setShow3DModel] = useState(true);
+  
+  // front.gif 표시 상태 관리
+  const [showFrontGif, setShowFrontGif] = useState(true);
+  const [showSvgBackground, setShowSvgBackground] = useState(false);
+
+  // 3페이지 모달 상태 관리
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedArea, setSelectedArea] = useState(null);
+  
+  // 추가 4개 영역 모달 상태 관리
+  const [isAdditionalModalOpen, setIsAdditionalModalOpen] = useState(false);
+  const [selectedAdditionalArea, setSelectedAdditionalArea] = useState(null);
+  
+  // 4페이지 모달 상태 관리
+  const [isPage4ModalOpen, setIsPage4ModalOpen] = useState(false);
+  const [selectedPage4Area, setSelectedPage4Area] = useState(null);
+  
+  // 5페이지 모달 상태 관리
+  const [isPage5ModalOpen, setIsPage5ModalOpen] = useState(false);
 
   // ref 변수들
   const animationRef = useRef(null);
@@ -92,6 +115,26 @@ function IsoverPageMobile({ onBack = null }) {
     }
   ];
 
+
+  // front.gif 4초 후 자동 비활성화, 3.5초에 SVG 배경 활성화
+  useEffect(() => {
+    if (showFrontGif) {
+      // 3.5초에 SVG 배경 활성화
+      const svgTimer = setTimeout(() => {
+        setShowSvgBackground(true);
+      }, 3500);
+
+      // 4초에 gif 비활성화
+      const gifTimer = setTimeout(() => {
+        setShowFrontGif(false);
+      }, 4000);
+
+      return () => {
+        clearTimeout(svgTimer);
+        clearTimeout(gifTimer);
+      };
+    }
+  }, [showFrontGif]);
 
   /**
    * 컴포넌트 마운트 시 애니메이션 시퀀스 실행
@@ -284,6 +327,109 @@ function IsoverPageMobile({ onBack = null }) {
     }
   };
 
+  /**
+   * 3D 모델 뷰어 토글 핸들러 (표지 페이지에서만 작동)
+   */
+  const handle3DModelToggle = () => {
+    setShow3DModel(!show3DModel);
+  };
+
+  /**
+   * 영역별 클릭 핸들러들
+   */
+  const handleArea2Click = () => {
+    // 2번 영역: 4번 페이지로 스크롤 (1페이지 건너뛰기)
+    const targetPage = document.querySelector('[data-page-index="3"]');
+    if (targetPage) {
+      targetPage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleArea3Click = () => {
+    // 3번 영역: 5번 페이지로 스크롤 (1페이지 건너뛰기)
+    const targetPage = document.querySelector('[data-page-index="4"]');
+    if (targetPage) {
+      targetPage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleArea4Click = () => {
+    // 4번 영역: 6번 페이지로 스크롤 (2페이지 건너뛰기)
+    const targetPage = document.querySelector('[data-page-index="5"]');
+    if (targetPage) {
+      targetPage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleArea5Click = () => {
+    // 5번 영역: 유튜브 링크 새 탭에서 열기
+    window.open('https://www.youtube.com/@%EC%83%9D%EA%B3%A0%EB%B1%85%EC%9D%B4%EC%86%8C%EB%B0%94%EC%BD%94%EB%A6%AC%EC%95%84/videos', '_blank');
+  };
+
+  /**
+   * 3페이지 영역 클릭 핸들러
+   */
+  const handle3PageAreaClick = (areaNumber) => {
+    if (areaNumber <= 6) {
+      // 기존 6개 영역 (1-6번)
+      setSelectedArea(areaNumber);
+      setIsModalOpen(true);
+    } else {
+      // 추가 4개 영역 (7-10번)
+      setSelectedAdditionalArea(areaNumber);
+      setIsAdditionalModalOpen(true);
+    }
+  };
+
+  /**
+   * 모달 닫기 핸들러
+   */
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedArea(null);
+  };
+
+  /**
+   * 추가 모달 닫기 핸들러
+   */
+  const closeAdditionalModal = () => {
+    setIsAdditionalModalOpen(false);
+    setSelectedAdditionalArea(null);
+  };
+
+  /**
+   * 4페이지 영역 클릭 핸들러
+   */
+  const handlePage4AreaClick = (areaNumber) => {
+    setSelectedPage4Area(areaNumber);
+    setIsPage4ModalOpen(true);
+  };
+
+  /**
+   * 4페이지 모달 닫기 핸들러
+   */
+  const closePage4Modal = () => {
+    setIsPage4ModalOpen(false);
+    setSelectedPage4Area(null);
+  };
+
+  /**
+   * 5페이지 영역 클릭 핸들러
+   */
+  const handlePage5AreaClick = (areaNumber) => {
+    if (areaNumber === 2) {
+      // 두 번째 영역만 모달 열기
+      setIsPage5ModalOpen(true);
+    }
+  };
+
+  /**
+   * 5페이지 모달 닫기 핸들러
+   */
+  const closePage5Modal = () => {
+    setIsPage5ModalOpen(false);
+  };
+
   return (
     <div className="w-full h-screen overflow-hidden relative">
       {/* 인트로 화면 (흰 화면 + 로고) */}
@@ -337,8 +483,43 @@ function IsoverPageMobile({ onBack = null }) {
                     // minHeight: '100vh'
                   }}
                 >
-                  <div className="w-full h-full flex flex-col justify-center items-center p-4 text-center relative">
-                    {/* 페이지 배경 이미지 */}
+                  <div 
+                    className="w-full h-full flex flex-col justify-center items-center p-4 text-center relative"
+                    style={{
+                      backgroundImage: index === 0 && showSvgBackground ? `url(${page.backgroundImage})` : 'none',
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  >
+                    {/* 표지 페이지 특별 처리 */}
+                    {index === 0 && (
+                      <>
+                        {/* front.gif 전체 사이즈 배치 */}
+                        {showFrontGif && (
+                          <div className="absolute inset-0 w-full h-full">
+                            <img
+                              src="/IsoverFile/IsoverPage/front.gif"
+                              alt="Front Animation"
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        
+                        {/* 표지 페이지에 3D 모델 배치 */}
+                        <div className="absolute inset-0">
+                          <Isover3DModel 
+                            isVisible={show3DModel} 
+                            opacity={1}
+                            scale={1}
+                            position={{ x: 0, y: 0 }}
+                            animationDelay={1000}
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {/* 일반 페이지 배경 이미지 */}
+                    {index !== 0 && (
                     <img
                       src={page.backgroundImage}
                       alt={page.name}
@@ -349,8 +530,320 @@ function IsoverPageMobile({ onBack = null }) {
                         objectFit: 'cover'
                       }}
                     />
+                    )}
 
+                    {/* 2번째 페이지 클릭 영역들 */}
+                    {index === 1 && (
+                      <>
+                        {/* 5개의 div 영역을 absolute로 배치 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '24%',
+                            left: '10%',
+                            width: '40%',
+                            height: '25%'
+                          }}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '24%',
+                            right: '6%',
+                            width: '40%',
+                            height: '25%'
+                          }}
+                          onClick={handleArea2Click}
+                          title="4번 페이지로 이동"
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '24%',
+                            left: '10%',
+                            width: '40%',
+                            height: '25%'
+                          }}
+                          onClick={handleArea3Click}
+                          title="5번 페이지로 이동"
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '24%',
+                            right: '6%',
+                            width: '40%',
+                            height: '25%'
+                          }}
+                          onClick={handleArea4Click}
+                          title="6번 페이지로 이동"
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '5%',
+                            left: '30%',
+                            width: '40%',
+                            height: '8%'
+                          }}
+                          onClick={handleArea5Click}
+                          title="유튜브 채널 열기"
+                        >
+                        </div>
+                      </>
+                    )}
 
+                    {/* 3번째 페이지 클릭 영역들 */}
+                    {index === 2 && (
+                      <>
+                        {/* 3페이지 영역 6개 배치 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '25.5%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(1)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '28.7%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(2)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '32%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(3)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '35.1%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(4)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '38.3%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(5)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '41.5%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(6)}
+                        >
+                        </div>
+                        
+                        {/* 추가 4개 영역 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '46%',
+                            right: '6%',
+                            width: '27%',
+                            height: '16.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(7)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '33%',
+                            right: '6%',
+                            width: '27%',
+                            height: '12.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(8)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '20%',
+                            right: '6%',
+                            width: '27%',
+                            height: '13%'
+                          }}
+                          onClick={() => handle3PageAreaClick(9)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '8%',
+                            right: '7%',
+                            width: '27%',
+                            height: '10.5%'
+                          }}
+                          onClick={() => handle3PageAreaClick(10)}
+                        >
+                        </div>
+                      </>
+                    )}
+
+                    {/* 4번째 페이지 클릭 영역들 */}
+                    {index === 3 && (
+                      <>
+                        {/* 4페이지 영역 4개 배치 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '10%',
+                            left: '5%',
+                            width: '89%',
+                            height: '19%'
+                          }}
+                          onClick={() => handlePage4AreaClick(1)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '31%',
+                            left: '5%',
+                            width: '89%',
+                            height: '19%'
+                          }}
+                          onClick={() => handlePage4AreaClick(2)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '29%',
+                            left: '5%',
+                            width: '89%',
+                            height: '19%'
+                          }}
+                          onClick={() => handlePage4AreaClick(3)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '7%',
+                            left: '5%',
+                            width: '89%',
+                            height: '20%'
+                          }}
+                          onClick={() => handlePage4AreaClick(4)}
+                        >
+                        </div>
+                      </>
+                    )}
+
+                    {/* 5번째 페이지 클릭 영역들 */}
+                    {index === 4 && (
+                      <>
+                        {/* 5페이지 영역 2개 배치 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '26%',
+                            left: '19%',
+                            width: '75%',
+                            height: '23%'
+                          }}
+                          onClick={() => handlePage5AreaClick(1)}
+                        >
+                          {/* 첫 번째 영역에 3D 모델 직접 배치 */}
+                          <div className="absolute inset-0">
+                            <Isover3DModel 
+                              isVisible={true} 
+                              opacity={0.9}
+                              scale={0.8}
+                              position={{ x: 0, y: 0 }}
+                              animationDelay={500}
+                              modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                              isModal={true}
+                            />
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '14%',
+                            left: '5%',
+                            width: '90%',
+                            height: '29%'
+                          }}
+                          onClick={() => handlePage5AreaClick(2)}
+                        >
+                        </div>
+                      </>
+                    )}
 
                     {/* 페이지 그림자 효과 */}
                     <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none"></div>
@@ -412,8 +905,290 @@ function IsoverPageMobile({ onBack = null }) {
         </div>
       )}
 
+      {/* 3페이지 모달 */}
+      {isModalOpen && selectedArea && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
 
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src={`/IsoverFile/Popup/${selectedArea}.jpg`}
+                alt={`영역 ${selectedArea}`}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // JPG가 없으면 PNG 시도
+                  if (e.target.src.includes('.jpg')) {
+                    e.target.src = `/IsoverFile/Popup/${selectedArea}.png`;
+                  } else {
+                    // 이미지 로드 실패 시 메시지 표시
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/{selectedArea}.jpg 또는 .png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* 추가 4개 영역 모달 */}
+      {isAdditionalModalOpen && selectedAdditionalArea && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closeAdditionalModal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closeAdditionalModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지와 3D 모델 표시 */}
+            <div className="relative flex items-center justify-center">
+              <img
+                src={`/IsoverFile/Popup/pae_3-${selectedAdditionalArea - 6}.jpg`}
+                alt={`영역 ${selectedAdditionalArea}`}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              
+              {/* 3D 모델 영역 - 각 영역마다 다른 모델 */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="relative w-full h-full">
+                  {selectedAdditionalArea === 7 && (
+                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                      <Isover3DModel 
+                        isVisible={true} 
+                        opacity={0.9}
+                        scale={0.8}
+                        position={{ x: 0, y: 0 }}
+                        animationDelay={500}
+                        modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                        isModal={true}
+                      />
+                    </div>
+                  )}
+                  
+                  {selectedAdditionalArea === 8 && (
+                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                    <Isover3DModel 
+                      isVisible={true} 
+                      opacity={0.9}
+                      scale={0.8}
+                      position={{ x: 0, y: 0 }}
+                      animationDelay={500}
+                      modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                      isModal={true}
+                    />
+                  </div>
+                  )}
+                  
+                  {selectedAdditionalArea === 9 && (
+                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                    <Isover3DModel 
+                      isVisible={true} 
+                      opacity={0.9}
+                      scale={0.8}
+                      position={{ x: 0, y: 0 }}
+                      animationDelay={500}
+                      modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                      isModal={true}
+                    />
+                  </div>
+                  )}
+                  
+                  {selectedAdditionalArea === 10 && (
+                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                    <Isover3DModel 
+                      isVisible={true} 
+                      opacity={0.9}
+                      scale={0.8}
+                      position={{ x: 0, y: 0 }}
+                      animationDelay={500}
+                      modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                      isModal={true}
+                    />
+                  </div>
+                  )}
+                </div>
+              </div>
+              
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/pae_3-{selectedAdditionalArea - 6}.jpg</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4페이지 모달 */}
+      {isPage4ModalOpen && selectedPage4Area && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closePage4Modal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closePage4Modal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지와 3D 모델 표시 */}
+            <div className="relative flex items-center justify-center">
+              <img
+                src={`/IsoverFile/Popup/4-${selectedPage4Area}.png`}
+                alt={`영역 ${selectedPage4Area}`}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              
+              {/* 3D 모델 영역 - 1,2,3 항목에만 배치 */}
+              {selectedPage4Area <= 3 && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-full h-full">
+                    {selectedPage4Area === 1 && (
+                      <div className="absolute top-[30%] left-[2%] w-[12%] h-[65%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={0.9}
+                          scale={0.8}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                          isModal={true}
+                        />
+                      </div>
+                    )}
+                    
+                    {selectedPage4Area === 2 && (
+                      <div className="absolute top-[30%] left-[2%] w-[12%] h-[65%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={0.9}
+                          scale={0.8}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                          isModal={true}
+                        />
+                      </div>
+                    )}
+                    
+                    {selectedPage4Area === 3 && (
+                      <div className="absolute top-[30%] left-[2%] w-[12%] h-[65%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={0.9}
+                          scale={0.8}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                          isModal={true}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/4-{selectedPage4Area}.png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5페이지 모달 */}
+      {isPage5ModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closePage5Modal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closePage5Modal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src="/IsoverFile/Popup/5-2.png"
+                alt="5페이지 2번째 영역"
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/5-2.png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
