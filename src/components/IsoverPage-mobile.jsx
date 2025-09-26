@@ -25,7 +25,7 @@ function IsoverPageMobile({ onBack = null }) {
   const [show3DModel, setShow3DModel] = useState(true);
   
   // front.gif 표시 상태 관리
-  const [showFrontGif, setShowFrontGif] = useState(true);
+  const [showFrontGif, setShowFrontGif] = useState(false);
   const [showSvgBackground, setShowSvgBackground] = useState(false);
 
   // 3페이지 모달 상태 관리
@@ -42,6 +42,15 @@ function IsoverPageMobile({ onBack = null }) {
   
   // 5페이지 모달 상태 관리
   const [isPage5ModalOpen, setIsPage5ModalOpen] = useState(false);
+  
+  // 6페이지 모달 상태 관리
+  const [isPage6ModalOpen, setIsPage6ModalOpen] = useState(false);
+  const [selectedPage6Area, setSelectedPage6Area] = useState(null);
+  const [hoveredArea6, setHoveredArea6] = useState(null);
+  
+  // 7페이지 영상 상태 관리
+  const [playingVideo, setPlayingVideo] = useState(null);
+  const [showVideo, setShowVideo] = useState(false);
 
   // ref 변수들
   const animationRef = useRef(null);
@@ -174,6 +183,10 @@ function IsoverPageMobile({ onBack = null }) {
       setTimeout(() => {
         setMainScreenVisible(true);
         startImageAnimation();
+        // 인트로 완료 후 1초 뒤에 GIF 시작
+        setTimeout(() => {
+          setShowFrontGif(true);
+        }, 1000);
       }, 500);
     };
 
@@ -255,6 +268,10 @@ function IsoverPageMobile({ onBack = null }) {
               setTimeout(() => {
                 setMainScreenVisible(true);
                 startCoverPageAnimation();
+                // 인트로 완료 후 1초 뒤에 GIF 시작
+                setTimeout(() => {
+                  setShowFrontGif(true);
+                }, 1000);
               }, 500);
             }, 2000);
           }
@@ -337,6 +354,14 @@ function IsoverPageMobile({ onBack = null }) {
   /**
    * 영역별 클릭 핸들러들
    */
+  const handleArea1Click = () => {
+    // 1번 영역: 3번 페이지로 스크롤
+    const targetPage = document.querySelector('[data-page-index="2"]');
+    if (targetPage) {
+      targetPage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleArea2Click = () => {
     // 2번 영역: 4번 페이지로 스크롤 (1페이지 건너뛰기)
     const targetPage = document.querySelector('[data-page-index="3"]');
@@ -430,6 +455,48 @@ function IsoverPageMobile({ onBack = null }) {
     setIsPage5ModalOpen(false);
   };
 
+  /**
+   * 6페이지 영역 클릭 핸들러
+   */
+  const handlePage6AreaClick = (areaNumber) => {
+    setSelectedPage6Area(areaNumber);
+    setIsPage6ModalOpen(true);
+  };
+
+  /**
+   * 6페이지 모달 닫기 핸들러
+   */
+  const closePage6Modal = () => {
+    setIsPage6ModalOpen(false);
+    setSelectedPage6Area(null);
+  };
+
+  /**
+   * 7페이지 영역 클릭 핸들러
+   */
+  const handlePage7AreaClick = (areaNumber) => {
+    if (areaNumber === 2) {
+      // 왼쪽 로고 영역: Isover 링크
+      window.open('https://www.isover.co.kr/', '_blank');
+    } else if (areaNumber === 3) {
+      // 오른쪽 로고 영역: Yoochang 링크
+      window.open('http://www.yoochang.com/', '_blank');
+    } else if (areaNumber === 4) {
+      // 하단 노란색 영역: Isover 링크
+      window.open('https://www.isover.co.kr/', '_blank');
+    } else if (areaNumber === 1) {
+      // 1번 영역: 영상 토글
+      setShowVideo(!showVideo);
+    }
+  };
+
+  /**
+   * 영상 닫기 핸들러
+   */
+  const closeVideo = () => {
+    setShowVideo(false);
+  };
+
   return (
     <div className="w-full h-screen overflow-hidden relative">
       {/* 인트로 화면 (흰 화면 + 로고) */}
@@ -479,8 +546,9 @@ function IsoverPageMobile({ onBack = null }) {
                   data-page-index={index}
                   style={{ 
                     width: '100%', 
-                    aspectRatio: 'auto',
-                    // minHeight: '100vh'
+                    height: index === 0 ? '100vh' : 'auto',
+                    minHeight: index === 0 ? '100vh' : 'auto',
+                    aspectRatio: index === 0 ? 'none' : 'auto'
                   }}
                 >
                   <div 
@@ -545,6 +613,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '40%',
                             height: '25%'
                           }}
+                          onClick={handleArea1Click}
+                          title="3번 페이지로 이동"
                         >
                         </div>
                         
@@ -840,6 +910,274 @@ function IsoverPageMobile({ onBack = null }) {
                             height: '29%'
                           }}
                           onClick={() => handlePage5AreaClick(2)}
+                        >
+                        </div>
+                      </>
+                    )}
+
+                    {/* 6번째 페이지 클릭 영역들 */}
+                    {index === 5 && (
+                      <>
+                        {/* 6페이지 영역 6개 배치 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '21.3%',
+                            left: '12.3%',
+                            width: '34.3%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => {
+                            if (hoveredArea6 === 1) {
+                              setHoveredArea6(null);
+                            } else {
+                              setHoveredArea6(1);
+                            }
+                          }}
+                          onMouseEnter={() => setHoveredArea6(1)}
+                          onMouseLeave={() => setHoveredArea6(null)}
+                        >
+                          {hoveredArea6 === 1 && (
+                            <img
+                              src="/IsoverFile/Interacive/gif-file/L-Bracket-고정-1114.gif"
+                              alt="L-Bracket 고정"
+                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '21.3%',
+                            right: '10.5%',
+                            width: '34.3%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => {
+                            if (hoveredArea6 === 2) {
+                              setHoveredArea6(null);
+                            } else {
+                              setHoveredArea6(2);
+                            }
+                          }}
+                          onMouseEnter={() => setHoveredArea6(2)}
+                          onMouseLeave={() => setHoveredArea6(null)}
+                        >
+                          {hoveredArea6 === 2 && (
+                            <img
+                              src="/IsoverFile/Interacive/gif-file/단열재-끼우기_1114.gif"
+                              alt="단열재 끼우기"
+                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '45.1%',
+                            left: '12.3%',
+                            width: '36%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => {
+                            if (hoveredArea6 === 3) {
+                              setHoveredArea6(null);
+                            } else {
+                              setHoveredArea6(3);
+                            }
+                          }}
+                          onMouseEnter={() => setHoveredArea6(3)}
+                          onMouseLeave={() => setHoveredArea6(null)}
+                        >
+                          {hoveredArea6 === 3 && (
+                            <img
+                              src="/IsoverFile/Interacive/gif-file/화스너-고정-Trim_1114.gif"
+                              alt="화스너 고정"
+                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '45.1%',
+                            right: '10.5%',
+                            width: '34.5%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => {
+                            if (hoveredArea6 === 4) {
+                              setHoveredArea6(null);
+                            } else {
+                              setHoveredArea6(4);
+                            }
+                          }}
+                          onMouseEnter={() => setHoveredArea6(4)}
+                          onMouseLeave={() => setHoveredArea6(null)}
+                        >
+                          {hoveredArea6 === 4 && (
+                            <img
+                              src="/IsoverFile/Interacive/gif-file/수직-L-Bar-고정_1114.gif"
+                              alt="수직 L-Bar 고정"
+                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '15%',
+                            left: '12.3%',
+                            width: '34.5%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => {
+                            if (hoveredArea6 === 5) {
+                              setHoveredArea6(null);
+                            } else {
+                              setHoveredArea6(5);
+                            }
+                          }}
+                          onMouseEnter={() => setHoveredArea6(5)}
+                          onMouseLeave={() => setHoveredArea6(null)}
+                        >
+                          {hoveredArea6 === 5 && (
+                            <img
+                              src="/IsoverFile/Interacive/gif-file/수평-Bar-고정-Trim_1114.gif"
+                              alt="수평 Bar 고정"
+                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '15%',
+                            right: '10.5%',
+                            width: '34.5%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => {
+                            if (hoveredArea6 === 6) {
+                              setHoveredArea6(null);
+                            } else {
+                              setHoveredArea6(6);
+                            }
+                          }}
+                          onMouseEnter={() => setHoveredArea6(6)}
+                          onMouseLeave={() => setHoveredArea6(null)}
+                        >
+                          {hoveredArea6 === 6 && (
+                            <img
+                              src="/IsoverFile/Interacive/gif-file/마감재-부착-Trim_1114.gif"
+                              alt="마감재 부착"
+                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                            />
+                          )}
+                        </div>
+                        
+                        {/* 6페이지 마지막 영역 (유튜브 링크) */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '5%',
+                            left: '32%',
+                            width: '36%',
+                            height: '4%'
+                          }}
+                          onClick={() => window.open('https://www.youtube.com/@%EC%83%9D%EA%B3%A0%EB%B1%85%EC%9D%B4%EC%86%8C%EB%B0%94%EC%BD%94%EB%A6%AC%EC%95%84/videos', '_blank')}
+                          title="유튜브 채널 열기"
+                        >
+                        </div>
+                      </>
+                    )}
+
+                    {/* 7번째 페이지 클릭 영역들 */}
+                    {index === 6 && (
+                      <>
+                        {/* 7페이지 영역 4개 배치 */}
+                        {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '23%',
+                            left: '15%',
+                            width: '70%',
+                            height: '41%',
+                            clipPath: 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
+                          }}
+                          onClick={() => {
+                            // 이미지 클릭 시 모달에서 영상 실행
+                            setShowVideo(true);
+                          }}
+                        >
+                          {/* 이미지 표시 */}
+                          <div 
+                            className="absolute inset-0 rounded-lg"
+                            style={{
+                              clipPath: 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
+                            }}
+                          >
+                            <img
+                              src="/IsoverFile/Interacive/video/액션캡 영상 이미지.png"
+                              alt="액션캠 영상 이미지"
+                              className="w-full h-full object-cover rounded-lg"
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* 2. 왼쪽 로고 영역 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '4%',
+                            left: '6%',
+                            width: '27%',
+                            height: '6%'
+                          }}
+                          onClick={() => handlePage7AreaClick(2)}
+                        >
+                        </div>
+                        
+                        {/* 3. 오른쪽 로고 영역 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '4%',
+                            right: '6%',
+                            width: '38%',
+                            height: '6%'
+                          }}
+                          onClick={() => handlePage7AreaClick(3)}
+                        >
+                        </div>
+                        
+                        {/* 4. 하단 노란색 부분 작은 영역 */}
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '4.2%',
+                            left: '5.5%',
+                            width: '31%',
+                            height: '22%'
+                          }}
+                          onClick={() => handlePage7AreaClick(4)}
                         >
                         </div>
                       </>
@@ -1185,6 +1523,82 @@ function IsoverPageMobile({ onBack = null }) {
                 <p>이미지를 불러올 수 없습니다.</p>
                 <p className="text-sm">경로: /IsoverFile/Popup/5-2.png</p>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 6페이지 모달 */}
+      {isPage6ModalOpen && selectedPage6Area && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closePage6Modal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closePage6Modal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src={`/IsoverFile/Popup/6-${selectedPage6Area}.png`}
+                alt={`영역 ${selectedPage6Area}`}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/6-{selectedPage6Area}.png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 7페이지 영상 모달 */}
+      {showVideo && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setShowVideo(false)}
+        >
+          <div
+            className="bg-black rounded-2xl p-4 max-w-4xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={() => setShowVideo(false)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 영상 표시 */}
+            <div className="flex items-center justify-center">
+              <video
+                className="w-full h-full object-contain rounded-lg"
+                controls
+                autoPlay
+                onEnded={() => setShowVideo(false)}
+              >
+                <source src="/IsoverFile/Interacive/video/Isover_목업시공 액션캠.mp4" type="video/mp4" />
+                영상을 재생할 수 없습니다.
+              </video>
             </div>
           </div>
         </div>

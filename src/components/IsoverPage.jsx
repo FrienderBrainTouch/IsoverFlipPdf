@@ -25,7 +25,7 @@ function IsoverPage({ onBack = null }) {
   const [mouseEventsEnabled, setMouseEventsEnabled] = React.useState(false);
   
   // front.gif 표시 상태 관리
-  const [showFrontGif, setShowFrontGif] = React.useState(true);
+  const [showFrontGif, setShowFrontGif] = React.useState(false);
   const [showSvgBackground, setShowSvgBackground] = React.useState(false);
 
   // 3페이지 모달 상태 관리
@@ -42,6 +42,21 @@ function IsoverPage({ onBack = null }) {
   
   // 5페이지 모달 상태 관리
   const [isPage5ModalOpen, setIsPage5ModalOpen] = React.useState(false);
+  
+  // 6페이지 모달 상태 관리
+  const [isPage6ModalOpen, setIsPage6ModalOpen] = React.useState(false);
+  const [selectedPage6Area, setSelectedPage6Area] = React.useState(null);
+  const [hoveredArea6, setHoveredArea6] = React.useState(null);
+  
+  // 7페이지 영상 상태 관리
+  const [playingVideo, setPlayingVideo] = React.useState(null);
+  const [showVideo, setShowVideo] = React.useState(false);
+
+  // 인트로 화면 상태 관리
+  const [showIntro, setShowIntro] = React.useState(true);
+  const [logoOpacity, setLogoOpacity] = React.useState(0);
+  const [whiteScreenVisible, setWhiteScreenVisible] = React.useState(true);
+  const [mainScreenVisible, setMainScreenVisible] = React.useState(false);
 
   // SVG 페이지 데이터
   const pageData = [
@@ -66,6 +81,54 @@ function IsoverPage({ onBack = null }) {
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 인트로 화면 애니메이션 시퀀스
+  React.useEffect(() => {
+    // 1단계: 로고 애니메이션 (opacity 0 → 100)
+    const logoAnimation = () => {
+      const startTime = performance.now();
+      const duration = 1500; // 1.5초
+
+      const animate = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // ease-out 효과 적용
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        setLogoOpacity(easeOut);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // 로고 애니메이션 완료 후 2초 대기
+          setTimeout(() => {
+            startTransition();
+          }, 2000);
+        }
+      };
+
+      requestAnimationFrame(animate);
+    };
+
+    // 2단계: 흰 화면이 위로 사라지는 전환
+    const startTransition = () => {
+      setWhiteScreenVisible(false);
+      
+      // 전환 완료 후 본 화면 표시
+      setTimeout(() => {
+        setMainScreenVisible(true);
+        // 인트로 완료 후 1초 뒤에 GIF 시작
+        setTimeout(() => {
+          setShowFrontGif(true);
+        }, 1000);
+      }, 500);
+    };
+
+    // 애니메이션 시작
+    setTimeout(() => {
+      logoAnimation();
+    }, 500);
   }, []);
 
   // front.gif 4초 후 자동 비활성화, 3.5초에 SVG 배경 활성화
@@ -114,7 +177,49 @@ function IsoverPage({ onBack = null }) {
   const handleHomeClick = () => {
     if (onBack) {
       onBack();
+      return;
     }
+
+    // 인트로 화면 재시작
+    setShowIntro(true);
+    setLogoOpacity(0);
+    setWhiteScreenVisible(true);
+    setMainScreenVisible(false);
+
+    // 애니메이션 재시작
+    setTimeout(() => {
+      const logoAnimation = () => {
+        const startTime = performance.now();
+        const duration = 1500;
+
+        const animate = (currentTime) => {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          
+          const easeOut = 1 - Math.pow(1 - progress, 3);
+          setLogoOpacity(easeOut);
+
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            setTimeout(() => {
+              setWhiteScreenVisible(false);
+              setTimeout(() => {
+                setMainScreenVisible(true);
+                // 인트로 완료 후 1초 뒤에 GIF 시작
+                setTimeout(() => {
+                  setShowFrontGif(true);
+                }, 1000);
+              }, 500);
+            }, 2000);
+          }
+        };
+
+        requestAnimationFrame(animate);
+      };
+
+      logoAnimation();
+    }, 500);
   };
 
   /**
@@ -317,6 +422,48 @@ function IsoverPage({ onBack = null }) {
   };
 
   /**
+   * 6페이지 영역 클릭 핸들러
+   */
+  const handlePage6AreaClick = (areaNumber) => {
+    setSelectedPage6Area(areaNumber);
+    setIsPage6ModalOpen(true);
+  };
+
+  /**
+   * 6페이지 모달 닫기 핸들러
+   */
+  const closePage6Modal = () => {
+    setIsPage6ModalOpen(false);
+    setSelectedPage6Area(null);
+  };
+
+  /**
+   * 7페이지 영역 클릭 핸들러
+   */
+  const handlePage7AreaClick = (areaNumber) => {
+    if (areaNumber === 2) {
+      // 왼쪽 로고 영역: Isover 링크
+      window.open('https://www.isover.co.kr/', '_blank');
+    } else if (areaNumber === 3) {
+      // 오른쪽 로고 영역: Yoochang 링크
+      window.open('http://www.yoochang.com/', '_blank');
+    } else if (areaNumber === 4) {
+      // 하단 노란색 영역: Isover 링크
+      window.open('https://www.isover.co.kr/', '_blank');
+    } else if (areaNumber === 1) {
+      // 1번 영역: 영상 토글
+      setShowVideo(!showVideo);
+    }
+  };
+
+  /**
+   * 영상 닫기 핸들러
+   */
+  const closeVideo = () => {
+    setShowVideo(false);
+  };
+
+  /**
    * 페이지 네비게이션 함수들
    */
   const goToFirstPage = () => {
@@ -350,7 +497,29 @@ function IsoverPage({ onBack = null }) {
   }
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-white flex">
+    <div className="w-full h-screen overflow-hidden relative">
+      {/* 인트로 화면 (흰 화면 + 로고) */}
+      {showIntro && (
+        <div 
+          className={`fixed inset-0 bg-white z-50 transition-transform duration-500 ease-out ${
+            whiteScreenVisible ? 'translate-y-0' : '-translate-y-full'
+          }`}
+        >
+          {/* Isover 로고 */}
+          <div className="w-full h-full flex items-center justify-center">
+            <img 
+              src="/IsoverFile/Interacive/Isover_Logo.svg"
+              alt="Isover Logo"
+              className="max-w-full max-h-full object-contain"
+              style={{ opacity: logoOpacity }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 본 화면 */}
+      {mainScreenVisible && (
+        <div className="w-full h-screen overflow-hidden bg-white flex">
       {/* 왼쪽 위 Isover 로고 (홈 버튼) */}
       <div className="flex-shrink-0 p-6">
         <button onClick={handleHomeClick} className="cursor-pointer">
@@ -365,35 +534,35 @@ function IsoverPage({ onBack = null }) {
       {/* 중앙 플립북 컨테이너 */}
       <div className=" w-full h-full flex items-center justify-center p-4">
         <div className="flex items-center gap-4">
-          {/* 왼쪽 네비게이션 버튼들 */}
-          <div className="flex flex-col items-center gap-2">
-            {/* Left 버튼 (항상 표시) */}
-            <button
-              onClick={goToPreviousPage}
-              className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
-              title="이전 페이지"
-            >
-              <img
-                src="/IsoverFile/Interacive/arrow_left.svg"
-                alt="이전 페이지"
-                className="w-6 h-6"
-              />
-            </button>
-            {/* First 버튼 (항상 표시) */}
-            <button
-              onClick={goToFirstPage}
-              className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
-              title="첫 페이지"
-            >
-              <img
-                src="/IsoverFile/Interacive/arrow_first.svg"
-                alt="첫 페이지"
-                className="w-6 h-6"
-              />
-            </button>
-            
-
-          </div>
+          {/* 왼쪽 네비게이션 버튼들 - 표지 페이지가 아닐 때만 표시 */}
+          {!isCoverPage && (
+            <div className="flex flex-col items-center gap-2">
+              {/* Left 버튼 */}
+              <button
+                onClick={goToPreviousPage}
+                className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
+                title="이전 페이지"
+              >
+                <img
+                  src="/IsoverFile/Interacive/arrow_left.svg"
+                  alt="이전 페이지"
+                  className="w-6 h-6"
+                />
+              </button>
+              {/* First 버튼 */}
+              <button
+                onClick={goToFirstPage}
+                className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
+                title="첫 페이지"
+              >
+                <img
+                  src="/IsoverFile/Interacive/arrow_first.svg"
+                  alt="첫 페이지"
+                  className="w-6 h-6"
+                />
+              </button>
+            </div>
+          )}
 
           {/* 플립북 */}
           <div className="flex items-center justify-center">
@@ -884,6 +1053,154 @@ function IsoverPage({ onBack = null }) {
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
                 
+                {/* 6페이지 영역 6개 배치 */}
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '20.8%',
+                    left: '10.3%',
+                    width: '36%',
+                    height: '17.1%'
+                  }}
+                  onClick={() => handlePage6AreaClick(1)}
+                  onMouseEnter={() => setHoveredArea6(1)}
+                  onMouseLeave={() => setHoveredArea6(null)}
+                >
+                  {hoveredArea6 === 1 && (
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/L-Bracket-고정-1114.gif"
+                      alt="L-Bracket 고정"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '20.8%',
+                    right: '8.8%',
+                    width: '36%',
+                    height: '17.1%'
+                  }}
+                  onClick={() => handlePage6AreaClick(2)}
+                  onMouseEnter={() => setHoveredArea6(2)}
+                  onMouseLeave={() => setHoveredArea6(null)}
+                >
+                  {hoveredArea6 === 2 && (
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/단열재-끼우기_1114.gif"
+                      alt="단열재 끼우기"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '45.1%',
+                    left: '10.3%',
+                    width: '36%',
+                    height: '17.1%'
+                  }}
+                  onClick={() => handlePage6AreaClick(3)}
+                  onMouseEnter={() => setHoveredArea6(3)}
+                  onMouseLeave={() => setHoveredArea6(null)}
+                >
+                  {hoveredArea6 === 3 && (
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/화스너-고정-Trim_1114.gif"
+                      alt="화스너 고정"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '45.1%',
+                    right: '8.8%',
+                    width: '36%',
+                    height: '17.1%'
+                  }}
+                  onClick={() => handlePage6AreaClick(4)}
+                  onMouseEnter={() => setHoveredArea6(4)}
+                  onMouseLeave={() => setHoveredArea6(null)}
+                >
+                  {hoveredArea6 === 4 && (
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/수직-L-Bar-고정_1114.gif"
+                      alt="수직 L-Bar 고정"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    bottom: '14%',
+                    left: '10.3%',
+                    width: '36%',
+                    height: '17.1%'
+                  }}
+                  onClick={() => handlePage6AreaClick(5)}
+                  onMouseEnter={() => setHoveredArea6(5)}
+                  onMouseLeave={() => setHoveredArea6(null)}
+                >
+                  {hoveredArea6 === 5 && (
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/수평-Bar-고정-Trim_1114.gif"
+                      alt="수평 Bar 고정"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    bottom: '14%',
+                    right: '8.8%',
+                    width: '36%',
+                    height: '17.1%'
+                  }}
+                  onClick={() => handlePage6AreaClick(6)}
+                  onMouseEnter={() => setHoveredArea6(6)}
+                  onMouseLeave={() => setHoveredArea6(null)}
+                >
+                  {hoveredArea6 === 6 && (
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/마감재-부착-Trim_1114.gif"
+                      alt="마감재 부착"
+                      className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+                
+                {/* 6페이지 마지막 영역 (유튜브 링크) */}
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    bottom: '5%',
+                    left: '32%',
+                    width: '36%',
+                    height: '4%'
+                  }}
+                  onClick={() => window.open('https://www.youtube.com/@%EC%83%9D%EA%B3%A0%EB%B1%85%EC%9D%B4%EC%86%8C%EB%B0%94%EC%BD%94%EB%A6%AC%EC%95%84/videos', '_blank')}
+                  title="유튜브 채널 열기"
+                >
+                </div>
+                
                 {/* 왼쪽 터치 영역 (6페이지는 왼쪽) */}
                 <div 
                   className="absolute left-0 top-0 w-2.5 h-full cursor-pointer hover:bg-blue-500/20 transition-colors"
@@ -911,6 +1228,94 @@ function IsoverPage({ onBack = null }) {
                 }}
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
+                
+                {/* 7페이지 영역 4개 배치 */}
+                {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '23%',
+                    left: '15%',
+                    width: '70%',
+                    height: '41%',
+                    clipPath: showVideo ? 'none' : 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
+                  }}
+                  onClick={() => handlePage7AreaClick(1)}
+                >
+                  {/* 이미지 표시 (영상이 재생되지 않을 때) */}
+                  {!showVideo && (
+                    <div 
+                      className="absolute inset-0 rounded-lg"
+                      style={{
+                        clipPath: 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
+                      }}
+                    >
+                      <img
+                        src="/IsoverFile/Interacive/video/액션캡 영상 이미지.png"
+                        alt="액션캠 영상 이미지"
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* 영상 표시 (영상이 재생될 때) */}
+                  {showVideo && (
+                    <div className="absolute inset-0 rounded-lg">
+                      <video
+                        className="w-full h-full object-cover rounded-lg"
+                        controls
+                        autoPlay
+                        onEnded={closeVideo}
+                      >
+                        <source src="/IsoverFile/Interacive/video/Isover_목업시공 액션캠.mp4" type="video/mp4" />
+                        영상을 재생할 수 없습니다.
+                      </video>
+                    </div>
+                  )}
+                </div>
+                
+                {/* 2. 왼쪽 로고 영역 */}
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '4%',
+                    left: '6%',
+                    width: '27%',
+                    height: '6%'
+                  }}
+                  onClick={() => handlePage7AreaClick(2)}
+                >
+                </div>
+                
+                {/* 3. 오른쪽 로고 영역 */}
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    top: '4%',
+                    right: '6%',
+                    width: '38%',
+                    height: '6%'
+                  }}
+                  onClick={() => handlePage7AreaClick(3)}
+                >
+                </div>
+                
+                {/* 4. 하단 노란색 부분 작은 영역 */}
+                <div 
+                  className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    bottom: '4.2%',
+                    left: '5.5%',
+                    width: '31%',
+                    height: '22%'
+                  }}
+                  onClick={() => handlePage7AreaClick(4)}
+                >
+                </div>
                 
                 {/* 오른쪽 터치 영역 (7페이지는 오른쪽) */}
                 <div 
@@ -1292,6 +1697,51 @@ function IsoverPage({ onBack = null }) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* 6페이지 모달 */}
+      {isPage6ModalOpen && selectedPage6Area && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closePage6Modal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closePage6Modal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src={`/IsoverFile/Popup/6-${selectedPage6Area}.png`}
+                alt={`영역 ${selectedPage6Area}`}
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/6-{selectedPage6Area}.png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
         </div>
       )}
 

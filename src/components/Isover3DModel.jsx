@@ -94,16 +94,19 @@ function Isover3DModel({
 
   return (
     <div 
-      className={`absolute w-full h-full z-10 ${isModal ? 'top-0 left-0' : 'w-[90%] h-[70%] top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2'}`}
+      className={`absolute z-10 ${isModal ? 'w-full h-full top-0 left-0' : ' '}`}
       style={{
-
+        width: isModal ? '100%' : '90%',
+        height: isModal ? '100%' : '64%',
+        top: isModal ? '0%' : '27%',
+        left: isModal ? '0%' : '2%'
       }}
     >
       {/* clip-path를 사용한 평행사변형 컨테이너 (모달이 아닐 때만) */}
       <div 
         className="relative w-full h-full"
         style={{
-          clipPath: isModal ? 'none' : 'polygon(25% 0%, 100% 0, 75% 100%, 0% 100%)',
+          clipPath: isModal ? 'none' : 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)',
           // transform: 'perspective(1000px) rotateX(0deg) rotateY(-20deg) rotateZ(2deg)',
           // transformStyle: 'preserve-3d',
           // transformOrigin: 'center center'
@@ -111,7 +114,7 @@ function Isover3DModel({
       >
         {/* 3D 모델 캔버스 - clip-path 영역 내에서 중앙 배치 */}
         <div 
-          className="absolute inset-0 rounded-lg overflow-hidden shadow-2xl border-2 border-white/20"
+          className="absolute inset-0 rounded-lg overflow-hidden"
           style={{
             left: '0%',
             width: '100%',
