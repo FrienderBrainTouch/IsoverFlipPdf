@@ -1718,14 +1718,22 @@ function IsoverPage({ onBack = null }) {
               ×
             </button>
 
-            {/* 이미지 표시 */}
+            {/* GIF 표시 */}
             <div className="flex items-center justify-center">
               <img
-                src={`/IsoverFile/Popup/6-${selectedPage6Area}.png`}
-                alt={`영역 ${selectedPage6Area}`}
+                src={`/IsoverFile/Interacive/gif-file/${
+                  selectedPage6Area === 1 ? 'L-Bracket-고정-1114.gif' :
+                  selectedPage6Area === 2 ? '단열재-끼우기_1114.gif' :
+                  selectedPage6Area === 3 ? '화스너-고정-Trim_1114.gif' :
+                  selectedPage6Area === 4 ? '수직-L-Bar-고정_1114.gif' :
+                  selectedPage6Area === 5 ? '수평-Bar-고정-Trim_1114.gif' :
+                  selectedPage6Area === 6 ? '마감재-부착-Trim_1114.gif' :
+                  'L-Bracket-고정-1114.gif'
+                }`}
+                alt={`영역 ${selectedPage6Area} GIF`}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 메시지 표시
+                  // GIF 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -1734,8 +1742,8 @@ function IsoverPage({ onBack = null }) {
                 className="hidden text-gray-500 text-center"
                 style={{ display: 'none' }}
               >
-                <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/6-{selectedPage6Area}.png</p>
+                <p>GIF를 불러올 수 없습니다.</p>
+                <p className="text-sm">영역 {selectedPage6Area}의 GIF 파일을 찾을 수 없습니다.</p>
               </div>
             </div>
           </div>
