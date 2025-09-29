@@ -156,16 +156,17 @@ function Isover3DModel({
               style={{ width: '100%', height: '100%' }}
             >
               <Suspense fallback={null}>
-                {/* 조명 설정 */}
-                <ambientLight intensity={0.6} />
-                <directionalLight position={[10, 10, 5]} intensity={1} />
-                <pointLight position={[-10, -10, -5]} intensity={0.5} />
+                {/* 조명 설정 - HDRI 대신 기본 조명 사용 */}
+                <ambientLight intensity={0.4} />
+                <directionalLight position={[10, 10, 5]} intensity={1.2} />
+                <directionalLight position={[-10, -10, 5]} intensity={0.8} />
+                <pointLight position={[0, 10, 0]} intensity={0.6} />
                 
                 {/* 3D 모델 */}
                 <IsoverModel modelPath={modelPath} />
                 
-                {/* 환경 설정 */}
-                <Environment preset="studio" />
+                {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}
+                {/* <Environment preset="studio" /> */}
                 
                 {/* 오빗 컨트롤 - 모델링 중심(0,0,0) 기준 회전 */}
                 <OrbitControls
