@@ -46,7 +46,6 @@ function IsoverPageMobile({ onBack = null }) {
   // 6페이지 모달 상태 관리
   const [isPage6ModalOpen, setIsPage6ModalOpen] = useState(false);
   const [selectedPage6Area, setSelectedPage6Area] = useState(null);
-  const [hoveredArea6, setHoveredArea6] = useState(null);
   
   // 7페이지 영상 상태 관리
   const [playingVideo, setPlayingVideo] = useState(null);
@@ -559,19 +558,26 @@ function IsoverPageMobile({ onBack = null }) {
                   data-page-index={index}
                   style={{ 
                     width: '100%', 
-                    height: index === 0 ? '100vh' : 'auto',
-                    minHeight: index === 0 ? '100vh' : 'auto',
-                    aspectRatio: index === 0 ? 'none' : 'auto'
+                    height: 'auto',
+                    minHeight: 'auto',
+                    aspectRatio: 'auto'
                   }}
                 >
                   <div 
                     className="w-full h-full flex flex-col justify-center items-center p-4 text-center relative"
-                    style={{
-                      backgroundImage: index === 0 && showSvgBackground ? `url(${page.backgroundImage})` : 'none',
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center'
-                    }}
                   >
+                    {/* 모든 페이지 배경 이미지 */}
+                    <img
+                      src={page.backgroundImage}
+                      alt={page.name}
+                      className="w-full h-full object-cover"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+
                     {/* 표지 페이지 특별 처리 */}
                     {index === 0 && (
                       <>
@@ -597,20 +603,6 @@ function IsoverPageMobile({ onBack = null }) {
                           />
                         </div>
                       </>
-                    )}
-
-                    {/* 일반 페이지 배경 이미지 */}
-                    {index !== 0 && (
-                    <img
-                      src={page.backgroundImage}
-                      alt={page.name}
-                      className="w-full h-full object-cover"
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover'
-                      }}
-                    />
                     )}
 
                     {/* 2번째 페이지 클릭 영역들 */}
@@ -692,6 +684,29 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 3번째 페이지 클릭 영역들 */}
                     {index === 2 && (
                       <>
+                        {/* 목차로 돌아가기 버튼 */}
+                        <button
+                          onClick={() => {
+                            const targetPage = document.querySelector('[data-page-index="1"]');
+                            if (targetPage) {
+                              targetPage.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                          style={{
+                            top: '7%',
+                            fontFamily: 'NanumSquareEB, sans-serif',
+                            fontWeight: 'bold',
+                            fontSize: '14px',
+                            backgroundColor: '#625C59',
+                            color: 'white',
+                            opacity: 0.9
+                          }}
+                          title="목차로 돌아가기"
+                        >
+                          📋 목차
+                        </button>
+
                         {/* 3페이지 영역 6개 배치 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
@@ -829,6 +844,29 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 4번째 페이지 클릭 영역들 */}
                     {index === 3 && (
                       <>
+                        {/* 목차로 돌아가기 버튼 */}
+                        <button
+                          onClick={() => {
+                            const targetPage = document.querySelector('[data-page-index="1"]');
+                            if (targetPage) {
+                              targetPage.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                          style={{
+                            top: '7%',
+                            fontFamily: 'NanumSquareEB, sans-serif',
+                            fontWeight: 'bold',
+                            fontSize: '14px',
+                            backgroundColor: '#625C59',
+                            color: 'white',
+                            opacity: 0.9
+                          }}
+                          title="목차로 돌아가기"
+                        >
+                          📋 목차
+                        </button>
+
                         {/* 4페이지 영역 4개 배치 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
@@ -887,6 +925,29 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 5번째 페이지 클릭 영역들 */}
                     {index === 4 && (
                       <>
+                        {/* 목차로 돌아가기 버튼 */}
+                        <button
+                          onClick={() => {
+                            const targetPage = document.querySelector('[data-page-index="1"]');
+                            if (targetPage) {
+                              targetPage.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                          style={{
+                            top: '7%',
+                            fontFamily: 'NanumSquareEB, sans-serif',
+                            fontWeight: 'bold',
+                            fontSize: '14px',
+                            backgroundColor: '#625C59',
+                            color: 'white',
+                            opacity: 0.9
+                          }}
+                          title="목차로 돌아가기"
+                        >
+                          📋 목차
+                        </button>
+
                         {/* 5페이지 영역 2개 배치 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
@@ -931,6 +992,29 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 6번째 페이지 클릭 영역들 */}
                     {index === 5 && (
                       <>
+                        {/* 목차로 돌아가기 버튼 */}
+                        <button
+                          onClick={() => {
+                            const targetPage = document.querySelector('[data-page-index="1"]');
+                            if (targetPage) {
+                              targetPage.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                          style={{
+                            top: '7%',
+                            fontFamily: 'NanumSquareEB, sans-serif',
+                            fontWeight: 'bold',
+                            fontSize: '14px',
+                            backgroundColor: '#625C59',
+                            color: 'white',
+                            opacity: 0.9
+                          }}
+                          title="목차로 돌아가기"
+                        >
+                          📋 목차
+                        </button>
+
                         {/* 6페이지 영역 6개 배치 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
@@ -941,23 +1025,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '34.3%',
                             height: '17.1%'
                           }}
-                          onClick={() => {
-                            if (hoveredArea6 === 1) {
-                              setHoveredArea6(null);
-                            } else {
-                              setHoveredArea6(1);
-                            }
-                          }}
-                          onMouseEnter={() => setHoveredArea6(1)}
-                          onMouseLeave={() => setHoveredArea6(null)}
+                          onClick={() => handlePage6AreaClick(1)}
                         >
-                          {hoveredArea6 === 1 && (
-                            <img
-                              src="/IsoverFile/Interacive/gif-file/L-Bracket-고정-1114.gif"
-                              alt="L-Bracket 고정"
-                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            />
-                          )}
                         </div>
                         
                         <div 
@@ -969,23 +1038,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '34.3%',
                             height: '17.1%'
                           }}
-                          onClick={() => {
-                            if (hoveredArea6 === 2) {
-                              setHoveredArea6(null);
-                            } else {
-                              setHoveredArea6(2);
-                            }
-                          }}
-                          onMouseEnter={() => setHoveredArea6(2)}
-                          onMouseLeave={() => setHoveredArea6(null)}
+                          onClick={() => handlePage6AreaClick(2)}
                         >
-                          {hoveredArea6 === 2 && (
-                            <img
-                              src="/IsoverFile/Interacive/gif-file/단열재-끼우기_1114.gif"
-                              alt="단열재 끼우기"
-                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            />
-                          )}
                         </div>
                         
                         <div 
@@ -997,23 +1051,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '36%',
                             height: '17.1%'
                           }}
-                          onClick={() => {
-                            if (hoveredArea6 === 3) {
-                              setHoveredArea6(null);
-                            } else {
-                              setHoveredArea6(3);
-                            }
-                          }}
-                          onMouseEnter={() => setHoveredArea6(3)}
-                          onMouseLeave={() => setHoveredArea6(null)}
+                          onClick={() => handlePage6AreaClick(3)}
                         >
-                          {hoveredArea6 === 3 && (
-                            <img
-                              src="/IsoverFile/Interacive/gif-file/화스너-고정-Trim_1114.gif"
-                              alt="화스너 고정"
-                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            />
-                          )}
                         </div>
                         
                         <div 
@@ -1025,23 +1064,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '34.5%',
                             height: '17.1%'
                           }}
-                          onClick={() => {
-                            if (hoveredArea6 === 4) {
-                              setHoveredArea6(null);
-                            } else {
-                              setHoveredArea6(4);
-                            }
-                          }}
-                          onMouseEnter={() => setHoveredArea6(4)}
-                          onMouseLeave={() => setHoveredArea6(null)}
+                          onClick={() => handlePage6AreaClick(4)}
                         >
-                          {hoveredArea6 === 4 && (
-                            <img
-                              src="/IsoverFile/Interacive/gif-file/수직-L-Bar-고정_1114.gif"
-                              alt="수직 L-Bar 고정"
-                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            />
-                          )}
                         </div>
                         
                         <div 
@@ -1053,23 +1077,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '34.5%',
                             height: '17.1%'
                           }}
-                          onClick={() => {
-                            if (hoveredArea6 === 5) {
-                              setHoveredArea6(null);
-                            } else {
-                              setHoveredArea6(5);
-                            }
-                          }}
-                          onMouseEnter={() => setHoveredArea6(5)}
-                          onMouseLeave={() => setHoveredArea6(null)}
+                          onClick={() => handlePage6AreaClick(5)}
                         >
-                          {hoveredArea6 === 5 && (
-                            <img
-                              src="/IsoverFile/Interacive/gif-file/수평-Bar-고정-Trim_1114.gif"
-                              alt="수평 Bar 고정"
-                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            />
-                          )}
                         </div>
                         
                         <div 
@@ -1081,23 +1090,8 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '34.5%',
                             height: '17.1%'
                           }}
-                          onClick={() => {
-                            if (hoveredArea6 === 6) {
-                              setHoveredArea6(null);
-                            } else {
-                              setHoveredArea6(6);
-                            }
-                          }}
-                          onMouseEnter={() => setHoveredArea6(6)}
-                          onMouseLeave={() => setHoveredArea6(null)}
+                          onClick={() => handlePage6AreaClick(6)}
                         >
-                          {hoveredArea6 === 6 && (
-                            <img
-                              src="/IsoverFile/Interacive/gif-file/마감재-부착-Trim_1114.gif"
-                              alt="마감재 부착"
-                              className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                            />
-                          )}
                         </div>
                         
                         {/* 6페이지 마지막 영역 (유튜브 링크) */}
@@ -1120,13 +1114,36 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 7번째 페이지 클릭 영역들 */}
                     {index === 6 && (
                       <>
+                        {/* 목차로 돌아가기 버튼 */}
+                        <button
+                          onClick={() => {
+                            const targetPage = document.querySelector('[data-page-index="1"]');
+                            if (targetPage) {
+                              targetPage.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                          style={{
+                            top: '7%',
+                            fontFamily: 'NanumSquareEB, sans-serif',
+                            fontWeight: 'bold',
+                            fontSize: '14px',
+                            backgroundColor: '#625C59',
+                            color: 'white',
+                            opacity: 0.9
+                          }}
+                          title="목차로 돌아가기"
+                        >
+                          📋 목차
+                        </button>
+
                         {/* 7페이지 영역 4개 배치 */}
                         {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 hover:scale-103 rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '23%',
+                            top: '16%',
                             left: '15%',
                             width: '70%',
                             height: '41%',
@@ -1157,7 +1174,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '4%',
+                            top: '7%',
                             left: '6%',
                             width: '27%',
                             height: '6%'
@@ -1171,7 +1188,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '4%',
+                            top: '7%',
                             right: '6%',
                             width: '38%',
                             height: '6%'
@@ -1574,14 +1591,22 @@ function IsoverPageMobile({ onBack = null }) {
               ×
             </button>
 
-            {/* 이미지 표시 */}
+            {/* GIF 표시 */}
             <div className="flex items-center justify-center">
               <img
-                src={`/IsoverFile/Popup/6-${selectedPage6Area}.png`}
-                alt={`영역 ${selectedPage6Area}`}
+                src={`/IsoverFile/Interacive/gif-file/${
+                  selectedPage6Area === 1 ? 'L-Bracket-고정-1114.gif' :
+                  selectedPage6Area === 2 ? '단열재-끼우기_1114.gif' :
+                  selectedPage6Area === 3 ? '화스너-고정-Trim_1114.gif' :
+                  selectedPage6Area === 4 ? '수직-L-Bar-고정_1114.gif' :
+                  selectedPage6Area === 5 ? '수평-Bar-고정-Trim_1114.gif' :
+                  selectedPage6Area === 6 ? '마감재-부착-Trim_1114.gif' :
+                  'L-Bracket-고정-1114.gif'
+                }`}
+                alt={`영역 ${selectedPage6Area} GIF`}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 메시지 표시
+                  // GIF 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -1590,8 +1615,8 @@ function IsoverPageMobile({ onBack = null }) {
                 className="hidden text-gray-500 text-center"
                 style={{ display: 'none' }}
               >
-                <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/6-{selectedPage6Area}.png</p>
+                <p>GIF를 불러올 수 없습니다.</p>
+                <p className="text-sm">영역 {selectedPage6Area}의 GIF 파일을 찾을 수 없습니다.</p>
               </div>
             </div>
           </div>

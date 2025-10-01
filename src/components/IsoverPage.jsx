@@ -784,6 +784,28 @@ function IsoverPage({ onBack = null }) {
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
                 
+                {/* 목차로 돌아가기 버튼 */}
+                <button
+                  onClick={() => {
+                    if (flipBookRef.current) {
+                      flipBookRef.current.pageFlip().turnToPage(1);
+                    }
+                  }}
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  style={{
+                    top: '5%',
+                    fontFamily: 'NanumSquareEB, sans-serif',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    backgroundColor: '#625C59',
+                    color: 'white',
+                    opacity: 0.9
+                  }}
+                  title="목차로 돌아가기"
+                >
+                  📋 목차
+                </button>
+                
                 {/* 3페이지 영역 6개 배치 */}
                 <div 
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
@@ -944,6 +966,28 @@ function IsoverPage({ onBack = null }) {
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
                 
+                {/* 목차로 돌아가기 버튼 */}
+                <button
+                  onClick={() => {
+                    if (flipBookRef.current) {
+                      flipBookRef.current.pageFlip().turnToPage(1);
+                    }
+                  }}
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  style={{
+                    top: '5%',
+                    fontFamily: 'NanumSquareEB, sans-serif',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    backgroundColor: '#625C59',
+                    color: 'white',
+                    opacity: 0.9
+                  }}
+                  title="목차로 돌아가기"
+                >
+                  📋 목차
+                </button>
+                
                 {/* 4페이지 영역 4개 배치 */}
                 <div 
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
@@ -1025,6 +1069,28 @@ function IsoverPage({ onBack = null }) {
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
                 
+                {/* 목차로 돌아가기 버튼 */}
+                <button
+                  onClick={() => {
+                    if (flipBookRef.current) {
+                      flipBookRef.current.pageFlip().turnToPage(1);
+                    }
+                  }}
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  style={{
+                    top: '5%',
+                    fontFamily: 'NanumSquareEB, sans-serif',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    backgroundColor: '#625C59',
+                    color: 'white',
+                    opacity: 0.9
+                  }}
+                  title="목차로 돌아가기"
+                >
+                  📋 목차
+                </button>
+                
                 {/* 5페이지 영역 2개 배치 */}
                 <div 
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
@@ -1091,6 +1157,28 @@ function IsoverPage({ onBack = null }) {
                 }}
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
+                
+                {/* 목차로 돌아가기 버튼 */}
+                <button
+                  onClick={() => {
+                    if (flipBookRef.current) {
+                      flipBookRef.current.pageFlip().turnToPage(1);
+                    }
+                  }}
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  style={{
+                    top: '5%',
+                    fontFamily: 'NanumSquareEB, sans-serif',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    backgroundColor: '#625C59',
+                    color: 'white',
+                    opacity: 0.9
+                  }}
+                  title="목차로 돌아가기"
+                >
+                  📋 목차
+                </button>
                 
                 {/* 6페이지 영역 6개 배치 */}
                 <div 
@@ -1267,6 +1355,28 @@ function IsoverPage({ onBack = null }) {
                 }}
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
+                
+                {/* 목차로 돌아가기 버튼 */}
+                <button
+                  onClick={() => {
+                    if (flipBookRef.current) {
+                      flipBookRef.current.pageFlip().turnToPage(1);
+                    }
+                  }}
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  style={{
+                    top: '5%',
+                    fontFamily: 'NanumSquareEB, sans-serif',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    backgroundColor: '#625C59',
+                    color: 'white',
+                    opacity: 0.9
+                  }}
+                  title="목차로 돌아가기"
+                >
+                  📋 목차
+                </button>
                 
                 {/* 7페이지 영역 4개 배치 */}
                 {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
