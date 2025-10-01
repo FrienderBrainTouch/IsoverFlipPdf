@@ -407,6 +407,19 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   /**
+   * 5페이지로 이동하는 핸들러
+   */
+  const handleGoToPage5 = () => {
+    // 모달 닫기
+    closeModal();
+    // 5페이지로 스크롤 이동 (페이지 인덱스는 0부터 시작하므로 4)
+    const targetPage = document.querySelector('[data-page-index="4"]');
+    if (targetPage) {
+      targetPage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  /**
    * 모달 닫기 핸들러
    */
   const closeModal = () => {
@@ -1110,7 +1123,7 @@ function IsoverPageMobile({ onBack = null }) {
                         {/* 7페이지 영역 4개 배치 */}
                         {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-103 rounded-lg"
                           style={{
                             position: 'absolute',
                             top: '23%',
@@ -1262,7 +1275,7 @@ function IsoverPageMobile({ onBack = null }) {
             </button>
 
             {/* 이미지 표시 */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center relative">
               <img
                 src={`/IsoverFile/Popup/${selectedArea}.jpg`}
                 alt={`영역 ${selectedArea}`}
@@ -1278,6 +1291,21 @@ function IsoverPageMobile({ onBack = null }) {
                   }
                 }}
               />
+              
+              {/* 5페이지로 이동하는 클릭 영역 */}
+              <div
+                className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                style={{
+                  top: '49%',
+                  left: '7%',
+                  width: '34%',
+                  height: '26%'
+                }}
+                onClick={handleGoToPage5}
+                title="5페이지로 이동"
+              >
+              </div>
+              
               <div
                 className="hidden text-gray-500 text-center"
                 style={{ display: 'none' }}

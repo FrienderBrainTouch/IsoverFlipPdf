@@ -5,11 +5,39 @@ import Isover3DModel from './Isover3DModel';
 
 function IsoverPage({ onBack = null }) {
   // 화면 크기 상태 관리
-  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1024);
-  const [flipBookSize, setFlipBookSize] = React.useState({
-    width: Math.min(window.innerWidth * 0.4, 500),
-    height: Math.min(window.innerHeight * 0.8, 700)
-  });
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1025);
+  
+  // 원본 이미지 비율 계산 (2480:3507)
+  const originalAspectRatio = 2480 / 3507; // 약 0.707
+  
+  // 플립북 크기 계산 함수
+  const calculateFlipBookSize = () => {
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
+    
+    // 화면의 40% 너비를 기준으로 하되, 최소 400px, 최대 600px
+    const targetWidth = Math.max(400, Math.min(600, screenWidth * 0.4));
+    
+    // 원본 비율을 유지하여 높이 계산
+    const targetHeight = targetWidth / originalAspectRatio;
+    
+    // 화면 높이의 80%를 넘지 않도록 제한
+    const maxHeight = screenHeight * 0.8;
+    if (targetHeight > maxHeight) {
+      const adjustedWidth = maxHeight * originalAspectRatio;
+      return {
+        width: Math.max(350, adjustedWidth),
+        height: maxHeight
+      };
+    }
+    
+    return {
+      width: targetWidth,
+      height: targetHeight
+    };
+  };
+  
+  const [flipBookSize, setFlipBookSize] = React.useState(calculateFlipBookSize());
   
   // 플립북 참조
   const flipBookRef = React.useRef(null);
@@ -72,11 +100,8 @@ function IsoverPage({ onBack = null }) {
   // 화면 크기 변경 감지
   React.useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-      setFlipBookSize({
-        width: Math.min(window.innerWidth * 0.4, 700),
-        height: Math.min(window.innerHeight * 0.8, 1000)
-      });
+      setIsMobile(window.innerWidth < 1025);
+      setFlipBookSize(calculateFlipBookSize());
     };
 
     window.addEventListener('resize', handleResize);
@@ -373,6 +398,18 @@ function IsoverPage({ onBack = null }) {
   };
 
   /**
+   * 5페이지로 이동하는 핸들러
+   */
+  const handleGoToPage5 = () => {
+    // 모달 닫기
+    closeModal();
+    // 5페이지로 이동 (페이지 인덱스는 0부터 시작하므로 4)
+    if (flipBookRef.current) {
+      flipBookRef.current.pageFlip().turnToPage(4);
+    }
+  };
+
+  /**
    * 모달 닫기 핸들러
    */
   const closeModal = () => {
@@ -526,41 +563,43 @@ function IsoverPage({ onBack = null }) {
           <img
             src="/IsoverFile/Interacive/Isover_Logo.svg"
             alt="Isover Logo"
-            className="h-8 w-auto"
+            className="h-10 xl:h-14 w-auto"
           />
         </button>
       </div>
 
       {/* 중앙 플립북 컨테이너 */}
       <div className=" w-full h-full flex items-center justify-center p-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center xl:gap-4">
           {/* 왼쪽 네비게이션 버튼들 - 표지 페이지가 아닐 때만 표시 */}
           {!isCoverPage && (
             <div className="flex flex-col items-center gap-2">
-              {/* Left 버튼 */}
-              <button
-                onClick={goToPreviousPage}
-                className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
-                title="이전 페이지"
-              >
-                <img
-                  src="/IsoverFile/Interacive/arrow_left.svg"
-                  alt="이전 페이지"
-                  className="w-6 h-6"
-                />
-              </button>
-              {/* First 버튼 */}
-              <button
-                onClick={goToFirstPage}
-                className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
-                title="첫 페이지"
-              >
-                <img
-                  src="/IsoverFile/Interacive/arrow_first.svg"
-                  alt="첫 페이지"
-                  className="w-6 h-6"
-                />
-              </button>
+               {/* Left 버튼 */}
+               <button
+                 onClick={goToPreviousPage}
+                 className="cursor-pointer hover:scale-110 transition-transform duration-200"
+                 style={{ width: '48px', height: '48px', padding: '8px' }}
+                 title="이전 페이지"
+               >
+                 <img
+                   src="/IsoverFile/Interacive/arrow_left.svg"
+                   alt="이전 페이지"
+                   style={{ width: '32px', height: '32px' }}
+                 />
+               </button>
+               {/* First 버튼 */}
+               <button
+                 onClick={goToFirstPage}
+                 className="cursor-pointer hover:scale-110 transition-transform duration-200"
+                 style={{ width: '48px', height: '48px', padding: '8px' }}
+                 title="첫 페이지"
+               >
+                 <img
+                   src="/IsoverFile/Interacive/arrow_first.svg"
+                   alt="첫 페이지"
+                   style={{ width: '32px', height: '32px' }}
+                 />
+               </button>
             </div>
           )}
 
@@ -653,10 +692,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '24%',
-                    left: '10%',
+                    top: '26%',
+                    left: '7%',
                     width: '40%',
-                    height: '25%'
+                    height: '22%'
                   }}
                 >
                 </div>
@@ -665,10 +704,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '24%',
-                    right: '6%',
+                    top: '26%',
+                    right: '9%',
                     width: '40%',
-                    height: '25%'
+                    height: '22%'
                   }}
                   onClick={handleArea2Click}
                   title="4번 페이지로 이동"
@@ -679,10 +718,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '24%',
-                    left: '10%',
+                    bottom: '26%',
+                    left: '8%',
                     width: '40%',
-                    height: '25%'
+                    height: '22%'
                   }}
                   onClick={handleArea3Click}
                   title="5번 페이지로 이동"
@@ -693,10 +732,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '24%',
-                    right: '6%',
+                    bottom: '26%',
+                    right: '9%',
                     width: '40%',
-                    height: '25%'
+                    height: '22%'
                   }}
                   onClick={handleArea4Click}
                   title="6번 페이지로 이동"
@@ -1058,9 +1097,9 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '20.8%',
-                    left: '10.3%',
-                    width: '36%',
+                    top: '18.3%',
+                    left: '11%',
+                    width: '35.3%',
                     height: '17.1%'
                   }}
                   onClick={() => handlePage6AreaClick(1)}
@@ -1080,9 +1119,9 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '20.8%',
-                    right: '8.8%',
-                    width: '36%',
+                    top: '18.3%',
+                    right: '9%',
+                    width: '35.5%',
                     height: '17.1%'
                   }}
                   onClick={() => handlePage6AreaClick(2)}
@@ -1102,9 +1141,9 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '45.1%',
+                    top: '42.1%',
                     left: '10.3%',
-                    width: '36%',
+                    width: '35.3%',
                     height: '17.1%'
                   }}
                   onClick={() => handlePage6AreaClick(3)}
@@ -1124,7 +1163,7 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '45.1%',
+                    top: '42.1%',
                     right: '8.8%',
                     width: '36%',
                     height: '17.1%'
@@ -1146,7 +1185,7 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '14%',
+                    bottom: '17%',
                     left: '10.3%',
                     width: '36%',
                     height: '17.1%'
@@ -1168,7 +1207,7 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '14%',
+                    bottom: '17%',
                     right: '8.8%',
                     width: '36%',
                     height: '17.1%'
@@ -1191,7 +1230,7 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '5%',
+                    bottom: '5.5%',
                     left: '32%',
                     width: '36%',
                     height: '4%'
@@ -1232,10 +1271,10 @@ function IsoverPage({ onBack = null }) {
                 {/* 7페이지 영역 4개 배치 */}
                 {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                 <div 
-                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  className="absolute cursor-pointer transition-all duration-300 hover:scale-103"
                   style={{
                     position: 'absolute',
-                    top: '23%',
+                    top: '18%',
                     left: '15%',
                     width: '70%',
                     height: '41%',
@@ -1280,10 +1319,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '4%',
+                    bottom: '6%',
                     left: '6%',
-                    width: '27%',
-                    height: '6%'
+                    width: '20%',
+                    height: '14%'
                   }}
                   onClick={() => handlePage7AreaClick(2)}
                 >
@@ -1294,17 +1333,17 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '4%',
+                    bottom: '10%',
                     right: '6%',
-                    width: '38%',
-                    height: '6%'
+                    width: '24%',
+                    height: '10%'
                   }}
                   onClick={() => handlePage7AreaClick(3)}
                 >
                 </div>
                 
                 {/* 4. 하단 노란색 부분 작은 영역 */}
-                <div 
+                {/* <div 
                   className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
@@ -1315,7 +1354,7 @@ function IsoverPage({ onBack = null }) {
                   }}
                   onClick={() => handlePage7AreaClick(4)}
                 >
-                </div>
+                </div> */}
                 
                 {/* 오른쪽 터치 영역 (7페이지는 오른쪽) */}
                 <div 
@@ -1331,39 +1370,41 @@ function IsoverPage({ onBack = null }) {
             </HTMLFlipBook>
           </div>
 
-          {/* 오른쪽 네비게이션 버튼들 */}
-          <div className="flex flex-col items-center gap-2">
-            {/* Right 버튼 (항상 표시) */}
-            <button
-              onClick={goToNextPage}
-              className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
-              title="다음 페이지"
-            >
-              <img
-                src="/IsoverFile/Interacive/arrow_right.svg"
-                alt="다음 페이지"
-                className="w-6 h-6"
-              />
-            </button>
-            
-            {/* Last 버튼 (항상 표시) */}
-            <button
-              onClick={goToLastPage}
-              className="p-2 cursor-pointer hover:scale-110 transition-transform duration-200"
-              title="마지막 페이지"
-            >
-              <img
-                src="/IsoverFile/Interacive/arrow_last.svg"
-                alt="마지막 페이지"
-                className="w-6 h-6"
-              />
-            </button>
-          </div>
+           {/* 오른쪽 네비게이션 버튼들 */}
+           <div className="flex flex-col items-center gap-2">
+             {/* Right 버튼 (항상 표시) */}
+             <button
+               onClick={goToNextPage}
+               className="cursor-pointer hover:scale-110 transition-transform duration-200"
+               style={{ width: '48px', height: '48px', padding: '8px' }}
+               title="다음 페이지"
+             >
+               <img
+                 src="/IsoverFile/Interacive/arrow_right.svg"
+                 alt="다음 페이지"
+                 style={{ width: '32px', height: '32px' }}
+               />
+             </button>
+             
+             {/* Last 버튼 (항상 표시) */}
+             <button
+               onClick={goToLastPage}
+               className="cursor-pointer hover:scale-110 transition-transform duration-200"
+               style={{ width: '48px', height: '48px', padding: '8px' }}
+               title="마지막 페이지"
+             >
+               <img
+                 src="/IsoverFile/Interacive/arrow_last.svg"
+                 alt="마지막 페이지"
+                 style={{ width: '32px', height: '32px' }}
+               />
+             </button>
+           </div>
         </div>
       </div>
 
-      {/* 오른쪽 툴바 */}
-      <div className="flex-shrink-0 flex flex-col gap-3 bg-gray-800 p-3">
+      {/* 오른쪽 툴바 - 데스크톱 */}
+      <div className="hidden xl:flex flex-shrink-0 flex-col gap-3 bg-gray-800 p-3">
         {/* 홈 버튼 */}
         <button
           onClick={() => (window.location.href = '/Isover')}
@@ -1410,8 +1451,57 @@ function IsoverPage({ onBack = null }) {
 
       </div>
 
+      {/* 하단 툴바 - 1200px 이하 */}
+      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-800 p-3">
+        <div className="flex justify-center items-center gap-4">
+          {/* 홈 버튼 */}
+          <button
+            onClick={() => (window.location.href = '/Isover')}
+            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="홈"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </button>
+
+          {/* 프린터 버튼 */}
+          <button
+            onClick={handlePrintClick}
+            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="프린트"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+          </button>
+
+          {/* PDF 다운로드 버튼 */}
+          <button
+            onClick={handleDownloadClick}
+            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="PDF 다운로드"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </button>
+          
+          {/* 공유 버튼 */}
+          <button
+            onClick={handleShareClick}
+            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="공유"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       {/* 페이지 정보 표시 */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm">
+      <div className="absolute bottom-6 xl:bottom-6 bottom-20 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm">
         Isover 카탈로그
       </div>
 
@@ -1434,7 +1524,7 @@ function IsoverPage({ onBack = null }) {
             </button>
 
             {/* 이미지 표시 */}
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center relative">
               <img
                 src={`/IsoverFile/Popup/${selectedArea}.jpg`}
                 alt={`영역 ${selectedArea}`}
@@ -1450,6 +1540,21 @@ function IsoverPage({ onBack = null }) {
                   }
                 }}
               />
+              
+              {/* 5페이지로 이동하는 클릭 영역 */}
+              <div
+                className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                style={{
+                  top: '49%',
+                  left: '7%',
+                  width: '34%',
+                  height: '26%'
+                }}
+                onClick={handleGoToPage5}
+                title="5페이지로 이동"
+              >
+              </div>
+              
               <div
                 className="hidden text-gray-500 text-center"
                 style={{ display: 'none' }}
