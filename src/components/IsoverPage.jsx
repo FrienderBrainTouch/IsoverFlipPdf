@@ -558,7 +558,7 @@ function IsoverPage({ onBack = null }) {
       {mainScreenVisible && (
         <div className="w-full h-screen overflow-hidden bg-white flex">
       {/* 왼쪽 위 Isover 로고 (홈 버튼) */}
-      <div className="flex-shrink-0 p-6">
+      <div className="flex-shrink-0 pt-6">
         <button onClick={handleHomeClick} className="cursor-pointer">
           <img
             src="/IsoverFile/Interacive/Isover_Logo.svg"
