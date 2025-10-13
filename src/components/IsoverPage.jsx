@@ -791,7 +791,7 @@ function IsoverPage({ onBack = null }) {
                       flipBookRef.current.pageFlip().turnToPage(1);
                     }
                   }}
-                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#4A453F] hover:shadow-xl z-10 hover:opacity-100 cursor-pointer"
                   style={{
                     top: '5%',
                     fontFamily: 'NanumSquareEB, sans-serif',
@@ -973,7 +973,7 @@ function IsoverPage({ onBack = null }) {
                       flipBookRef.current.pageFlip().turnToPage(1);
                     }
                   }}
-                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#4A453F] hover:shadow-xl z-10 hover:opacity-100 cursor-pointer"
                   style={{
                     top: '5%',
                     fontFamily: 'NanumSquareEB, sans-serif',
@@ -1076,7 +1076,7 @@ function IsoverPage({ onBack = null }) {
                       flipBookRef.current.pageFlip().turnToPage(1);
                     }
                   }}
-                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#4A453F] hover:shadow-xl z-10 hover:opacity-100 cursor-pointer"
                   style={{
                     top: '5%',
                     fontFamily: 'NanumSquareEB, sans-serif',
@@ -1165,7 +1165,7 @@ function IsoverPage({ onBack = null }) {
                       flipBookRef.current.pageFlip().turnToPage(1);
                     }
                   }}
-                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#4A453F] hover:shadow-xl z-10 hover:opacity-100 cursor-pointer"
                   style={{
                     top: '5%',
                     fontFamily: 'NanumSquareEB, sans-serif',
@@ -1363,7 +1363,7 @@ function IsoverPage({ onBack = null }) {
                       flipBookRef.current.pageFlip().turnToPage(1);
                     }
                   }}
-                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
+                  className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 hover:bg-[#4A453F] hover:shadow-xl z-10 hover:opacity-100 cursor-pointer"
                   style={{
                     top: '5%',
                     fontFamily: 'NanumSquareEB, sans-serif',
