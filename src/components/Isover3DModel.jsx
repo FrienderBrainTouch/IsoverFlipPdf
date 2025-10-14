@@ -1,16 +1,38 @@
 import React, { useRef, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Environment } from '@react-three/drei';
+import { useGLTF, OrbitControls, Environment, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
+
+// Draco 압축 모델 지원: CDN에서 자동 로드
+useGLTF.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
+
+// 전역 로딩 매니저 디버그 훅
+THREE.DefaultLoadingManager.onStart = (url, loaded, total) => {
+  // eslint-disable-next-line no-console
+  console.log('[Loader] Start:', { url, loaded, total });
+};
+THREE.DefaultLoadingManager.onProgress = (url, loaded, total) => {
+  // eslint-disable-next-line no-console
+  console.log('[Loader] Progress:', { url, loaded, total });
+};
+THREE.DefaultLoadingManager.onLoad = () => {
+  // eslint-disable-next-line no-console
+  console.log('[Loader] All resources loaded');
+};
+THREE.DefaultLoadingManager.onError = (url) => {
+  // eslint-disable-next-line no-console
+  console.error('[Loader] Error:', { url });
+};
 
 /**
  * 3D 모델 컴포넌트
  * GLB 파일을 로드하고 회전 애니메이션을 적용합니다.
  */
-function IsoverModel({ modelPath }) {
+function IsoverModel({ modelPath, customScale = null }) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // 자동 회전 애니메이션 비활성화
   // useFrame((state, delta) => {
@@ -19,9 +41,9 @@ function IsoverModel({ modelPath }) {
   //   }
   // });
 
-  // 3D 모델의 중심을 계산하여 위치 조정
+  // 3D 모델의 중심을 계산하여 위치 조정 (한 번만 실행)
   React.useEffect(() => {
-    if (scene && meshRef.current) {
+    if (scene && meshRef.current && !isInitialized) {
       // 바운딩 박스 계산
       const box = new THREE.Box3().setFromObject(scene);
       const center = box.getCenter(new THREE.Vector3());
@@ -29,13 +51,19 @@ function IsoverModel({ modelPath }) {
       // 중심을 원점으로 이동
       scene.position.set(-center.x, -center.y, -center.z);
       
-      // 스케일 조정 (적절한 크기로)
-      const size = box.getSize(new THREE.Vector3());
-      const maxSize = Math.max(size.x, size.y, size.z);
-      const scale = 2 / maxSize; // 적절한 크기로 조정
-      scene.scale.setScalar(scale);
+      // 스케일 조정 (커스텀 스케일이 있으면 사용, 없으면 자동 계산)
+      if (customScale !== null) {
+        scene.scale.setScalar(customScale);
+      } else {
+        const size = box.getSize(new THREE.Vector3());
+        const maxSize = Math.max(size.x, size.y, size.z);
+        const scale = 2 / maxSize; // 적절한 크기로 조정
+        scene.scale.setScalar(scale);
+      }
+      
+      setIsInitialized(true);
     }
-  }, [scene]);
+  }, [scene, customScale, isInitialized]);
 
   return (
     <primitive
@@ -58,13 +86,25 @@ function Isover3DModel({
   position = { x: 0, y: 0 },
   animationDelay = 0,
   modelPath = "/IsoverFile/3dmodel/Untitled.glb",
-  isModal = false
+  isModal = false,
+  cameraPosition = [0, 0, 8],
+  cameraFov = 35,
+  customScale = null,
+  rotateSpeed = 1.0
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [animationOpacity, setAnimationOpacity] = useState(0);
   const [animationScale, setAnimationScale] = useState(0.8);
   const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
+
+  // 로더 진행률 (drei)
+  const { active, progress, errors, item, loaded, total } = useProgress();
+
+  React.useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.log('[3D] useProgress:', { active, progress, item, loaded, total, errors });
+  }, [active, progress, item, loaded, total, errors]);
 
   // 로딩 완료 핸들러
   const handleLoad = () => {
@@ -150,10 +190,18 @@ function Isover3DModel({
 
           {!hasError && (
             <Canvas
-              camera={{ position: [0, 0, 5], fov: 50 }}
-              onCreated={handleLoad}
-              onError={handleError}
-              style={{ width: '100%', height: '100%' }}
+              camera={{ position: cameraPosition, fov: cameraFov }}
+              onCreated={(state) => {
+                // eslint-disable-next-line no-console
+                console.log('[Canvas] Created', state);
+                handleLoad();
+              }}
+              onError={(e) => {
+                // eslint-disable-next-line no-console
+                console.error('[Canvas] Error', e);
+                handleError();
+              }}
+              style={{ paddingTop: '5%', width: '100%', height: '90%' }}
             >
               <Suspense fallback={null}>
                 {/* 조명 설정 - HDRI 대신 기본 조명 사용 */}
@@ -163,7 +211,7 @@ function Isover3DModel({
                 <pointLight position={[0, 10, 0]} intensity={0.6} />
                 
                 {/* 3D 모델 */}
-                <IsoverModel modelPath={modelPath} />
+                <IsoverModel modelPath={modelPath} customScale={customScale} />
                 
                 {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}
                 {/* <Environment preset="studio" /> */}
@@ -179,8 +227,9 @@ function Isover3DModel({
                   target={[0, 0, 0]}
                   enableDamping={true}
                   dampingFactor={0.05}
-                  minDistance={2}
-                  maxDistance={10}
+                  minDistance={4}
+                  maxDistance={15}
+                  rotateSpeed={rotateSpeed}
                 />
               </Suspense>
             </Canvas>

@@ -49,6 +49,9 @@ function IsoverPage({ onBack = null }) {
   // 3D 모델 뷰어 상태 관리 (표지 페이지에서만 표시)
   const [show3DModel, setShow3DModel] = React.useState(true);
   
+  // 3D 모델 모달 상태 관리
+  const [is3DModalOpen, setIs3DModalOpen] = React.useState(false);
+  
   // 마우스 이벤트 활성화 상태 관리
   const [mouseEventsEnabled, setMouseEventsEnabled] = React.useState(false);
   
@@ -70,6 +73,9 @@ function IsoverPage({ onBack = null }) {
   
   // 5페이지 모달 상태 관리
   const [isPage5ModalOpen, setIsPage5ModalOpen] = React.useState(false);
+  
+  // 5페이지 3D 모델 모달 상태 관리
+  const [isPage53DModalOpen, setIsPage53DModalOpen] = React.useState(false);
   
   // 6페이지 모달 상태 관리
   const [isPage6ModalOpen, setIsPage6ModalOpen] = React.useState(false);
@@ -391,7 +397,7 @@ function IsoverPage({ onBack = null }) {
       setSelectedArea(areaNumber);
       setIsModalOpen(true);
     } else {
-      // 추가 4개 영역 (7-10번)
+      // 추가 5개 영역 (7-11번)
       setSelectedAdditionalArea(areaNumber);
       setIsAdditionalModalOpen(true);
     }
@@ -445,7 +451,10 @@ function IsoverPage({ onBack = null }) {
    * 5페이지 영역 클릭 핸들러
    */
   const handlePage5AreaClick = (areaNumber) => {
-    if (areaNumber === 2) {
+    if (areaNumber === 1) {
+      // 첫 번째 영역 - 3D 모델 모달 열기
+      setIsPage53DModalOpen(true);
+    } else if (areaNumber === 2) {
       // 두 번째 영역만 모달 열기
       setIsPage5ModalOpen(true);
     }
@@ -649,7 +658,7 @@ function IsoverPage({ onBack = null }) {
                 )}
                 
                 {/* 표지 페이지에 3D 모델 배치 */}
-                <div className="absolute inset-0">
+                {/* <div className="absolute inset-0">
                   <Isover3DModel 
                     isVisible={show3DModel} 
                     opacity={1}
@@ -657,7 +666,7 @@ function IsoverPage({ onBack = null }) {
                     position={{ x: 0, y: 0 }}
                     animationDelay={1000}
                   />
-                </div>
+                </div> */}
 
                 {/* 오른쪽 터치 영역 (표지는 오른쪽) */}
                 <div 
@@ -938,6 +947,43 @@ function IsoverPage({ onBack = null }) {
                 >
                 </div>
                 
+                {/* 왼쪽 아래 3D 모델 영역 */}
+                <div 
+                  className="absolute cursor-pointer hover:bg-blue-500/10 transition-all duration-300 rounded-lg"
+                  style={{
+                    position: 'absolute',
+                    bottom: '20%',
+                    left: '5%',
+                    width: '58%',
+                    height: '21%'
+                  }}
+                  onClick={() => setIs3DModalOpen(true)}
+                  title="3D 모델 확대 보기"
+                >
+                  {/* 3D 모델 직접 배치 */}
+                  {/* <div className="absolute inset-0">
+                    <Isover3DModel 
+                      isVisible={true} 
+                      opacity={1}
+                      scale={0.3}
+                      position={{ x: 0, y: 0 }}
+                      animationDelay={500}
+                      modelPath="/IsoverFile/3dmodel/system_without_panel.glb"
+                      isModal={false}
+                      cameraPosition={[0, 0, 500]}
+                      cameraFov={50}
+                      customScale={0.1}
+                    />
+                  </div> */}
+                  
+                  {/* 호버 시 표시될 오버레이 */}
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100">
+                    <div className="text-white text-sm font-medium bg-blue-600/80 px-3 py-1 rounded-full">
+                      3D 모델 확대 보기
+                    </div>
+                  </div>
+                </div>
+                
                 {/* 오른쪽 터치 영역 (3페이지는 오른쪽) */}
                 <div 
                   className="absolute right-0 top-0 w-2.5 h-full cursor-pointer hover:bg-blue-500/20 transition-colors"
@@ -1093,7 +1139,7 @@ function IsoverPage({ onBack = null }) {
                 
                 {/* 5페이지 영역 2개 배치 */}
                 <div 
-                  className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                  className="absolute cursor-pointer hover:bg-blue-500/10 transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
                     top: '26%',
@@ -1102,6 +1148,7 @@ function IsoverPage({ onBack = null }) {
                     height: '23%'
                   }}
                   onClick={() => handlePage5AreaClick(1)}
+                  title="3D 모델 확대 보기"
                 >
                   {/* 첫 번째 영역에 3D 모델 직접 배치 */}
                   <div className="absolute inset-0">
@@ -1112,8 +1159,15 @@ function IsoverPage({ onBack = null }) {
                       position={{ x: 0, y: 0 }}
                       animationDelay={500}
                       modelPath="/IsoverFile/3dmodel/Untitled.glb"
-                      isModal={true}
+                      isModal={false}
                     />
+                  </div>
+                  
+                  {/* 호버 시 표시될 오버레이 */}
+                  <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100">
+                    <div className="text-white text-sm font-medium bg-blue-600/80 px-3 py-1 rounded-full">
+                      3D 모델 확대 보기
+                    </div>
                   </div>
                 </div>
                 
@@ -1715,12 +1769,15 @@ function IsoverPage({ onBack = null }) {
                     <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
                       <Isover3DModel 
                         isVisible={true} 
-                        opacity={0.9}
-                        scale={0.8}
+                        opacity={1}
+                        scale={1}
                         position={{ x: 0, y: 0 }}
                         animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                        modelPath="/IsoverFile/3dmodel/L-Bar.glb"
                         isModal={true}
+                        cameraPosition={[4, 8, 8]}
+                        cameraFov={5}
+                        customScale={1}
                       />
                     </div>
                   )}
@@ -1729,12 +1786,15 @@ function IsoverPage({ onBack = null }) {
                     <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
                     <Isover3DModel 
                       isVisible={true} 
-                      opacity={0.9}
-                      scale={0.8}
+                      opacity={1}
+                      scale={1}
                       position={{ x: 0, y: 0 }}
                       animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                      modelPath="/IsoverFile/3dmodel/L-AnkerBracket.glb"
                       isModal={true}
+                      cameraPosition={[1, 2, 2]}
+                      cameraFov={5}
+                      customScale={1}
                     />
                   </div>
                   )}
@@ -1743,18 +1803,38 @@ function IsoverPage({ onBack = null }) {
                     <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
                     <Isover3DModel 
                       isVisible={true} 
-                      opacity={0.9}
-                      scale={0.8}
+                      opacity={1}
+                      scale={1}
                       position={{ x: 0, y: 0 }}
                       animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/Untitled.glb"
+                      modelPath="/IsoverFile/3dmodel/L-HBar.glb"
                       isModal={true}
+                      cameraPosition={[1, 2, 2]}
+                      cameraFov={10}
+                      customScale={1}
                     />
                   </div>
                   )}
                   
                   {selectedAdditionalArea === 10 && (
                     <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                    <Isover3DModel 
+                      isVisible={true} 
+                      opacity={1}
+                      scale={1}
+                      position={{ x: 0, y: 0 }}
+                      animationDelay={500}
+                      modelPath="/IsoverFile/3dmodel/L-Holder.glb"
+                      isModal={true}
+                      cameraPosition={[1, 2, 2]}
+                      cameraFov={5}
+                      customScale={2}
+                    />
+                  </div>
+                  )}
+                  
+                  {/* {selectedAdditionalArea === 11 && (
+                    <div className="absolute top-[20%] left-[5%] w-[58%] h-[21%]">
                     <Isover3DModel 
                       isVisible={true} 
                       opacity={0.9}
@@ -1765,7 +1845,7 @@ function IsoverPage({ onBack = null }) {
                       isModal={true}
                     />
                   </div>
-                  )}
+                  )} */}
                 </div>
               </div>
               
@@ -1812,54 +1892,6 @@ function IsoverPage({ onBack = null }) {
                 }}
               />
               
-              {/* 3D 모델 영역 - 1,2,3 항목에만 배치 */}
-              {selectedPage4Area <= 3 && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-full h-full">
-                    {selectedPage4Area === 1 && (
-                      <div className="absolute top-[30%] left-[2%] w-[12%] h-[65%]">
-                        <Isover3DModel 
-                          isVisible={true} 
-                          opacity={0.9}
-                          scale={0.8}
-                          position={{ x: 0, y: 0 }}
-                          animationDelay={500}
-                          modelPath="/IsoverFile/3dmodel/Untitled.glb"
-                          isModal={true}
-                        />
-                      </div>
-                    )}
-                    
-                    {selectedPage4Area === 2 && (
-                      <div className="absolute top-[30%] left-[2%] w-[12%] h-[65%]">
-                        <Isover3DModel 
-                          isVisible={true} 
-                          opacity={0.9}
-                          scale={0.8}
-                          position={{ x: 0, y: 0 }}
-                          animationDelay={500}
-                          modelPath="/IsoverFile/3dmodel/Untitled.glb"
-                          isModal={true}
-                        />
-                      </div>
-                    )}
-                    
-                    {selectedPage4Area === 3 && (
-                      <div className="absolute top-[30%] left-[2%] w-[12%] h-[65%]">
-                        <Isover3DModel 
-                          isVisible={true} 
-                          opacity={0.9}
-                          scale={0.8}
-                          position={{ x: 0, y: 0 }}
-                          animationDelay={500}
-                          modelPath="/IsoverFile/3dmodel/Untitled.glb"
-                          isModal={true}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
               
               <div
                 className="hidden text-gray-500 text-center"
@@ -1959,6 +1991,97 @@ function IsoverPage({ onBack = null }) {
               >
                 <p>GIF를 불러올 수 없습니다.</p>
                 <p className="text-sm">영역 {selectedPage6Area}의 GIF 파일을 찾을 수 없습니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 3D 모델 모달창 */}
+      {is3DModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden">
+            {/* 모달 헤더 */}
+            <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
+              <div className="flex justify-center items-center">
+                <h3 className="text-lg font-semibold text-gray-800">3D 모델 뷰어</h3>
+              </div>
+            </div>
+            
+            {/* 3D 모델 컨테이너 - 제목과 하단 컨트롤 영역 제외 */}
+            <div className="w-full h-full pt-16 pb-20">
+              <Isover3DModel 
+                isVisible={true} 
+                opacity={1}
+                scale={0.3}
+                position={{ x: 0, y: 0 }}
+                animationDelay={0}
+                modelPath="/IsoverFile/3dmodel/system_without_panel.glb"
+                isModal={true}
+                cameraPosition={[0, 0, 1000]}
+                cameraFov={100000}
+                customScale={0.1}
+                rotateSpeed={-1.0}
+              />
+            </div>
+            
+            {/* 모달 하단 컨트롤 */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">마우스로 회전, 휠로 확대/축소 가능</p>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => setIs3DModalOpen(false)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5페이지 3D 모델 모달창 */}
+      {isPage53DModalOpen && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden">
+            {/* 모달 헤더 */}
+            <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
+              <div className="flex justify-center items-center">
+                <h3 className="text-lg font-semibold text-gray-800">5페이지 3D 모델 뷰어</h3>
+              </div>
+            </div>
+            
+            {/* 3D 모델 컨테이너 - 제목과 하단 컨트롤 영역 제외 */}
+            <div className="w-full h-full pt-16 pb-20">
+              <Isover3DModel 
+                isVisible={true} 
+                opacity={1}
+                scale={0.7}
+                position={{ x: 0, y: 0 }}
+                animationDelay={0}
+                modelPath="/IsoverFile/3dmodel/system_with_panel.glb"
+                isModal={true}
+                cameraPosition={[1, 2, 2]}
+                cameraFov={50}
+                customScale={0.5}
+              />
+            </div>
+            
+            {/* 모달 하단 컨트롤 */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">마우스로 회전, 휠로 확대/축소 가능</p>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => setIsPage53DModalOpen(false)}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    닫기
+                  </button>
+                </div>
               </div>
             </div>
           </div>
