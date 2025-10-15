@@ -607,11 +607,6 @@ function IsoverPageMobile({ onBack = null }) {
       setIsPage53DModelLoading(true); // 로딩 상태 시작
       setModalKey(prev => prev + 1); // 모달 새로고침을 위한 키 증가
       setIsPage53DModalOpen(true);
-      
-      // 모델이 캐시에 있는지 확인하고 로딩 상태 관리
-      setTimeout(() => {
-        setIsPage53DModelLoading(false); // 캐시된 모델이므로 즉시 로딩 완료
-      }, 100);
     } else if (areaNumber === 2) {
       // 두 번째 영역만 모달 열기
       setIsPage5ModalOpen(true);
@@ -629,11 +624,6 @@ function IsoverPageMobile({ onBack = null }) {
     // 파트별 모델 경로 설정
     const partModelPath = getModelPathByPart(partNumber);
     setCurrentPartModel(partModelPath);
-    
-    // 캐시된 모델이므로 즉시 로딩 완료
-    setTimeout(() => {
-      setIsPage53DModelLoading(false);
-    }, 100);
   };
 
   /**
@@ -1810,7 +1800,7 @@ function IsoverPageMobile({ onBack = null }) {
                     <p className="text-lg font-medium text-gray-700">
                       {currentPartModel ? `${getPartName(selectedPart)} 로딩 중...` : '3D 모델 로딩 중...'}
                     </p>
-                    <p className="text-sm text-gray-500 mt-2">캐시된 모델을 불러오는 중입니다</p>
+                    <p className="text-sm text-gray-500 mt-2">네트워크에서 모델을 불러오는 중입니다</p>
                   </div>
                 </div>
               )}
@@ -1829,6 +1819,7 @@ function IsoverPageMobile({ onBack = null }) {
                 rotateSpeed={1.0}
                 showWireframe={!currentPartModel} // 파트 모델이 선택되면 박스 숨김
                 onPartClick={handlePage5PartClick}
+                onModelLoad={() => setIsPage53DModelLoading(false)} // 모델 로딩 완료 시 로딩 상태 해제
               />
             </div>
             

@@ -227,7 +227,8 @@ function Isover3DModel({
   customScale = null,
   rotateSpeed = 1.0,
   showWireframe = false,
-  onPartClick = null
+  onPartClick = null,
+  onModelLoad = null
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -246,6 +247,7 @@ function Isover3DModel({
   // 로딩 완료 핸들러
   const handleLoad = () => {
     setIsLoading(false);
+    onModelLoad && onModelLoad(); // 모델 로딩 완료 콜백 호출
   };
 
   // 에러 핸들러
