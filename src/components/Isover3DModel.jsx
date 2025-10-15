@@ -24,11 +24,137 @@ THREE.DefaultLoadingManager.onError = (url) => {
   console.error('[Loader] Error:', { url });
 };
 
+
+/**
+ * 하이라이트 기능이 있는 투명 박스 컴포넌트
+ * 클릭 영역을 제공하고 하이라이트 효과를 표시합니다.
+ */
+function HighlightBox({ position, size, color = 0x00ff00, opacity = 0, onHover, onClick, isActive = false }) {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const currentOpacity = isHovered ? 0.3 : (isActive ? 0.2 : opacity);
+  const highlightColor = isHovered ? color : (isActive ? color : color);
+  
+  return (
+    <mesh 
+      position={position}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        setIsHovered(true);
+        onHover && onHover(true);
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        setIsHovered(false);
+        onHover && onHover(false);
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick && onClick();
+      }}
+    >
+      <boxGeometry args={size} />
+      <meshBasicMaterial 
+        color={highlightColor}
+        transparent={true} 
+        opacity={currentOpacity}
+        side={2} // DoubleSide로 설정하여 양면 모두 렌더링
+      />
+    </mesh>
+  );
+}
+
+/**
+ * 4개의 파트 박스를 배치하는 컴포넌트
+ */
+function PartBoxes({ modelPath, customScale = null, onPartClick }) {
+  const { scene } = useGLTF(modelPath);
+  const [modelData, setModelData] = useState(null);
+  const [hoveredBox, setHoveredBox] = useState(null);
+  const [activeBox, setActiveBox] = useState(0); // 현재 활성화된 박스 인덱스
+
+  React.useEffect(() => {
+    if (scene) {
+      // 모델의 바운딩 박스 계산
+      const box = new THREE.Box3().setFromObject(scene);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      
+      // console.log('PartBoxes - Model size:', size);
+      // console.log('PartBoxes - Model center:', center);
+      
+      // 모델 데이터 설정
+      setModelData({
+        size: [size.x, size.y, size.z],
+        center: [center.x, center.y, center.z]
+      });
+    }
+  }, [scene]);
+
+  // 박스 활성화 애니메이션
+  React.useEffect(() => {
+    if (!modelData) return;
+
+    const interval = setInterval(() => {
+      setActiveBox(prev => (prev + 1) % 4); // 0, 1, 2, 3 순환
+    }, 2000); // 2초마다 변경
+
+    return () => clearInterval(interval);
+  }, [modelData]);
+
+  if (!modelData) return null;
+
+  // 각 박스별 개별 크기 정의 (모델 크기 기준)
+  const boxSizes = [
+    // 1번 박스 (파이버시멘트보드) - 다른 크기
+    [modelData.size[0] * 1.2, modelData.size[1] * 3.5, modelData.size[2] * 5.0],
+    // 2번 박스 (AL 복합판넬) - 기본 크기
+    [modelData.size[0] * 0.6, modelData.size[1] * 3.5, modelData.size[2] * 5.0],
+    // 3번 박스 (AL 시트판넬) - 기본 크기
+    [modelData.size[0] * 0.6, modelData.size[1] * 3.5, modelData.size[2] * 5.0],
+    // 4번 박스 (조적판넬) - 기본 크기
+    [modelData.size[0] * 0.6, modelData.size[1] * 3.5, modelData.size[2] * 5.0]
+  ];
+
+  // 4개의 박스 위치 (각 패널에 배치 - 2번째 패널 제외)
+  // 이미지 분석: 1번(왼쪽), 3번(중앙), 4번(오른쪽), 5번(가장 오른쪽) 패널에 배치
+  const boxPositions = [
+    [-modelData.size[0] * 1.1, modelData.size[1] * 0.15, modelData.size[2] * 0.15], // 1번 패널 (왼쪽) - 파이버시멘트보드
+    [modelData.size[0] * 0.3, modelData.size[1] * 0.2, modelData.size[2] * 0.15], // 3번 패널 (중앙) - AL 복합판넬
+    [modelData.size[0] * 0.3 + modelData.size[0] * 0.55, modelData.size[1] * 0.2, modelData.size[2] * 0.15], // 4번 패널 (오른쪽) - AL 시트판넬
+    [modelData.size[0] * 0.3 + modelData.size[0] * 1.1, modelData.size[1] * 0.2, modelData.size[2] * 0.15] // 5번 패널 (가장 오른쪽) - 조적판넬
+  ];
+
+  const boxColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]; // 빨강, 녹색, 파랑, 노랑
+
+  return (
+    <group scale={customScale || 1}>
+      {boxPositions.map((position, index) => (
+        <HighlightBox
+          key={index}
+          position={position}
+          size={boxSizes[index]}
+          color={boxColors[index]}
+          opacity={0} // 기본적으로 완전 투명
+          isActive={activeBox === index} // 현재 활성화된 박스
+          onHover={(isHovered) => {
+            setHoveredBox(isHovered ? index : null);
+          }}
+          onClick={() => {
+            console.log(`Part ${index + 1} clicked`);
+            onPartClick && onPartClick(index + 1);
+          }}
+        />
+      ))}
+    </group>
+  );
+}
+
 /**
  * 3D 모델 컴포넌트
  * GLB 파일을 로드하고 회전 애니메이션을 적용합니다.
  */
-function IsoverModel({ modelPath, customScale = null }) {
+function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null }) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -66,12 +192,21 @@ function IsoverModel({ modelPath, customScale = null }) {
   }, [scene, customScale, isInitialized]);
 
   return (
-    <primitive
-      ref={meshRef}
-      object={scene}
-      onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    />
+    <group>
+      <primitive
+        ref={meshRef}
+        object={scene}
+        onPointerOver={() => setHovered(true)}
+        onPointerOut={() => setHovered(false)}
+      />
+      {showWireframe && (
+        <PartBoxes 
+          modelPath={modelPath} 
+          customScale={customScale} 
+          onPartClick={onPartClick}
+        />
+      )}
+    </group>
   );
 }
 
@@ -90,7 +225,9 @@ function Isover3DModel({
   cameraPosition = [0, 0, 8],
   cameraFov = 35,
   customScale = null,
-  rotateSpeed = 1.0
+  rotateSpeed = 1.0,
+  showWireframe = false,
+  onPartClick = null
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -211,7 +348,7 @@ function Isover3DModel({
                 <pointLight position={[0, 10, 0]} intensity={0.6} />
                 
                 {/* 3D 모델 */}
-                <IsoverModel modelPath={modelPath} customScale={customScale} />
+                <IsoverModel modelPath={modelPath} customScale={customScale} showWireframe={showWireframe} onPartClick={onPartClick} />
                 
                 {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}
                 {/* <Environment preset="studio" /> */}

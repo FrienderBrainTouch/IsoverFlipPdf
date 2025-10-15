@@ -51,7 +51,8 @@ function IsoverPageMobile({ onBack = null }) {
   
   // 5페이지 3D 모델 모달 상태 관리
   const [isPage53DModalOpen, setIsPage53DModalOpen] = useState(false);
-  const [selectedPart, setSelectedPart] = useState(1); // 선택된 파트 (1-6)
+  const [selectedPart, setSelectedPart] = useState(1); // 선택된 파트 (1-4)
+  const [currentPartModel, setCurrentPartModel] = useState(null); // 현재 표시할 파트 모델
   
   // 6페이지 모달 상태 관리
   const [isPage6ModalOpen, setIsPage6ModalOpen] = useState(false);
@@ -480,18 +481,33 @@ function IsoverPageMobile({ onBack = null }) {
   const getModelPathByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
+        return "/IsoverFile/3dmodel/1_System_Fiber_SET.glb"; // 파이버시멘트보드
       case 2:
-        return "/IsoverFile/3dmodel/1_System_Fiber_SET.glb";
+        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb"; // AL 복합판넬
       case 3:
-        return "/IsoverFile/3dmodel/system_with_panel.glb"; // 기본 모델
+        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb"; // AL 시트판넬
       case 4:
-        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb";
-      case 5:
-        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb";
-      case 6:
-        return "/IsoverFile/3dmodel/4_System_Three_SET.glb";
+        return "/IsoverFile/3dmodel/4_System_Three_SET.glb"; // 조적판넬
       default:
         return "/IsoverFile/3dmodel/system_with_panel.glb";
+    }
+  };
+
+  /**
+   * 파트별 이름 반환 함수
+   */
+  const getPartName = (partNumber) => {
+    switch (partNumber) {
+      case 1:
+        return "파이버시멘트보드";
+      case 2:
+        return "AL 복합판넬";
+      case 3:
+        return "AL 시트판넬";
+      case 4:
+        return "조적판넬";
+      default:
+        return "전체 시스템";
     }
   };
 
@@ -501,18 +517,15 @@ function IsoverPageMobile({ onBack = null }) {
   const getModelScaleByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
+        return 0.3; // 1_System_Fiber_SET
       case 2:
-        return 0.3;
+        return 0.3; // 2_System_Alu-Complex_SET
       case 3:
-        return 0.4;
+        return 0.3; // 3_System_Alu-Sheet_SET
       case 4:
-        return 0.3;
-      case 5:
-        return 0.3;
-      case 6:
-        return 0.3;
+        return 0.3; // 4_System_Three_SET
       default:
-        return 0.4;
+        return 0.3; // 기본 모델
     }
   };
 
@@ -522,11 +535,25 @@ function IsoverPageMobile({ onBack = null }) {
   const handlePage5AreaClick = (areaNumber) => {
     if (areaNumber === 1) {
       // 첫 번째 영역 - 3D 모델 모달 열기
+      setCurrentPartModel(null);
+      setSelectedPart(1);
       setIsPage53DModalOpen(true);
     } else if (areaNumber === 2) {
       // 두 번째 영역만 모달 열기
       setIsPage5ModalOpen(true);
     }
+  };
+
+  /**
+   * 5페이지 3D 모델 파트 클릭 핸들러
+   */
+  const handlePage5PartClick = (partNumber) => {
+    console.log(`Part ${partNumber} clicked`);
+    setSelectedPart(partNumber);
+    
+    // 파트별 모델 경로 설정
+    const partModelPath = getModelPathByPart(partNumber);
+    setCurrentPartModel(partModelPath);
   };
 
   /**
@@ -970,7 +997,7 @@ function IsoverPageMobile({ onBack = null }) {
                             width: '89%',
                             height: '19%'
                           }}
-                          onClick={handlePage4Area2Click}
+                          onClick={() => handlePage4AreaClick(2)}
                         >
                         </div>
                         
@@ -1030,28 +1057,17 @@ function IsoverPageMobile({ onBack = null }) {
 
                         {/* 5페이지 영역 2개 배치 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '26%',
-                            left: '19%',
-                            width: '75%',
-                            height: '23%'
+                            top: '25%',
+                            left: '21%',
+                            width: '70.5%',
+                            height: '26%'
                           }}
                           onClick={() => handlePage5AreaClick(1)}
+                          title="3D 모델 확대 보기"
                         >
-                          {/* 첫 번째 영역에 3D 모델 직접 배치 */}
-                          <div className="absolute inset-0">
-                            <Isover3DModel 
-                              isVisible={true} 
-                              opacity={0.9}
-                              scale={0.8}
-                              position={{ x: 0, y: 0 }}
-                              animationDelay={500}
-                              modelPath="/IsoverFile/3dmodel/Untitled.glb"
-                              isModal={true}
-                            />
-                          </div>
                         </div>
                         
                         <div 
@@ -1544,7 +1560,7 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 닫기 버튼 */}
             <button
               onClick={closePage4Modal}
-              className="absolute top-2 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
             >
               ×
             </button>
@@ -1552,9 +1568,9 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 이미지와 3D 모델 표시 */}
             <div className="relative flex items-center justify-center">
               <img
-                src={`/IsoverFile/Popup/4-${selectedPage4Area === 1 ? '1.svg' : selectedPage4Area + '.png'}`}
+                src={`/IsoverFile/Popup/4-${selectedPage4Area}.png`}
                 alt={`영역 ${selectedPage4Area}`}
-                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
                   // 이미지 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
@@ -1568,7 +1584,7 @@ function IsoverPageMobile({ onBack = null }) {
                 style={{ display: 'none' }}
               >
                 <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/4-{selectedPage4Area === 1 ? '1.svg' : selectedPage4Area + '.png'}</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/4-{selectedPage4Area}.png</p>
               </div>
             </div>
           </div>
@@ -1663,12 +1679,27 @@ function IsoverPageMobile({ onBack = null }) {
 
       {/* 5페이지 3D 모델 모달창 */}
       {isPage53DModalOpen && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden">
+        <div 
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+          onClick={() => {
+            setIsPage53DModalOpen(false);
+            setCurrentPartModel(null);
+            setSelectedPart(1);
+          }}
+        >
+          <div 
+            className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* 모달 헤더 */}
             <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
               <div className="flex justify-center items-center">
-                <h3 className="text-lg font-semibold text-gray-800">5페이지 3D 모델 뷰어</h3>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {currentPartModel ? 
+                    `5페이지 3D 모델 뷰어 - ${getPartName(selectedPart)}` : 
+                    '5페이지 3D 모델 뷰어 - 전체 시스템'
+                  }
+                </h3>
               </div>
             </div>
             
@@ -1680,12 +1711,14 @@ function IsoverPageMobile({ onBack = null }) {
                 scale={0.7}
                 position={{ x: 0, y: 0 }}
                 animationDelay={0}
-                modelPath="/IsoverFile/3dmodel/system_with_panel.glb"
+                modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel.glb"}
                 isModal={true}
-                cameraPosition={[0, 0, 14]}
-                cameraFov={100000}
-                customScale={0.1}
-                rotateSpeed={-1.0}
+                cameraPosition={[0, 0, 14]} // 파트 모델링과 system_with_panel 분리
+                cameraFov={80}
+                customScale={currentPartModel ? getModelScaleByPart(selectedPart) : 0.3}
+                rotateSpeed={1.0}
+                showWireframe={!currentPartModel} // 파트 모델이 선택되면 박스 숨김
+                onPartClick={handlePage5PartClick}
               />
             </div>
             
@@ -1693,9 +1726,27 @@ function IsoverPageMobile({ onBack = null }) {
             <div className="absolute bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-2">마우스로 회전, 휠로 확대/축소 가능</p>
+                {currentPartModel && (
+                  <p className="text-sm text-blue-600 mb-2">선택된 파트: {getPartName(selectedPart)}</p>
+                )}
                 <div className="flex justify-center space-x-4">
+                  {currentPartModel && (
+                    <button
+                      onClick={() => {
+                        setCurrentPartModel(null);
+                        setSelectedPart(1);
+                      }}
+                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                    >
+                      전체 모델로 돌아가기
+                    </button>
+                  )}
                   <button
-                    onClick={() => setIsPage53DModalOpen(false)}
+                    onClick={() => {
+                      setIsPage53DModalOpen(false);
+                      setCurrentPartModel(null);
+                      setSelectedPart(1);
+                    }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     닫기
