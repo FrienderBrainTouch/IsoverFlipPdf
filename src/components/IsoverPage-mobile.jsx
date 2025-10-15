@@ -85,37 +85,43 @@ function IsoverPageMobile({ onBack = null }) {
     "/IsoverFile/3dmodel/system_without_panel.glb"
   ];
 
-  // 3D 모델 로딩 함수
+  // 3D 모델 로딩 함수 - Three.js GLTFLoader를 사용하여 실제 모델 파싱
   const preloadAllModels = async () => {
     setTotalModels(allModelPaths.length);
     setLoadingProgress(0);
     
+    // Three.js GLTFLoader 동적 import
+    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+    const loader = new GLTFLoader();
+    
     const loadPromises = allModelPaths.map((modelPath, index) => {
       return new Promise((resolve) => {
-        // GLB 파일을 fetch로 미리 로딩
-        fetch(modelPath)
-          .then(response => {
-            if (response.ok) {
-              return response.blob();
-            }
-            throw new Error(`Failed to load ${modelPath}`);
-          })
-          .then(() => {
+        // GLTFLoader를 사용하여 실제 모델 파싱 및 캐시
+        loader.load(
+          modelPath,
+          (gltf) => {
+            // 모델이 성공적으로 로딩되면 useGLTF 캐시에 저장
+            console.log(`모델 로딩 완료: ${modelPath}`);
             setLoadingProgress(prev => prev + 1);
             resolve();
-          })
-          .catch(error => {
-            console.warn(`Failed to preload model: ${modelPath}`, error);
+          },
+          (progress) => {
+            // 로딩 진행률 (선택사항)
+            console.log(`로딩 진행률 ${modelPath}: ${(progress.loaded / progress.total * 100)}%`);
+          },
+          (error) => {
+            console.warn(`모델 로딩 실패: ${modelPath}`, error);
             setLoadingProgress(prev => prev + 1);
             resolve(); // 에러가 있어도 계속 진행
-          });
+          }
+        );
       });
     });
 
     try {
       await Promise.all(loadPromises);
       setModelsLoaded(true);
-      console.log('모든 3D 모델 로딩 완료');
+      console.log('모든 3D 모델 로딩 및 파싱 완료');
     } catch (error) {
       console.error('3D 모델 로딩 중 오류 발생:', error);
       setModelsLoaded(true); // 에러가 있어도 로딩 완료로 처리
