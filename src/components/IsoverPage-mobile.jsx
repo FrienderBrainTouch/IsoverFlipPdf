@@ -62,8 +62,65 @@ function IsoverPageMobile({ onBack = null }) {
   const [playingVideo, setPlayingVideo] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
 
+  // 3D 모델 로딩 상태 관리
+  const [modelsLoaded, setModelsLoaded] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [totalModels, setTotalModels] = useState(0);
+
   // ref 변수들
   const animationRef = useRef(null);
+
+  // 모든 3D 모델 경로 정의
+  const allModelPaths = [
+    "/IsoverFile/3dmodel/1_System_Fiber_SET.glb",
+    "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb",
+    "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb",
+    "/IsoverFile/3dmodel/4_System_Three_SET.glb",
+    "/IsoverFile/3dmodel/BlackFacing.glb",
+    "/IsoverFile/3dmodel/L-AnkerBracket.glb",
+    "/IsoverFile/3dmodel/L-Bar.glb",
+    "/IsoverFile/3dmodel/L-HBar.glb",
+    "/IsoverFile/3dmodel/L-Holder.glb",
+    "/IsoverFile/3dmodel/system_with_panel.glb",
+    "/IsoverFile/3dmodel/system_without_panel.glb"
+  ];
+
+  // 3D 모델 로딩 함수
+  const preloadAllModels = async () => {
+    setTotalModels(allModelPaths.length);
+    setLoadingProgress(0);
+    
+    const loadPromises = allModelPaths.map((modelPath, index) => {
+      return new Promise((resolve) => {
+        // GLB 파일을 fetch로 미리 로딩
+        fetch(modelPath)
+          .then(response => {
+            if (response.ok) {
+              return response.blob();
+            }
+            throw new Error(`Failed to load ${modelPath}`);
+          })
+          .then(() => {
+            setLoadingProgress(prev => prev + 1);
+            resolve();
+          })
+          .catch(error => {
+            console.warn(`Failed to preload model: ${modelPath}`, error);
+            setLoadingProgress(prev => prev + 1);
+            resolve(); // 에러가 있어도 계속 진행
+          });
+      });
+    });
+
+    try {
+      await Promise.all(loadPromises);
+      setModelsLoaded(true);
+      console.log('모든 3D 모델 로딩 완료');
+    } catch (error) {
+      console.error('3D 모델 로딩 중 오류 발생:', error);
+      setModelsLoaded(true); // 에러가 있어도 로딩 완료로 처리
+    }
+  };
 
   /**
    * 중앙 이미지 애니메이션 시작 함수
@@ -155,11 +212,37 @@ function IsoverPageMobile({ onBack = null }) {
     }
   }, [showFrontGif]);
 
+  // 2단계: 흰 화면이 위로 사라지는 전환 (3D 모델 로딩 완료 후 실행)
+  const startTransition = React.useCallback(() => {
+    console.log('2단계 애니메이션 시작');
+    setWhiteScreenVisible(false);
+    
+    // 전환 완료 후 본 화면 표시
+    setTimeout(() => {
+      setMainScreenVisible(true);
+      startImageAnimation();
+      // 인트로 완료 후 1초 뒤에 GIF 시작
+      setTimeout(() => {
+        setShowFrontGif(true);
+      }, 1000);
+    }, 500);
+  }, []);
+
+  // 3D 모델 로딩 완료 감지
+  useEffect(() => {
+    if (modelsLoaded && logoOpacity === 1) {
+      // 로고 애니메이션과 3D 모델 로딩이 모두 완료되면 2초 후 2단계 시작
+      setTimeout(() => {
+        startTransition();
+      }, 2000);
+    }
+  }, [modelsLoaded, logoOpacity, startTransition]);
+
   /**
    * 컴포넌트 마운트 시 애니메이션 시퀀스 실행
    */
   useEffect(() => {
-    // 1단계: 로고 애니메이션 (opacity 0 → 100)
+    // 1단계: 로고 애니메이션과 3D 모델 로딩 동시 시작
     const logoAnimation = () => {
       const startTime = performance.now();
       const duration = 1500; // 1.5초
@@ -175,36 +258,18 @@ function IsoverPageMobile({ onBack = null }) {
         if (progress < 1) {
           animationRef.current = requestAnimationFrame(animate);
         } else {
-          // 로고 애니메이션 완료 후 2초 대기
-          setTimeout(() => {
-            startTransition();
-          }, 2000);
+          // 로고 애니메이션 완료 - 3D 모델 로딩 완료까지 대기
+          console.log('로고 애니메이션 완료, 3D 모델 로딩 대기 중...');
         }
       };
 
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    // 2단계: 흰 화면이 위로 사라지는 전환
-    const startTransition = () => {
-      setWhiteScreenVisible(false);
-      
-      // 전환 완료 후 본 화면 표시
-      setTimeout(() => {
-        setMainScreenVisible(true);
-        startImageAnimation();
-        // 인트로 완료 후 1초 뒤에 GIF 시작
-        setTimeout(() => {
-          setShowFrontGif(true);
-        }, 1000);
-      }, 500);
-    };
-
-    // 3단계: 중앙 이미지 애니메이션
-
-    // 애니메이션 시작
+    // 애니메이션과 3D 모델 로딩 동시 시작
     setTimeout(() => {
       logoAnimation();
+      preloadAllModels(); // 3D 모델 로딩 시작
     }, 500);
 
     // 컴포넌트 언마운트 시 정리
@@ -256,8 +321,10 @@ function IsoverPageMobile({ onBack = null }) {
     setMainScreenVisible(false);
     setImageScale(1.2);
     setImageOpacity(0);
+    setModelsLoaded(false);
+    setLoadingProgress(0);
 
-    // 애니메이션 재시작
+    // 애니메이션과 3D 모델 로딩 재시작
     setTimeout(() => {
       const logoAnimation = () => {
         const startTime = performance.now();
@@ -273,24 +340,16 @@ function IsoverPageMobile({ onBack = null }) {
           if (progress < 1) {
             animationRef.current = requestAnimationFrame(animate);
           } else {
-            setTimeout(() => {
-              setWhiteScreenVisible(false);
-              setTimeout(() => {
-                setMainScreenVisible(true);
-                startCoverPageAnimation();
-                // 인트로 완료 후 1초 뒤에 GIF 시작
-                setTimeout(() => {
-                  setShowFrontGif(true);
-                }, 1000);
-              }, 500);
-            }, 2000);
+            console.log('로고 애니메이션 완료, 3D 모델 로딩 대기 중...');
           }
         };
 
         animationRef.current = requestAnimationFrame(animate);
       };
 
+      // 로고 애니메이션과 3D 모델 로딩 동시 시작
       logoAnimation();
+      preloadAllModels();
     }, 500);
   };
 
@@ -615,13 +674,28 @@ function IsoverPageMobile({ onBack = null }) {
           }`}
         >
           {/* Isover 로고 */}
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full flex flex-col items-center justify-center">
             <img 
               src="/IsoverFile/Interacive/Isover_Logo.svg"
               alt="Isover Logo"
               className="max-w-full max-h-full object-contain"
               style={{ opacity: logoOpacity }}
             />
+            
+            {/* 3D 모델 로딩 진행률 표시 */}
+            {!modelsLoaded && totalModels > 0 && (
+              <div className="mt-8 w-64">
+                <div className="text-center text-gray-600 mb-2 text-sm">
+                  3D 모델 로딩 중... ({loadingProgress}/{totalModels})
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${(loadingProgress / totalModels) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
