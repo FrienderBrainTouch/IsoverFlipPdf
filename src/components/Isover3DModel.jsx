@@ -1,6 +1,6 @@
 import React, { useRef, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, OrbitControls, Environment, useProgress } from '@react-three/drei';
+import { useGLTF, OrbitControls, Environment, useProgress, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Draco 압축 모델 지원: CDN에서 자동 로드
@@ -151,6 +151,77 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
 }
 
 /**
+ * 전역 로딩 컴포넌트
+ * React Three Fiber의 전역 로딩 상태를 표시합니다.
+ */
+function GlobalLoader() {
+  const { active, progress, errors, item, loaded, total } = useProgress();
+
+  if (!active) return null;
+
+  return (
+    <Html center>
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl p-8 max-w-md mx-4 shadow-2xl">
+          <div className="text-center">
+            {/* 로딩 아이콘 */}
+            <div className="mb-6">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
+            </div>
+            
+            {/* 프로그레스바 */}
+            <div className="mb-4">
+              <div className="w-full bg-gray-200 rounded-full h-4 mb-3 shadow-inner">
+                <div 
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-500 ease-out shadow-sm relative overflow-hidden"
+                  style={{ width: `${progress}%` }}
+                >
+                  {/* 프로그레스바 내부 애니메이션 효과 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+                </div>
+              </div>
+              <p className="text-lg font-semibold text-gray-800">
+                {Math.round(progress)}% 로딩 중...
+              </p>
+              {total > 0 && (
+                <p className="text-sm text-gray-500">
+                  {loaded} / {total} 파일
+                </p>
+              )}
+            </div>
+            
+            {/* 현재 로딩 중인 파일 */}
+            {item && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 font-medium">현재 로딩 중:</p>
+                <p className="text-xs text-gray-500 truncate max-w-xs mx-auto">
+                  {item}
+                </p>
+              </div>
+            )}
+            
+            {/* 에러 표시 */}
+            {errors.length > 0 && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600 font-medium">로딩 오류:</p>
+                <p className="text-xs text-red-500">
+                  {errors[0]}
+                </p>
+              </div>
+            )}
+            
+            {/* 로딩 메시지 */}
+            <p className="text-sm text-gray-600">
+              3D 모델을 준비하고 있습니다...
+            </p>
+          </div>
+        </div>
+      </div>
+    </Html>
+  );
+}
+
+/**
  * 3D 모델 컴포넌트
  * GLB 파일을 로드하고 회전 애니메이션을 적용합니다.
  */
@@ -229,30 +300,12 @@ function Isover3DModel({
   showWireframe = false,
   onPartClick = null
 }) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
   const [animationOpacity, setAnimationOpacity] = useState(0);
   const [animationScale, setAnimationScale] = useState(0.8);
   const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
 
-  // 로더 진행률 (drei)
-  const { active, progress, errors, item, loaded, total } = useProgress();
-
-  React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[3D] useProgress:', { active, progress, item, loaded, total, errors });
-  }, [active, progress, item, loaded, total, errors]);
-
-  // 로딩 완료 핸들러
-  const handleLoad = () => {
-    setIsLoading(false);
-  };
-
-  // 에러 핸들러
-  const handleError = () => {
-    setHasError(true);
-    setIsLoading(false);
-  };
+  // 에러 상태만 관리 (전역 로딩은 GlobalLoader에서 처리)
+  const [hasError, setHasError] = useState(false);
 
   // 애니메이션 효과
   React.useEffect(() => {
@@ -299,27 +352,20 @@ function Isover3DModel({
             height: '100%'
           }}
         >
-          {isLoading && (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 mx-auto mb-2"></div>
-                <p className="text-sm text-blue-600 font-medium">3D 모델 로딩 중...</p>
-              </div>
-            </div>
-          )}
+          {/* 전역 로딩이 처리하므로 개별 로딩 UI 제거 */}
           
           {hasError && (
             <div className="w-full h-full bg-red-50 flex items-center justify-center">
               <div className="text-center">
                 <p className="text-red-600 mb-2 font-medium">3D 모델 로딩 실패</p>
+                <p className="text-xs text-gray-500 mb-3">
+                  {errors.length > 0 && errors[0]}
+                </p>
                 <button 
-                  onClick={() => {
-                    setHasError(false);
-                    setIsLoading(true);
-                  }}
+                  onClick={() => window.location.reload()}
                   className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                 >
-                  다시 시도
+                  페이지 새로고침
                 </button>
               </div>
             </div>
@@ -331,16 +377,19 @@ function Isover3DModel({
               onCreated={(state) => {
                 // eslint-disable-next-line no-console
                 console.log('[Canvas] Created', state);
-                handleLoad();
+                setHasError(false);
               }}
-              onError={(e) => {
+              onError={(error) => {
                 // eslint-disable-next-line no-console
-                console.error('[Canvas] Error', e);
-                handleError();
+                console.error('[Canvas] Error', error);
+                setHasError(true);
               }}
               style={{ paddingTop: '5%', width: '100%', height: '90%' }}
             >
               <Suspense fallback={null}>
+                {/* 전역 로딩 컴포넌트 */}
+                <GlobalLoader />
+                
                 {/* 조명 설정 - HDRI 대신 기본 조명 사용 */}
                 <ambientLight intensity={0.4} />
                 <directionalLight position={[10, 10, 5]} intensity={1.2} />
