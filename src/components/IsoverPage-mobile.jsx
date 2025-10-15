@@ -1667,14 +1667,8 @@ function IsoverPageMobile({ onBack = null }) {
           <div className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden">
             {/* 모달 헤더 */}
             <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-center items-center">
                 <h3 className="text-lg font-semibold text-gray-800">5페이지 3D 모델 뷰어</h3>
-                <button
-                  onClick={() => setIsPage53DModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors duration-300"
-                >
-                  ×
-                </button>
               </div>
             </div>
             
