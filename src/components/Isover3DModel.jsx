@@ -154,7 +154,7 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
  * 3D 모델 컴포넌트
  * GLB 파일을 로드하고 회전 애니메이션을 적용합니다.
  */
-function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null }) {
+function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null, onModelLoad = null }) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -188,8 +188,13 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
       }
       
       setIsInitialized(true);
+      
+      // 모델 로딩 완료 콜백 호출
+      if (onModelLoad) {
+        onModelLoad();
+      }
     }
-  }, [scene, customScale, isInitialized]);
+  }, [scene, customScale, isInitialized, onModelLoad]);
 
   return (
     <group>
@@ -235,6 +240,7 @@ function Isover3DModel({
   const [animationOpacity, setAnimationOpacity] = useState(0);
   const [animationScale, setAnimationScale] = useState(0.8);
   const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
+  const [loadingTimeout, setLoadingTimeout] = useState(null);
 
   // 로더 진행률 (drei)
   const { active, progress, errors, item, loaded, total } = useProgress();
@@ -242,16 +248,54 @@ function Isover3DModel({
   React.useEffect(() => {
     // eslint-disable-next-line no-console
     console.log('[3D] useProgress:', { active, progress, item, loaded, total, errors });
+    
+    // 로딩이 완료되었을 때 (active가 false이고 progress가 100이거나 total이 0이 아닌 경우)
+    if (!active && (progress === 100 || (total > 0 && loaded === total))) {
+      console.log('[3D] 모델 로딩 완료 감지');
+      handleLoad();
+    }
+    
+    // 에러가 발생한 경우
+    if (errors.length > 0) {
+      console.error('[3D] 로딩 에러:', errors);
+      handleError();
+    }
   }, [active, progress, item, loaded, total, errors]);
+
+  // 타임아웃을 통한 무한 로딩 방지
+  React.useEffect(() => {
+    if (isLoading) {
+      const timeout = setTimeout(() => {
+        console.warn('[3D] 로딩 타임아웃 - 강제로 로딩 완료 처리');
+        handleLoad();
+      }, 10000); // 10초 타임아웃
+      
+      setLoadingTimeout(timeout);
+      
+      return () => {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+      };
+    }
+  }, [isLoading]);
 
   // 로딩 완료 핸들러
   const handleLoad = () => {
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
+      setLoadingTimeout(null);
+    }
     setIsLoading(false);
     onModelLoad && onModelLoad(); // 모델 로딩 완료 콜백 호출
   };
 
   // 에러 핸들러
   const handleError = () => {
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
+      setLoadingTimeout(null);
+    }
     setHasError(true);
     setIsLoading(false);
   };
@@ -268,6 +312,15 @@ function Isover3DModel({
       return () => clearTimeout(timer);
     }
   }, [isVisible, opacity, scale, position, animationDelay]);
+
+  // 컴포넌트 언마운트 시 타임아웃 정리
+  React.useEffect(() => {
+    return () => {
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+      }
+    };
+  }, [loadingTimeout]);
 
   if (!isVisible) return null;
 
@@ -301,14 +354,6 @@ function Isover3DModel({
             height: '100%'
           }}
         >
-          {isLoading && (
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 mx-auto mb-2"></div>
-                <p className="text-sm text-blue-600 font-medium">3D 모델 로딩 중...</p>
-              </div>
-            </div>
-          )}
           
           {hasError && (
             <div className="w-full h-full bg-red-50 flex items-center justify-center">
@@ -330,11 +375,6 @@ function Isover3DModel({
           {!hasError && (
             <Canvas
               camera={{ position: cameraPosition, fov: cameraFov }}
-              onCreated={(state) => {
-                // eslint-disable-next-line no-console
-                console.log('[Canvas] Created', state);
-                handleLoad();
-              }}
               onError={(e) => {
                 // eslint-disable-next-line no-console
                 console.error('[Canvas] Error', e);
@@ -350,7 +390,7 @@ function Isover3DModel({
                 <pointLight position={[0, 10, 0]} intensity={0.6} />
                 
                 {/* 3D 모델 */}
-                <IsoverModel modelPath={modelPath} customScale={customScale} showWireframe={showWireframe} onPartClick={onPartClick} />
+                <IsoverModel modelPath={modelPath} customScale={customScale} showWireframe={showWireframe} onPartClick={onPartClick} onModelLoad={onModelLoad} />
                 
                 {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}
                 {/* <Environment preset="studio" /> */}

@@ -693,20 +693,6 @@ function IsoverPageMobile({ onBack = null }) {
               style={{ opacity: logoOpacity }}
             />
             
-            {/* 3D 모델 로딩 진행률 표시 */}
-            {!modelsLoaded && totalModels > 0 && (
-              <div className="mt-8 w-64">
-                <div className="text-center text-gray-600 mb-2 text-sm">
-                  3D 모델 로딩 중... ({loadingProgress}/{totalModels})
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-out"
-                    style={{ width: `${(loadingProgress / totalModels) * 100}%` }}
-                  ></div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -1792,21 +1778,9 @@ function IsoverPageMobile({ onBack = null }) {
             
             {/* 3D 모델 컨테이너 - 제목과 하단 컨트롤 영역 제외 */}
             <div className="w-full h-full pt-16 pb-20 relative">
-              {/* 로딩 오버레이 */}
-              {isPage53DModelLoading && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-20">
-                  <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-lg font-medium text-gray-700">
-                      {currentPartModel ? `${getPartName(selectedPart)} 로딩 중...` : '3D 모델 로딩 중...'}
-                    </p>
-                    <p className="text-sm text-gray-500 mt-2">네트워크에서 모델을 불러오는 중입니다</p>
-                  </div>
-                </div>
-              )}
               
               <Isover3DModel 
-                isVisible={!isPage53DModelLoading} 
+                isVisible={true} 
                 opacity={1}
                 scale={0.7}
                 position={{ x: 0, y: 0 }}
