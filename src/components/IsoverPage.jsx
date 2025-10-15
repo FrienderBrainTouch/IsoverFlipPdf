@@ -1139,7 +1139,7 @@ function IsoverPage({ onBack = null }) {
                 
                 {/* 5페이지 영역 2개 배치 */}
                 <div 
-                  className="absolute cursor-pointer hover:bg-blue-500/10 transition-all duration-300 rounded-lg"
+                  className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
                   style={{
                     position: 'absolute',
                     top: '26%',
@@ -1150,25 +1150,6 @@ function IsoverPage({ onBack = null }) {
                   onClick={() => handlePage5AreaClick(1)}
                   title="3D 모델 확대 보기"
                 >
-                  {/* 첫 번째 영역에 3D 모델 직접 배치 */}
-                  <div className="absolute inset-0">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={0.9}
-                      scale={0.8}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/Untitled.glb"
-                      isModal={false}
-                    />
-                  </div>
-                  
-                  {/* 호버 시 표시될 오버레이 */}
-                  <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100">
-                    <div className="text-white text-sm font-medium bg-blue-600/80 px-3 py-1 rounded-full">
-                      3D 모델 확대 보기
-                    </div>
-                  </div>
                 </div>
                 
                 <div 
@@ -1775,7 +1756,7 @@ function IsoverPage({ onBack = null }) {
                         animationDelay={500}
                         modelPath="/IsoverFile/3dmodel/L-Bar.glb"
                         isModal={true}
-                        cameraPosition={[4, 8, 8]}
+                        cameraPosition={[8, 14, 14]}
                         cameraFov={5}
                         customScale={1}
                       />
@@ -2013,12 +1994,12 @@ function IsoverPage({ onBack = null }) {
               <Isover3DModel 
                 isVisible={true} 
                 opacity={1}
-                scale={0.3}
+                scale={0.7}
                 position={{ x: 0, y: 0 }}
                 animationDelay={0}
                 modelPath="/IsoverFile/3dmodel/system_without_panel.glb"
                 isModal={true}
-                cameraPosition={[0, 0, 1000]}
+                cameraPosition={[0, 0, 14]}
                 cameraFov={100000}
                 customScale={0.1}
                 rotateSpeed={-1.0}
@@ -2064,9 +2045,10 @@ function IsoverPage({ onBack = null }) {
                 animationDelay={0}
                 modelPath="/IsoverFile/3dmodel/system_with_panel.glb"
                 isModal={true}
-                cameraPosition={[1, 2, 2]}
-                cameraFov={50}
-                customScale={0.5}
+                cameraPosition={[0, 0, 14]}
+                cameraFov={100000}
+                customScale={0.4}
+                rotateSpeed={-1.0}
               />
             </div>
             
