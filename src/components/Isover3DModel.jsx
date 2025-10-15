@@ -72,22 +72,40 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
   const [modelData, setModelData] = useState(null);
   const [hoveredBox, setHoveredBox] = useState(null);
   const [activeBox, setActiveBox] = useState(0); // 현재 활성화된 박스 인덱스
+  const [isModelReady, setIsModelReady] = useState(false);
 
   React.useEffect(() => {
     if (scene) {
-      // 모델의 바운딩 박스 계산
-      const box = new THREE.Box3().setFromObject(scene);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
+      // 모델이 완전히 로딩되었는지 확인
+      const checkModelReady = () => {
+        if (scene.children && scene.children.length > 0) {
+          // 모델의 바운딩 박스 계산
+          const box = new THREE.Box3().setFromObject(scene);
+          const center = box.getCenter(new THREE.Vector3());
+          const size = box.getSize(new THREE.Vector3());
+          
+          // 모델 크기가 유효한지 확인 (0이 아닌 값들)
+          if (size.x > 0 && size.y > 0 && size.z > 0) {
+            console.log('PartBoxes - Model size:', size);
+            console.log('PartBoxes - Model center:', center);
+            
+            // 모델 데이터 설정
+            setModelData({
+              size: [size.x, size.y, size.z],
+              center: [center.x, center.y, center.z]
+            });
+            setIsModelReady(true);
+          } else {
+            // 모델이 아직 완전히 로딩되지 않았으면 잠시 후 다시 시도
+            setTimeout(checkModelReady, 100);
+          }
+        } else {
+          // 모델이 아직 로딩되지 않았으면 잠시 후 다시 시도
+          setTimeout(checkModelReady, 100);
+        }
+      };
       
-      // console.log('PartBoxes - Model size:', size);
-      // console.log('PartBoxes - Model center:', center);
-      
-      // 모델 데이터 설정
-      setModelData({
-        size: [size.x, size.y, size.z],
-        center: [center.x, center.y, center.z]
-      });
+      checkModelReady();
     }
   }, [scene]);
 
@@ -102,7 +120,7 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
     return () => clearInterval(interval);
   }, [modelData]);
 
-  if (!modelData) return null;
+  if (!modelData || !isModelReady) return null;
 
   // 각 박스별 개별 크기 정의 (모델 크기 기준)
   const boxSizes = [
@@ -159,6 +177,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isModelFullyLoaded, setIsModelFullyLoaded] = useState(false);
 
   // 자동 회전 애니메이션 비활성화
   // useFrame((state, delta) => {
@@ -166,6 +185,12 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
   //     meshRef.current.rotation.y += delta * 0.5;
   //   }
   // });
+
+  // 모델 경로가 변경될 때 상태 초기화
+  React.useEffect(() => {
+    setIsInitialized(false);
+    setIsModelFullyLoaded(false);
+  }, [modelPath]);
 
   // 3D 모델의 중심을 계산하여 위치 조정 (한 번만 실행)
   React.useEffect(() => {
@@ -188,6 +213,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
       }
       
       setIsInitialized(true);
+      setIsModelFullyLoaded(true);
       
       // 모델 로딩 완료 콜백 호출
       if (onModelLoad) {
@@ -204,7 +230,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       />
-      {showWireframe && (
+      {showWireframe && isModelFullyLoaded && (
         <PartBoxes 
           modelPath={modelPath} 
           customScale={customScale} 
