@@ -81,6 +81,8 @@ function IsoverPage({ onBack = null }) {
   const [isPage53DModalOpen, setIsPage53DModalOpen] = React.useState(false);
   const [selectedPart, setSelectedPart] = React.useState(1); // 선택된 파트 (1-4)
   const [currentPartModel, setCurrentPartModel] = React.useState(null); // 현재 표시할 파트 모델
+  const [isPage53DModelLoading, setIsPage53DModelLoading] = React.useState(false); // 5페이지 3D 모델 로딩 상태
+  const [modalKey, setModalKey] = React.useState(0); // 모달 새로고침을 위한 키
   
   // 6페이지 모달 상태 관리
   const [isPage6ModalOpen, setIsPage6ModalOpen] = React.useState(false);
@@ -596,7 +598,14 @@ function IsoverPage({ onBack = null }) {
       // 첫 번째 영역 - 3D 모델 모달 열기
       setCurrentPartModel(null);
       setSelectedPart(1);
+      setIsPage53DModelLoading(true); // 로딩 상태 시작
+      setModalKey(prev => prev + 1); // 모달 새로고침을 위한 키 증가
       setIsPage53DModalOpen(true);
+      
+      // 모델이 캐시에 있는지 확인하고 로딩 상태 관리
+      setTimeout(() => {
+        setIsPage53DModelLoading(false); // 캐시된 모델이므로 즉시 로딩 완료
+      }, 100);
     } else if (areaNumber === 2) {
       // 두 번째 영역만 모달 열기
       setIsPage5ModalOpen(true);
@@ -616,10 +625,16 @@ function IsoverPage({ onBack = null }) {
   const handlePage5PartClick = (partNumber) => {
     console.log(`Part ${partNumber} clicked`);
     setSelectedPart(partNumber);
+    setIsPage53DModelLoading(true); // 파트 변경 시 로딩 상태 시작
     
     // 파트별 모델 경로 설정
     const partModelPath = getModelPathByPart(partNumber);
     setCurrentPartModel(partModelPath);
+    
+    // 캐시된 모델이므로 즉시 로딩 완료
+    setTimeout(() => {
+      setIsPage53DModelLoading(false);
+    }, 100);
   };
 
   /**
@@ -2242,11 +2257,13 @@ function IsoverPage({ onBack = null }) {
             setIsPage53DModalOpen(false);
             setCurrentPartModel(null);
             setSelectedPart(1);
+            setIsPage53DModelLoading(false);
           }}
         >
           <div 
             className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
+            key={modalKey} // 모달 새로고침을 위한 키
           >
             {/* 모달 헤더 */}
             <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
@@ -2261,9 +2278,22 @@ function IsoverPage({ onBack = null }) {
             </div>
             
             {/* 3D 모델 컨테이너 - 제목과 하단 컨트롤 영역 제외 */}
-            <div className="w-full h-full pt-16 pb-20">
+            <div className="w-full h-full pt-16 pb-20 relative">
+              {/* 로딩 오버레이 */}
+              {isPage53DModelLoading && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-20">
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-lg font-medium text-gray-700">
+                      {currentPartModel ? `${getPartName(selectedPart)} 로딩 중...` : '3D 모델 로딩 중...'}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">캐시된 모델을 불러오는 중입니다</p>
+                  </div>
+                </div>
+              )}
+              
               <Isover3DModel 
-                isVisible={true} 
+                isVisible={!isPage53DModelLoading} 
                 opacity={1}
                 scale={0.7}
                 position={{ x: 0, y: 0 }}
@@ -2292,6 +2322,7 @@ function IsoverPage({ onBack = null }) {
                       onClick={() => {
                         setCurrentPartModel(null);
                         setSelectedPart(1);
+                        setIsPage53DModelLoading(false);
                       }}
                       className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
                     >
@@ -2303,6 +2334,7 @@ function IsoverPage({ onBack = null }) {
                       setIsPage53DModalOpen(false);
                       setCurrentPartModel(null);
                       setSelectedPart(1);
+                      setIsPage53DModelLoading(false);
                     }}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
