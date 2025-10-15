@@ -71,11 +71,15 @@ function IsoverPage({ onBack = null }) {
   const [isPage4ModalOpen, setIsPage4ModalOpen] = React.useState(false);
   const [selectedPage4Area, setSelectedPage4Area] = React.useState(null);
   
+  // 4페이지 영역 2번 전용 모달 상태 관리 (테스트용)
+  const [isPage4Area2ModalOpen, setIsPage4Area2ModalOpen] = React.useState(false);
+  
   // 5페이지 모달 상태 관리
   const [isPage5ModalOpen, setIsPage5ModalOpen] = React.useState(false);
   
   // 5페이지 3D 모델 모달 상태 관리
   const [isPage53DModalOpen, setIsPage53DModalOpen] = React.useState(false);
+  const [selectedPart, setSelectedPart] = React.useState(1); // 선택된 파트 (1-6)
   
   // 6페이지 모달 상태 관리
   const [isPage6ModalOpen, setIsPage6ModalOpen] = React.useState(false);
@@ -445,6 +449,62 @@ function IsoverPage({ onBack = null }) {
   const closePage4Modal = () => {
     setIsPage4ModalOpen(false);
     setSelectedPage4Area(null);
+  };
+
+  /**
+   * 4페이지 영역 2번 전용 모달 열기 핸들러 (테스트용)
+   */
+  const handlePage4Area2Click = () => {
+    setIsPage4Area2ModalOpen(true);
+  };
+
+  /**
+   * 4페이지 영역 2번 전용 모달 닫기 핸들러 (테스트용)
+   */
+  const closePage4Area2Modal = () => {
+    setIsPage4Area2ModalOpen(false);
+  };
+
+  /**
+   * 파트별 모델 경로 반환 함수
+   */
+  const getModelPathByPart = (partNumber) => {
+    switch (partNumber) {
+      case 1:
+      case 2:
+        return "/IsoverFile/3dmodel/1_System_Fiber_SET.glb";
+      case 3:
+        return "/IsoverFile/3dmodel/system_with_panel.glb"; // 기본 모델
+      case 4:
+        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb";
+      case 5:
+        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb";
+      case 6:
+        return "/IsoverFile/3dmodel/4_System_Three_SET.glb";
+      default:
+        return "/IsoverFile/3dmodel/system_with_panel.glb";
+    }
+  };
+
+  /**
+   * 파트별 모델 스케일 반환 함수
+   */
+  const getModelScaleByPart = (partNumber) => {
+    switch (partNumber) {
+      case 1:
+      case 2:
+        return 0.3;
+      case 3:
+        return 0.4;
+      case 4:
+        return 0.3;
+      case 5:
+        return 0.3;
+      case 6:
+        return 0.3;
+      default:
+        return 0.4;
+    }
   };
 
   /**
@@ -1057,7 +1117,7 @@ function IsoverPage({ onBack = null }) {
                     width: '89%',
                     height: '19%'
                   }}
-                  onClick={() => handlePage4AreaClick(2)}
+                  onClick={handlePage4Area2Click}
                 >
                 </div>
                 
@@ -1733,7 +1793,7 @@ function IsoverPage({ onBack = null }) {
             {/* 이미지와 3D 모델 표시 */}
             <div className="relative flex items-center justify-center">
               <img
-                src={`/IsoverFile/Popup/pae_3-${selectedAdditionalArea - 6}.jpg`}
+                src={`/IsoverFile/Popup/pae_3-${selectedAdditionalArea - 6}.png`}
                 alt={`영역 ${selectedAdditionalArea}`}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
@@ -1835,7 +1895,7 @@ function IsoverPage({ onBack = null }) {
                 style={{ display: 'none' }}
               >
                 <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/pae_3-{selectedAdditionalArea - 6}.jpg</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/pae_3-{selectedAdditionalArea - 6}.png</p>
               </div>
             </div>
           </div>
@@ -1849,13 +1909,13 @@ function IsoverPage({ onBack = null }) {
           onClick={closePage4Modal}
         >
           <div
-            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            className="bg-white rounded-2xl p-6 max-w-5xl max-h-[95vh] overflow-auto relative shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 닫기 버튼 */}
             <button
               onClick={closePage4Modal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              className="absolute top-2 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
             >
               ×
             </button>
@@ -1863,9 +1923,9 @@ function IsoverPage({ onBack = null }) {
             {/* 이미지와 3D 모델 표시 */}
             <div className="relative flex items-center justify-center">
               <img
-                src={`/IsoverFile/Popup/4-${selectedPage4Area}.png`}
+                src={`/IsoverFile/Popup/4-${selectedPage4Area === 1 ? '1.svg' : selectedPage4Area + '.png'}`}
                 alt={`영역 ${selectedPage4Area}`}
-                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
+                className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
                   // 이미지 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
@@ -1879,7 +1939,51 @@ function IsoverPage({ onBack = null }) {
                 style={{ display: 'none' }}
               >
                 <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/4-{selectedPage4Area}.png</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/4-{selectedPage4Area === 1 ? '1.svg' : selectedPage4Area + '.png'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4페이지 영역 2번 전용 모달 (테스트용) */}
+      {isPage4Area2ModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closePage4Area2Modal}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-5xl max-h-[95vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closePage4Area2Modal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지와 3D 모델 표시 */}
+            <div className="relative flex items-center justify-center">
+              <img
+                src="/IsoverFile/Popup/4-2.png"
+                alt="영역 2 (테스트용)"
+                className="max-w-full  min-h-[40vh] max-h-[75vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              
+              
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/4-2.png</p>
               </div>
             </div>
           </div>
@@ -2030,8 +2134,14 @@ function IsoverPage({ onBack = null }) {
           <div className="relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden">
             {/* 모달 헤더 */}
             <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
-              <div className="flex justify-center items-center">
+              <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold text-gray-800">5페이지 3D 모델 뷰어</h3>
+                <button
+                  onClick={() => setIsPage53DModalOpen(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold transition-colors duration-300"
+                >
+                  ×
+                </button>
               </div>
             </div>
             
@@ -2047,7 +2157,7 @@ function IsoverPage({ onBack = null }) {
                 isModal={true}
                 cameraPosition={[0, 0, 14]}
                 cameraFov={100000}
-                customScale={0.4}
+                customScale={0.3}
                 rotateSpeed={-1.0}
               />
             </div>
