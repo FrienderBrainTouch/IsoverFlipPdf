@@ -99,68 +99,6 @@ function IsoverPage({ onBack = null }) {
   const [whiteScreenVisible, setWhiteScreenVisible] = React.useState(true);
   const [mainScreenVisible, setMainScreenVisible] = React.useState(false);
   
-  // 3D 모델 로딩 상태 관리
-  const [modelsLoaded, setModelsLoaded] = React.useState(false);
-  const [loadingProgress, setLoadingProgress] = React.useState(0);
-  const [totalModels, setTotalModels] = React.useState(0);
-
-  // 모든 3D 모델 경로 정의
-  const allModelPaths = [
-    "/IsoverFile/3dmodel/1_System_Fiber_SET.glb",
-    "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb",
-    "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb",
-    "/IsoverFile/3dmodel/4_System_Three_SET.glb",
-    "/IsoverFile/3dmodel/BlackFacing.glb",
-    "/IsoverFile/3dmodel/L-AnkerBracket.glb",
-    "/IsoverFile/3dmodel/L-Bar.glb",
-    "/IsoverFile/3dmodel/L-HBar.glb",
-    "/IsoverFile/3dmodel/L-Holder.glb",
-    "/IsoverFile/3dmodel/system_with_panel.glb",
-    "/IsoverFile/3dmodel/system_without_panel.glb"
-  ];
-
-  // 3D 모델 로딩 함수 - Three.js GLTFLoader를 사용하여 실제 모델 파싱
-  const preloadAllModels = async () => {
-    setTotalModels(allModelPaths.length);
-    setLoadingProgress(0);
-    
-    // Three.js GLTFLoader 동적 import
-    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-    const loader = new GLTFLoader();
-    
-    const loadPromises = allModelPaths.map((modelPath, index) => {
-      return new Promise((resolve) => {
-        // GLTFLoader를 사용하여 실제 모델 파싱 및 캐시
-        loader.load(
-          modelPath,
-          (gltf) => {
-            // 모델이 성공적으로 로딩되면 useGLTF 캐시에 저장
-            console.log(`모델 로딩 완료: ${modelPath}`);
-            setLoadingProgress(prev => prev + 1);
-            resolve();
-          },
-          (progress) => {
-            // 로딩 진행률 (선택사항)
-            console.log(`로딩 진행률 ${modelPath}: ${(progress.loaded / progress.total * 100)}%`);
-          },
-          (error) => {
-            console.warn(`모델 로딩 실패: ${modelPath}`, error);
-            setLoadingProgress(prev => prev + 1);
-            resolve(); // 에러가 있어도 계속 진행
-          }
-        );
-      });
-    });
-
-    try {
-      await Promise.all(loadPromises);
-      setModelsLoaded(true);
-      console.log('모든 3D 모델 로딩 및 파싱 완료');
-    } catch (error) {
-      console.error('3D 모델 로딩 중 오류 발생:', error);
-      setModelsLoaded(true); // 에러가 있어도 로딩 완료로 처리
-    }
-  };
 
   // SVG 페이지 데이터
   const pageData = [
@@ -199,19 +137,19 @@ function IsoverPage({ onBack = null }) {
     }, 500);
   }, []);
 
-  // 3D 모델 로딩 완료 감지
+  // 로고 애니메이션 완료 후 화면 전환
   React.useEffect(() => {
-    if (modelsLoaded && logoOpacity === 1) {
-      // 로고 애니메이션과 3D 모델 로딩이 모두 완료되면 2초 후 2단계 시작
+    if (logoOpacity === 1) {
+      // 로고 애니메이션이 완료되면 2초 후 2단계 시작
       setTimeout(() => {
         startTransition();
       }, 2000);
     }
-  }, [modelsLoaded, logoOpacity, startTransition]);
+  }, [logoOpacity, startTransition]);
 
   // 인트로 화면 애니메이션 시퀀스
   React.useEffect(() => {
-    // 1단계: 로고 애니메이션과 3D 모델 로딩 동시 시작
+    // 로고 애니메이션 시작
     const logoAnimation = () => {
       const startTime = performance.now();
       const duration = 1500; // 1.5초
@@ -226,19 +164,15 @@ function IsoverPage({ onBack = null }) {
 
         if (progress < 1) {
           requestAnimationFrame(animate);
-        } else {
-          // 로고 애니메이션 완료 - 3D 모델 로딩 완료까지 대기
-          console.log('로고 애니메이션 완료, 3D 모델 로딩 대기 중...');
         }
       };
 
       requestAnimationFrame(animate);
     };
 
-    // 애니메이션과 3D 모델 로딩 동시 시작
+    // 로고 애니메이션 시작
     setTimeout(() => {
       logoAnimation();
-      preloadAllModels(); // 3D 모델 로딩 시작
     }, 500);
   }, []);
 
@@ -296,10 +230,8 @@ function IsoverPage({ onBack = null }) {
     setLogoOpacity(0);
     setWhiteScreenVisible(true);
     setMainScreenVisible(false);
-    setModelsLoaded(false);
-    setLoadingProgress(0);
 
-    // 애니메이션과 3D 모델 로딩 재시작
+    // 로고 애니메이션 재시작
     setTimeout(() => {
       const logoAnimation = () => {
         const startTime = performance.now();
@@ -314,17 +246,14 @@ function IsoverPage({ onBack = null }) {
 
           if (progress < 1) {
             requestAnimationFrame(animate);
-          } else {
-            console.log('로고 애니메이션 완료, 3D 모델 로딩 대기 중...');
           }
         };
 
         requestAnimationFrame(animate);
       };
 
-      // 로고 애니메이션과 3D 모델 로딩 동시 시작
+      // 로고 애니메이션 시작
       logoAnimation();
-      preloadAllModels();
     }, 500);
   };
 

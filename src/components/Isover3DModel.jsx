@@ -178,6 +178,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
   const [hovered, setHovered] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isModelFullyLoaded, setIsModelFullyLoaded] = useState(false);
+  const [actualModelLoaded, setActualModelLoaded] = useState(false);
 
   // 자동 회전 애니메이션 비활성화
   // useFrame((state, delta) => {
@@ -190,37 +191,76 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
   React.useEffect(() => {
     setIsInitialized(false);
     setIsModelFullyLoaded(false);
+    setActualModelLoaded(false);
   }, [modelPath]);
+
+  // 모델이 실제로 사용 가능한지 검증하는 함수
+  const validateModel = (scene) => {
+    if (!scene || !scene.children || scene.children.length === 0) {
+      return false;
+    }
+    
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = box.getSize(new THREE.Vector3());
+    
+    // 크기가 너무 작거나 0인 경우 무효
+    if (size.x < 0.001 || size.y < 0.001 || size.z < 0.001) {
+      return false;
+    }
+    
+    // 메시가 실제로 있는지 확인
+    let hasValidMesh = false;
+    scene.traverse((child) => {
+      if (child.isMesh && child.geometry && child.material) {
+        hasValidMesh = true;
+      }
+    });
+    
+    return hasValidMesh;
+  };
 
   // 3D 모델의 중심을 계산하여 위치 조정 (한 번만 실행)
   React.useEffect(() => {
     if (scene && meshRef.current && !isInitialized) {
-      // 바운딩 박스 계산
-      const box = new THREE.Box3().setFromObject(scene);
-      const center = box.getCenter(new THREE.Vector3());
+      // 모델이 실제로 렌더링 가능한 상태인지 확인
+      const checkModelReady = () => {
+        if (validateModel(scene)) {
+          // 바운딩 박스 계산
+          const box = new THREE.Box3().setFromObject(scene);
+          const center = box.getCenter(new THREE.Vector3());
+          
+          // 중심을 원점으로 이동
+          scene.position.set(-center.x, -center.y, -center.z);
+          
+          // 스케일 조정 (커스텀 스케일이 있으면 사용, 없으면 자동 계산)
+          if (customScale !== null) {
+            scene.scale.setScalar(customScale);
+          } else {
+            const size = box.getSize(new THREE.Vector3());
+            const maxSize = Math.max(size.x, size.y, size.z);
+            const scale = 2 / maxSize; // 적절한 크기로 조정
+            scene.scale.setScalar(scale);
+          }
+          
+          setActualModelLoaded(true);
+          setIsInitialized(true);
+          setIsModelFullyLoaded(true);
+          
+          // 모델 로딩 완료 콜백 호출
+          if (onModelLoad) {
+            onModelLoad();
+          }
+          
+          console.log('[3D] 모델 로딩 완료:', getModelDisplayName(modelPath));
+        } else {
+          // 모델이 아직 완전히 로딩되지 않았으면 재시도
+          setTimeout(checkModelReady, 100);
+        }
+      };
       
-      // 중심을 원점으로 이동
-      scene.position.set(-center.x, -center.y, -center.z);
-      
-      // 스케일 조정 (커스텀 스케일이 있으면 사용, 없으면 자동 계산)
-      if (customScale !== null) {
-        scene.scale.setScalar(customScale);
-      } else {
-        const size = box.getSize(new THREE.Vector3());
-        const maxSize = Math.max(size.x, size.y, size.z);
-        const scale = 2 / maxSize; // 적절한 크기로 조정
-        scene.scale.setScalar(scale);
-      }
-      
-      setIsInitialized(true);
-      setIsModelFullyLoaded(true);
-      
-      // 모델 로딩 완료 콜백 호출
-      if (onModelLoad) {
-        onModelLoad();
-      }
+      checkModelReady();
     }
-  }, [scene, customScale, isInitialized, onModelLoad]);
+  }, [scene, customScale, isInitialized, onModelLoad, modelPath]);
 
   return (
     <group>
@@ -245,6 +285,27 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
  * 평행사변형 3D 모델 뷰어 컴포넌트
  * 표지 페이지에 absolute로 배치되어 3D 모델을 표시합니다.
  */
+// 모델 파일명을 한국어 이름으로 매핑하는 함수
+const getModelDisplayName = (modelPath) => {
+  const fileName = modelPath.split('/').pop().replace('.glb', '');
+  
+  const modelNames = {
+    '1_System_Fiber_SET': '파이버시멘트보드',
+    '2_System_Alu-Complex_SET': 'AL 복합판넬',
+    '3_System_Alu-Sheet_SET': 'AL 시트판넬',
+    '4_System_Three_SET': '조적판넬',
+    'system_with_panel': '시스템 with 패널',
+    'system_without_panel': '시스템 without 패널',
+    'L-AnkerBracket': 'L-앙카프라켓',
+    'L-Bar': '수직 L-Bar',
+    'L-HBar': '수평바',
+    'L-Holder': '수평바 브라켓',
+    'BlackFacing': '검은색 마감재'
+  };
+  
+  return modelNames[fileName] || fileName;
+};
+
 function Isover3DModel({ 
   isVisible = true, 
   opacity = 1, 
@@ -267,34 +328,29 @@ function Isover3DModel({
   const [animationScale, setAnimationScale] = useState(0.8);
   const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
   const [loadingTimeout, setLoadingTimeout] = useState(null);
+  const [actualModelLoaded, setActualModelLoaded] = useState(false);
 
   // 로더 진행률 (drei)
   const { active, progress, errors, item, loaded, total } = useProgress();
 
   React.useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[3D] useProgress:', { active, progress, item, loaded, total, errors });
-    
-    // 로딩이 완료되었을 때 (active가 false이고 progress가 100이거나 total이 0이 아닌 경우)
-    if (!active && (progress === 100 || (total > 0 && loaded === total))) {
-      console.log('[3D] 모델 로딩 완료 감지');
-      handleLoad();
-    }
-    
-    // 에러가 발생한 경우
+    // 에러가 발생한 경우만 로그 출력
     if (errors.length > 0) {
-      console.error('[3D] 로딩 에러:', errors);
+      console.error('[3D] 모델 로딩 에러:', errors);
       handleError();
     }
-  }, [active, progress, item, loaded, total, errors]);
+  }, [errors]);
 
   // 타임아웃을 통한 무한 로딩 방지
   React.useEffect(() => {
-    if (isLoading) {
+    if (isLoading && !actualModelLoaded) {
       const timeout = setTimeout(() => {
-        console.warn('[3D] 로딩 타임아웃 - 강제로 로딩 완료 처리');
-        handleLoad();
-      }, 10000); // 10초 타임아웃
+        if (!actualModelLoaded) {
+          console.warn('[3D] 모델 로딩 타임아웃:', getModelDisplayName(modelPath));
+          setActualModelLoaded(true);
+          setIsLoading(false);
+        }
+      }, 15000); // 타임아웃 시간을 15초로 증가
       
       setLoadingTimeout(timeout);
       
@@ -304,7 +360,7 @@ function Isover3DModel({
         }
       };
     }
-  }, [isLoading]);
+  }, [isLoading, actualModelLoaded]);
 
   // 로딩 완료 핸들러
   const handleLoad = () => {
@@ -312,6 +368,7 @@ function Isover3DModel({
       clearTimeout(loadingTimeout);
       setLoadingTimeout(null);
     }
+    setActualModelLoaded(true);
     setIsLoading(false);
     onModelLoad && onModelLoad(); // 모델 로딩 완료 콜백 호출
   };
@@ -325,6 +382,13 @@ function Isover3DModel({
     setHasError(true);
     setIsLoading(false);
   };
+
+  // 모델 경로가 변경될 때 상태 초기화
+  React.useEffect(() => {
+    setIsLoading(true);
+    setHasError(false);
+    setActualModelLoaded(false);
+  }, [modelPath]);
 
   // 애니메이션 효과
   React.useEffect(() => {
@@ -385,10 +449,12 @@ function Isover3DModel({
             <div className="w-full h-full bg-red-50 flex items-center justify-center">
               <div className="text-center">
                 <p className="text-red-600 mb-2 font-medium">3D 모델 로딩 실패</p>
+                <p className="text-red-500 text-sm mb-4">모델: {getModelDisplayName(modelPath)}</p>
                 <button 
                   onClick={() => {
                     setHasError(false);
                     setIsLoading(true);
+                    setActualModelLoaded(false);
                   }}
                   className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
                 >
@@ -398,12 +464,44 @@ function Isover3DModel({
             </div>
           )}
 
+          {isLoading && !actualModelLoaded && !hasError && (
+            <div className="absolute inset-0 bg-gray-100 flex flex-col items-center justify-center">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600 mb-2 font-medium">3D 모델 로딩 중...</p>
+                
+                {/* useProgress 정보 표시 */}
+                <div className="text-sm text-gray-500 mb-2">
+                  {active ? `로딩 중... ${Math.round(progress)}%` : '처리 중...'}
+                </div>
+                
+                {/* 진행률 바 */}
+                <div className="w-48 bg-gray-200 rounded-full h-2 mb-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+                
+                {/* 타임아웃 경고 */}
+                {progress > 0 && progress < 100 && (
+                  <div className="text-xs text-orange-500">
+                    로딩이 오래 걸리고 있습니다...
+                  </div>
+                )}
+                
+                <div className="text-xs text-gray-400 mt-2">
+                  모델: {getModelDisplayName(modelPath)}
+                </div>
+              </div>
+            </div>
+          )}
+
           {!hasError && (
             <Canvas
               camera={{ position: cameraPosition, fov: cameraFov }}
               onError={(e) => {
-                // eslint-disable-next-line no-console
-                console.error('[Canvas] Error', e);
+                console.error('[3D] Canvas 에러:', e);
                 handleError();
               }}
               style={{ paddingTop: '5%', width: '100%', height: '90%' }}
@@ -416,7 +514,13 @@ function Isover3DModel({
                 <pointLight position={[0, 10, 0]} intensity={0.6} />
                 
                 {/* 3D 모델 */}
-                <IsoverModel modelPath={modelPath} customScale={customScale} showWireframe={showWireframe} onPartClick={onPartClick} onModelLoad={onModelLoad} />
+                <IsoverModel 
+                  modelPath={modelPath} 
+                  customScale={customScale} 
+                  showWireframe={showWireframe} 
+                  onPartClick={onPartClick} 
+                  onModelLoad={handleLoad} 
+                />
                 
                 {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}
                 {/* <Environment preset="studio" /> */}
