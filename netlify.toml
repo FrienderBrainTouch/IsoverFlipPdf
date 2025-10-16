@@ -40,6 +40,11 @@
   [headers.values]
     Content-Type = "text/html"
 
+[[headers]]
+  for = "*.ico"
+  [headers.values]
+    Content-Type = "image/x-icon"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
