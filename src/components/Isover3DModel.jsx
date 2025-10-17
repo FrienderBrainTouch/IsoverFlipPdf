@@ -32,8 +32,9 @@ THREE.DefaultLoadingManager.onError = (url) => {
 function HighlightBox({ position, size, color = 0x00ff00, opacity = 0, onHover, onClick, isActive = false }) {
   const [isHovered, setIsHovered] = useState(false);
   
-  const currentOpacity = isHovered ? 0.3 : (isActive ? 0.2 : opacity);
-  const highlightColor = isHovered ? color : (isActive ? color : color);
+  // 박스를 완전히 투명하게 설정 (호버 시에도 투명)
+  const currentOpacity = 0; // 항상 투명
+  const highlightColor = color;
   
   return (
     <mesh 
@@ -73,6 +74,18 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
   const [hoveredBox, setHoveredBox] = useState(null);
   const [activeBox, setActiveBox] = useState(0); // 현재 활성화된 박스 인덱스
   const [isModelReady, setIsModelReady] = useState(false);
+
+  // 커서 제어를 위한 useEffect
+  React.useEffect(() => {
+    const canvas = document.querySelector('canvas');
+    if (canvas) {
+      if (hoveredBox !== null) {
+        canvas.style.cursor = 'pointer';
+      } else {
+        canvas.style.cursor = 'default';
+      }
+    }
+  }, [hoveredBox]);
 
   React.useEffect(() => {
     if (scene) {
@@ -270,6 +283,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       />
+      {/* 파트 선택 박스 - 투명하게 표시 */}
       {showWireframe && isModelFullyLoaded && (
         <PartBoxes 
           modelPath={modelPath} 
@@ -418,17 +432,17 @@ function Isover3DModel({
     <div 
       className={`absolute z-10 ${isModal ? 'w-full h-full top-0 left-0' : ' '}`}
       style={{
-        width: isModal ? '100%' : '90%',
-        height: isModal ? '100%' : '64%',
-        top: isModal ? '0%' : '27%',
-        left: isModal ? '0%' : '2%'
+        width: isModal ? '100%' : '100%',
+        height: isModal ? '100%' : '100%',
+        top: isModal ? '0%' : '0%',
+        left: isModal ? '0%' : '0%'
       }}
     >
-      {/* clip-path를 사용한 평행사변형 컨테이너 (모달이 아닐 때만) */}
+      {/* 3D 모델 컨테이너 */}
       <div 
         className="relative w-full h-full"
         style={{
-          clipPath: isModal ? 'none' : 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)',
+          clipPath: 'none',
           // transform: 'perspective(1000px) rotateX(0deg) rotateY(-20deg) rotateZ(2deg)',
           // transformStyle: 'preserve-3d',
           // transformOrigin: 'center center'
@@ -496,7 +510,11 @@ function Isover3DModel({
                 console.error('[3D] Canvas 에러:', e);
                 handleError();
               }}
-              style={{ paddingTop: '5%', width: '100%', height: '90%' }}
+              style={{ 
+                width: '100%', 
+                height: '100%',
+                cursor: 'default'
+              }}
             >
               <Suspense fallback={null}>
                 {/* 조명 설정 - HDRI 대신 기본 조명 사용 */}

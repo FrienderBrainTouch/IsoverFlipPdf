@@ -350,6 +350,16 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   /**
+   * 목차 버튼 클릭 핸들러
+   */
+  const handleTocClick = () => {
+    const targetPage = document.querySelector('[data-page-index="1"]');
+    if (targetPage) {
+      targetPage.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  /**
    * 3D 모델 뷰어 토글 핸들러 (표지 페이지에서만 작동)
    */
   const handle3DModelToggle = () => {
@@ -615,8 +625,14 @@ function IsoverPageMobile({ onBack = null }) {
           {/* Isover 로고 */}
           <div className="w-full h-full flex flex-col items-center justify-center">
             <img 
-              src="/IsoverFile/Interacive/Isover_Logo.svg"
+              src="/IsoverFile/Interacive/Isover_Logo_Black.svg"
               alt="Isover Logo"
+              className="max-w-full max-h-full object-contain mb-4"
+              style={{ opacity: logoOpacity }}
+            />
+            <img 
+              src="/IsoverFile/Interacive/Yoochang_Logo_Black.svg"
+              alt="Yoochang Logo"
               className="max-w-full max-h-full object-contain"
               style={{ opacity: logoOpacity }}
             />
@@ -628,16 +644,21 @@ function IsoverPageMobile({ onBack = null }) {
       {/* 본 화면 */}
       {mainScreenVisible && (
         <div className="w-full h-full relative bg-white flex flex-col">
-          {/* 상단 중앙 Isover 로고 (홈 버튼) */}
+          {/* 상단 중앙 로고들 (홈 버튼) */}
           <div className="flex justify-center items-center py-4 bg-white z-40">
             <button
               onClick={handleHomeClick}
-              className="cursor-pointer"
+              className="cursor-pointer flex flex-col items-center w-[60%] max-w-[300px] min-w-[200px]"
             >
               <img 
-                src="/IsoverFile/Interacive/Isover_Logo.svg"
+                src="/IsoverFile/Interacive/Isover_Logo_Black.svg"
                 alt="Isover Logo"
-                className="h-10 w-auto"
+                className="w-full h-auto object-contain mb-2"
+              />
+              <img 
+                src="/IsoverFile/Interacive/Yoochang_Logo_Black.svg"
+                alt="Yoochang Logo"
+                className="w-full h-auto object-contain"
               />
             </button>
           </div>
@@ -695,7 +716,7 @@ function IsoverPageMobile({ onBack = null }) {
                       <>
                         {/* 5개의 div 영역을 absolute로 배치 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '24%',
@@ -709,7 +730,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '24%',
@@ -723,7 +744,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '24%',
@@ -737,7 +758,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '24%',
@@ -751,7 +772,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '5%',
@@ -769,32 +790,9 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 3번째 페이지 클릭 영역들 */}
                     {index === 2 && (
                       <>
-                        {/* 목차로 돌아가기 버튼 */}
-                        <button
-                          onClick={() => {
-                            const targetPage = document.querySelector('[data-page-index="1"]');
-                            if (targetPage) {
-                              targetPage.scrollIntoView({ behavior: 'smooth' });
-                            }
-                          }}
-                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
-                          style={{
-                            top: '7%',
-                            fontFamily: 'NanumSquareEB, sans-serif',
-                            fontWeight: 'bold',
-                            fontSize: '14px',
-                            backgroundColor: '#625C59',
-                            color: 'white',
-                            opacity: 0.9
-                          }}
-                          title="목차로 돌아가기"
-                        >
-                          📋 목차
-                        </button>
-
                         {/* 3페이지 영역 6개 배치 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '25.5%',
@@ -807,7 +805,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '28.7%',
@@ -820,7 +818,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '32%',
@@ -833,7 +831,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '35.1%',
@@ -846,7 +844,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '38.3%',
@@ -859,7 +857,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '41.5%',
@@ -873,7 +871,7 @@ function IsoverPageMobile({ onBack = null }) {
                         
                         {/* 추가 4개 영역 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '46%',
@@ -886,7 +884,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '33%',
@@ -899,7 +897,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '20%',
@@ -912,7 +910,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '8%',
@@ -950,32 +948,9 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 4번째 페이지 클릭 영역들 */}
                     {index === 3 && (
                       <>
-                        {/* 목차로 돌아가기 버튼 */}
-                        <button
-                          onClick={() => {
-                            const targetPage = document.querySelector('[data-page-index="1"]');
-                            if (targetPage) {
-                              targetPage.scrollIntoView({ behavior: 'smooth' });
-                            }
-                          }}
-                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
-                          style={{
-                            top: '7%',
-                            fontFamily: 'NanumSquareEB, sans-serif',
-                            fontWeight: 'bold',
-                            fontSize: '14px',
-                            backgroundColor: '#625C59',
-                            color: 'white',
-                            opacity: 0.9
-                          }}
-                          title="목차로 돌아가기"
-                        >
-                          📋 목차
-                        </button>
-
                         {/* 4페이지 영역 4개 배치 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '10%',
@@ -988,7 +963,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '31%',
@@ -1001,7 +976,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '29%',
@@ -1014,7 +989,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '7%',
@@ -1031,32 +1006,9 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 5번째 페이지 클릭 영역들 */}
                     {index === 4 && (
                       <>
-                        {/* 목차로 돌아가기 버튼 */}
-                        <button
-                          onClick={() => {
-                            const targetPage = document.querySelector('[data-page-index="1"]');
-                            if (targetPage) {
-                              targetPage.scrollIntoView({ behavior: 'smooth' });
-                            }
-                          }}
-                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
-                          style={{
-                            top: '7%',
-                            fontFamily: 'NanumSquareEB, sans-serif',
-                            fontWeight: 'bold',
-                            fontSize: '14px',
-                            backgroundColor: '#625C59',
-                            color: 'white',
-                            opacity: 0.9
-                          }}
-                          title="목차로 돌아가기"
-                        >
-                          📋 목차
-                        </button>
-
                         {/* 5페이지 영역 2개 배치 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '25%',
@@ -1070,7 +1022,7 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '14%',
@@ -1087,29 +1039,6 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 6번째 페이지 클릭 영역들 */}
                     {index === 5 && (
                       <>
-                        {/* 목차로 돌아가기 버튼 */}
-                        <button
-                          onClick={() => {
-                            const targetPage = document.querySelector('[data-page-index="1"]');
-                            if (targetPage) {
-                              targetPage.scrollIntoView({ behavior: 'smooth' });
-                            }
-                          }}
-                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
-                          style={{
-                            top: '7%',
-                            fontFamily: 'NanumSquareEB, sans-serif',
-                            fontWeight: 'bold',
-                            fontSize: '14px',
-                            backgroundColor: '#625C59',
-                            color: 'white',
-                            opacity: 0.9
-                          }}
-                          title="목차로 돌아가기"
-                        >
-                          📋 목차
-                        </button>
-
                         {/* 6페이지 영역 6개 배치 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
@@ -1191,7 +1120,7 @@ function IsoverPageMobile({ onBack = null }) {
                         
                         {/* 6페이지 마지막 영역 (유튜브 링크) */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '5%',
@@ -1209,29 +1138,6 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 7번째 페이지 클릭 영역들 */}
                     {index === 6 && (
                       <>
-                        {/* 목차로 돌아가기 버튼 */}
-                        <button
-                          onClick={() => {
-                            const targetPage = document.querySelector('[data-page-index="1"]');
-                            if (targetPage) {
-                              targetPage.scrollIntoView({ behavior: 'smooth' });
-                            }
-                          }}
-                          className="absolute right-4 px-3 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 z-10 hover:opacity-100"
-                          style={{
-                            top: '7%',
-                            fontFamily: 'NanumSquareEB, sans-serif',
-                            fontWeight: 'bold',
-                            fontSize: '14px',
-                            backgroundColor: '#625C59',
-                            color: 'white',
-                            opacity: 0.9
-                          }}
-                          title="목차로 돌아가기"
-                        >
-                          📋 목차
-                        </button>
-
                         {/* 7페이지 영역 4개 배치 */}
                         {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                         <div 
@@ -1266,7 +1172,7 @@ function IsoverPageMobile({ onBack = null }) {
                         
                         {/* 2. 왼쪽 로고 영역 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '7%',
@@ -1280,7 +1186,7 @@ function IsoverPageMobile({ onBack = null }) {
                         
                         {/* 3. 오른쪽 로고 영역 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '7%',
@@ -1294,7 +1200,7 @@ function IsoverPageMobile({ onBack = null }) {
                         
                         {/* 4. 하단 노란색 부분 작은 영역 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg"
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             bottom: '4.2%',
@@ -1349,6 +1255,17 @@ function IsoverPageMobile({ onBack = null }) {
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </button>
+
+              {/* 목차 버튼 */}
+              <button
+                onClick={handleTocClick}
+                className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+                title="목차"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                 </svg>
               </button>
 
