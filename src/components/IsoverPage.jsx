@@ -177,35 +177,35 @@ function IsoverPage({ onBack = null }) {
   // 로고 애니메이션 완료 후 화면 전환
   React.useEffect(() => {
     if (logoOpacity === 1) {
-      // 로고 애니메이션이 완료되면 2초 후 2단계 시작
+      // 로고 애니메이션이 완료되면 0.5초 후 2단계 시작
       setTimeout(() => {
         startTransition();
-      }, 2000);
+      }, 500);
     }
   }, [logoOpacity, startTransition]);
 
   // 인트로 화면 애니메이션 시퀀스
   React.useEffect(() => {
-    // 로고 애니메이션 시작
-    const logoAnimation = () => {
-      const startTime = performance.now();
-      const duration = 1500; // 1.5초
+  // 로고 애니메이션 시작
+  const logoAnimation = () => {
+    const startTime = performance.now();
+    const duration = 1000; // 1초
 
-      const animate = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // ease-out 효과 적용
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        setLogoOpacity(easeOut);
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // ease-out 효과 적용
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setLogoOpacity(easeOut);
 
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        }
-      };
-
-      requestAnimationFrame(animate);
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
     };
+
+    requestAnimationFrame(animate);
+  };
 
     // 로고 애니메이션 시작
     setTimeout(() => {
@@ -278,7 +278,7 @@ function IsoverPage({ onBack = null }) {
     setTimeout(() => {
       const logoAnimation = () => {
         const startTime = performance.now();
-        const duration = 1500;
+        const duration = 1000;
 
         const animate = (currentTime) => {
           const elapsed = currentTime - startTime;
@@ -359,7 +359,7 @@ function IsoverPage({ onBack = null }) {
   const handleZoomIn = () => {
     const newZoomLevel = Math.min(zoomLevel + 0.2, 2); // 최대 2배까지 확대
     setZoomLevel(newZoomLevel);
-    setIsZoomed(newZoomLevel > 1);
+    setIsZoomed(newZoomLevel !== 1); // 1이 아닐 때 리셋 버튼 활성화
     setShowMinimap(newZoomLevel > 1); // 확대 시 미니맵 표시
     // 확대 시 드래그 오프셋 리셋 (중심에서 시작)
     if (newZoomLevel > 1) {
@@ -373,7 +373,7 @@ function IsoverPage({ onBack = null }) {
   const handleZoomOut = () => {
     const newZoomLevel = Math.max(zoomLevel - 0.2, 0.5); // 최소 0.5배까지 축소
     setZoomLevel(newZoomLevel);
-    setIsZoomed(newZoomLevel > 1);
+    setIsZoomed(newZoomLevel !== 1); // 1이 아닐 때 리셋 버튼 활성화
     setShowMinimap(newZoomLevel > 1); // 축소 시 미니맵 표시/숨김
     // 축소 시 드래그 오프셋 리셋 (중심에서 시작)
     if (newZoomLevel <= 1) {
@@ -1022,6 +1022,44 @@ function IsoverPage({ onBack = null }) {
           </div>
         </div> */}
         
+        {/* 돋보기 버튼들 - 플립북 컨테이너 위에 배치 */}
+        <div className="absolute top-18 left-1/2 transform -translate-x-1/2 z-40 flex gap-3">
+          {/* 확대 버튼 */}
+          <button
+            onClick={handleZoomIn}
+            className="w-12 h-12 bg-white/90 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+            title="확대"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+          </button>
+
+          {/* 축소 버튼 */}
+          <button
+            onClick={handleZoomOut}
+            className="w-12 h-12 bg-white/90 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+            title="축소"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+            </svg>
+          </button>
+
+          {/* 확대/축소 리셋 버튼 */}
+          {isZoomed && (
+            <button
+              onClick={handleZoomReset}
+              className="w-12 h-12 bg-white/90 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="원본 크기로 복원"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          )}
+        </div>
+
         <div className="flex items-center xl:gap-4">
           {/* 왼쪽 네비게이션 버튼들 - 항상 표시하되 표지 페이지에서는 비활성화 */}
           <div className="flex flex-col items-center gap-2">
@@ -2192,40 +2230,6 @@ function IsoverPage({ onBack = null }) {
             </svg>
           </button>
 
-          {/* 확대 버튼 */}
-          <button
-            onClick={handleZoomIn}
-            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
-            title="확대"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-            </svg>
-          </button>
-
-          {/* 축소 버튼 */}
-          <button
-            onClick={handleZoomOut}
-            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
-            title="축소"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
-            </svg>
-          </button>
-
-          {/* 확대/축소 리셋 버튼 */}
-          {isZoomed && (
-            <button
-              onClick={handleZoomReset}
-              className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
-              title="원본 크기로 복원"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </button>
-          )}
         </div>
         </div>
 
