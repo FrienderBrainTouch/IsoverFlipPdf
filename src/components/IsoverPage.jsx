@@ -6,6 +6,7 @@ import Isover3DModel from './Isover3DModel';
 function IsoverPage({ onBack = null }) {
   // 화면 크기 상태 관리
   const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1025);
+  const [isSmallScreen, setIsSmallScreen] = React.useState(window.innerWidth <= 1450);
   
   // 원본 이미지 비율 계산 (2480:3507)
   const originalAspectRatio = 2480 / 3507; // 약 0.707
@@ -117,6 +118,23 @@ function IsoverPage({ onBack = null }) {
   const [whiteScreenVisible, setWhiteScreenVisible] = React.useState(true);
   const [mainScreenVisible, setMainScreenVisible] = React.useState(false);
   
+  // 확대/축소 상태 관리
+  const [zoomLevel, setZoomLevel] = React.useState(1);
+  const [isZoomed, setIsZoomed] = React.useState(false);
+  
+  // 미니맵 상태 관리
+  const [showMinimap, setShowMinimap] = React.useState(false);
+  
+  // 드래그 상태 관리
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 });
+  
+  // 드래그 시작점을 ref로 관리 (무한 루프 방지)
+  const dragStartRef = React.useRef({ x: 0, y: 0 });
+  
+  // 플립북 컨테이너 참조
+  const flipBookContainerRef = React.useRef(null);
+  
 
   // SVG 페이지 데이터
   const pageData = [
@@ -133,6 +151,7 @@ function IsoverPage({ onBack = null }) {
   React.useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1025);
+      setIsSmallScreen(window.innerWidth <= 1450);
       setFlipBookSize(calculateFlipBookSize());
     };
 
@@ -232,6 +251,12 @@ function IsoverPage({ onBack = null }) {
       setShowFrontGif(true);
       setShowSvgBackground(false);
     }
+    
+    // 페이지 변경 시 확대/축소 상태 리셋
+    setZoomLevel(1);
+    setIsZoomed(false);
+    setShowMinimap(false);
+    setDragOffset({ x: 0, y: 0 });
   };
 
   /**
@@ -327,6 +352,150 @@ function IsoverPage({ onBack = null }) {
       flipBookRef.current.pageFlip().turnToPage(1); // 2번째 페이지(목차 페이지)로 이동
     }
   };
+
+  /**
+   * 확대 버튼 클릭 핸들러
+   */
+  const handleZoomIn = () => {
+    const newZoomLevel = Math.min(zoomLevel + 0.2, 2); // 최대 2배까지 확대
+    setZoomLevel(newZoomLevel);
+    setIsZoomed(newZoomLevel > 1);
+    setShowMinimap(newZoomLevel > 1); // 확대 시 미니맵 표시
+    // 확대 시 드래그 오프셋 리셋 (중심에서 시작)
+    if (newZoomLevel > 1) {
+      setDragOffset({ x: 0, y: 0 });
+    }
+  };
+
+  /**
+   * 축소 버튼 클릭 핸들러
+   */
+  const handleZoomOut = () => {
+    const newZoomLevel = Math.max(zoomLevel - 0.2, 0.5); // 최소 0.5배까지 축소
+    setZoomLevel(newZoomLevel);
+    setIsZoomed(newZoomLevel > 1);
+    setShowMinimap(newZoomLevel > 1); // 축소 시 미니맵 표시/숨김
+    // 축소 시 드래그 오프셋 리셋 (중심에서 시작)
+    if (newZoomLevel <= 1) {
+      setDragOffset({ x: 0, y: 0 });
+    }
+  };
+
+  /**
+   * 확대/축소 리셋 핸들러
+   */
+  const handleZoomReset = () => {
+    setZoomLevel(1);
+    setIsZoomed(false);
+    setShowMinimap(false); // 리셋 시 미니맵 숨김
+    setDragOffset({ x: 0, y: 0 }); // 드래그 오프셋도 리셋
+  };
+
+  /**
+   * 마우스 다운 핸들러 (드래그 시작)
+   */
+  const handleMouseDown = (e) => {
+    if (isZoomed) {
+      setIsDragging(true);
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
+      e.preventDefault();
+    }
+  };
+
+  /**
+   * 마우스 이동 핸들러 (드래그 중)
+   */
+  const handleMouseMove = (e) => {
+    if (isDragging && isZoomed) {
+      const deltaX = e.clientX - dragStartRef.current.x;
+      const deltaY = e.clientY - dragStartRef.current.y;
+      
+      // 드래그 감도 조정 (더 부드럽게)
+      const sensitivity = 1.0;
+      
+      setDragOffset(prev => ({
+        x: prev.x + (deltaX * sensitivity),
+        y: prev.y + (deltaY * sensitivity)
+      }));
+      
+      dragStartRef.current = { x: e.clientX, y: e.clientY };
+      e.preventDefault();
+    }
+  };
+
+  /**
+   * 마우스 업 핸들러 (드래그 종료)
+   */
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  /**
+   * 터치 시작 핸들러 (모바일 드래그 시작)
+   */
+  const handleTouchStart = (e) => {
+    if (isZoomed && e.touches.length === 1) {
+      setIsDragging(true);
+      dragStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  };
+
+  /**
+   * 터치 이동 핸들러 (모바일 드래그 중)
+   */
+  const handleTouchMove = (e) => {
+    if (isDragging && isZoomed && e.touches.length === 1) {
+      const deltaX = e.touches[0].clientX - dragStartRef.current.x;
+      const deltaY = e.touches[0].clientY - dragStartRef.current.y;
+      
+      // 드래그 감도 조정 (더 부드럽게)
+      const sensitivity = 1.0;
+      
+      setDragOffset(prev => ({
+        x: prev.x + (deltaX * sensitivity),
+        y: prev.y + (deltaY * sensitivity)
+      }));
+      
+      dragStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  };
+
+  /**
+   * 터치 종료 핸들러 (모바일 드래그 종료)
+   */
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+  };
+
+  // 터치 이벤트 리스너 직접 추가 (passive: false로 설정)
+  React.useEffect(() => {
+    const container = flipBookContainerRef.current;
+    if (!container) return;
+
+    const touchMoveHandler = (e) => {
+      if (isDragging && isZoomed && e.touches.length === 1) {
+        const deltaX = e.touches[0].clientX - dragStartRef.current.x;
+        const deltaY = e.touches[0].clientY - dragStartRef.current.y;
+        
+        const sensitivity = 1.0;
+        
+        setDragOffset(prev => ({
+          x: prev.x + (deltaX * sensitivity),
+          y: prev.y + (deltaY * sensitivity)
+        }));
+        
+        dragStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        e.preventDefault();
+      }
+    };
+
+    // passive: false로 설정하여 preventDefault 사용 가능
+    container.addEventListener('touchmove', touchMoveHandler, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchmove', touchMoveHandler);
+    };
+  }, [isDragging, isZoomed]); // dragStart 제거
 
   /**
    * 3D 모델 뷰어 토글 핸들러 (표지 페이지에서만 작동)
@@ -766,6 +935,62 @@ function IsoverPage({ onBack = null }) {
             className="w-full h-auto object-contain"
           />
         </button>
+        
+        {/* 미니맵 */}
+        {showMinimap && (
+          <div className="mt-4 w-full">
+            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-2 shadow-lg border border-gray-200">
+              <div className="text-xs text-gray-600 mb-1 text-center">현재 보기</div>
+              <div className="relative w-full h-24 bg-gray-100 rounded overflow-hidden">
+                {/* 표지 페이지인 경우 단일 페이지 표시 */}
+                {isCoverPage ? (
+                  <div 
+                    className="w-full h-full bg-cover bg-center bg-no-repeat opacity-30"
+                    style={{
+                      backgroundImage: `url(/IsoverFile/IsoverPage/page_1_Front_full.svg)`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  />
+                ) : (
+                  /* 일반 페이지인 경우 양쪽 페이지 표시 */
+                  <div className="flex w-full h-full">
+                    {/* 왼쪽 페이지 */}
+                    <div 
+                      className="w-1/2 h-full bg-cover bg-center bg-no-repeat opacity-30"
+                      style={{
+                        backgroundImage: `url(${pageData[currentPage]?.svg})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'right center'
+                      }}
+                    />
+                    {/* 오른쪽 페이지 */}
+                    <div 
+                      className="w-1/2 h-full bg-cover bg-center bg-no-repeat opacity-30"
+                      style={{
+                        backgroundImage: `url(${pageData[currentPage + 1]?.svg || pageData[currentPage]?.svg})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'left center'
+                      }}
+                    />
+                  </div>
+                )}
+                
+                {/* 현재 뷰포트 표시 */}
+                <div 
+                  className="absolute border-2 border-red-500 bg-red-500/20 transition-all duration-200"
+                  style={{
+                    width: `${100 / zoomLevel}%`,
+                    height: `${100 / zoomLevel}%`,
+                    left: `${50 - (dragOffset.x / (flipBookSize.width * zoomLevel)) * 100}%`,
+                    top: `${50 - (dragOffset.y / (flipBookSize.height * zoomLevel)) * 100}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 중앙 플립북 컨테이너 */}
@@ -778,40 +1003,59 @@ function IsoverPage({ onBack = null }) {
         </div>
         
         <div className="flex items-center xl:gap-4">
-          {/* 왼쪽 네비게이션 버튼들 - 표지 페이지가 아닐 때만 표시 */}
-          {!isCoverPage && (
-            <div className="flex flex-col items-center gap-2">
-               {/* Left 버튼 */}
-               <button
-                 onClick={goToPreviousPage}
-                 className="cursor-pointer hover:scale-110 transition-transform duration-200"
-                 style={{ width: '48px', height: '48px', padding: '8px' }}
-                 title="이전 페이지"
-               >
-                 <img
-                   src="/IsoverFile/Interacive/arrow_left.svg"
-                   alt="이전 페이지"
-                   style={{ width: '32px', height: '32px' }}
-                 />
-               </button>
-               {/* First 버튼 */}
-               <button
-                 onClick={goToFirstPage}
-                 className="cursor-pointer hover:scale-110 transition-transform duration-200"
-                 style={{ width: '48px', height: '48px', padding: '8px' }}
-                 title="첫 페이지"
-               >
-                 <img
-                   src="/IsoverFile/Interacive/arrow_first.svg"
-                   alt="첫 페이지"
-                   style={{ width: '32px', height: '32px' }}
-                 />
-               </button>
-            </div>
-          )}
+          {/* 왼쪽 네비게이션 버튼들 - 항상 표시하되 표지 페이지에서는 비활성화 */}
+          <div className="flex flex-col items-center gap-2">
+             {/* Left 버튼 */}
+             <button
+               onClick={goToPreviousPage}
+               className={`transition-transform duration-200 ${isCoverPage ? 'opacity-0 cursor-not-allowed' : 'cursor-pointer hover:scale-110'}`}
+               style={{ width: '48px', height: '48px', padding: '8px' }}
+               title={isCoverPage ? "첫 페이지입니다" : "이전 페이지"}
+               disabled={isCoverPage}
+             >
+               <img
+                 src="/IsoverFile/Interacive/arrow_left.svg"
+                 alt="이전 페이지"
+                 style={{ width: '32px', height: '32px' }}
+               />
+             </button>
+             {/* First 버튼 */}
+             <button
+               onClick={goToFirstPage}
+               className={`transition-transform duration-200 ${isCoverPage ? 'opacity-0 cursor-not-allowed' : 'cursor-pointer hover:scale-110'}`}
+               style={{ width: '48px', height: '48px', padding: '8px' }}
+               title={isCoverPage ? "이미 첫 페이지입니다" : "첫 페이지"}
+               disabled={isCoverPage}
+             >
+               <img
+                 src="/IsoverFile/Interacive/arrow_first.svg"
+                 alt="첫 페이지"
+                 style={{ width: '32px', height: '32px' }}
+               />
+             </button>
+          </div>
 
-          {/* 플립북 */}
-          <div className="flex items-center justify-center">
+          {/* 플립북 컨테이너 */}
+          <div 
+            ref={flipBookContainerRef}
+            className="flex items-center justify-center relative overflow-hidden"
+            style={{ width: '100%', height: '100%' }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* 플립북 */}
+            <div 
+              className={`${isZoomed ? 'cursor-grab' : ''} ${isDragging ? 'cursor-grabbing' : ''}`}
+              style={{
+                transform: `scale(${zoomLevel}) translate(${dragOffset.x}px, ${dragOffset.y}px)`,
+                transformOrigin: 'center center',
+                transition: isDragging ? 'none' : 'transform 0.3s ease-in-out'
+              }}
+            >
             <HTMLFlipBook 
               ref={flipBookRef}
               width={flipBookSize.width} 
@@ -1742,6 +1986,7 @@ function IsoverPage({ onBack = null }) {
               </div>
             </div>
             </HTMLFlipBook>
+            </div>
           </div>
 
            {/* 오른쪽 네비게이션 버튼들 */}
@@ -1778,9 +2023,9 @@ function IsoverPage({ onBack = null }) {
       </div>
 
 
-      {/* 오른쪽 툴바 - 데스크톱 */}
-      <div className="hidden xl:flex flex-shrink-0 w-[4%] min-w-[40px] max-w-[60px] flex-col gap-3 bg-gray-800 p-3 items-center">
-        {/* 홈 버튼 */}
+      {/* 오른쪽 툴바 - 데스크톱 (1450px 초과) - 주석처리됨 */}
+      {/* {!isSmallScreen && (
+        <div className="flex flex-shrink-0 w-[4%] min-w-[40px] max-w-[60px] flex-col gap-3 bg-gray-800 p-3 items-center relative z-50">
         <button
           onClick={() => (window.location.href = '/Isover')}
           className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
@@ -1791,7 +2036,6 @@ function IsoverPage({ onBack = null }) {
           </svg>
         </button>
 
-        {/* 프린터 버튼 */}
         <button
           onClick={handlePrintClick}
           className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
@@ -1802,7 +2046,6 @@ function IsoverPage({ onBack = null }) {
           </svg>
         </button>
 
-        {/* PDF 다운로드 버튼 */}
         <button
           onClick={handleDownloadClick}
           className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
@@ -1813,7 +2056,6 @@ function IsoverPage({ onBack = null }) {
           </svg>
         </button>
         
-        {/* 목차 버튼 */}
         <button
           onClick={handleTocClick}
           className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
@@ -1824,7 +2066,6 @@ function IsoverPage({ onBack = null }) {
           </svg>
         </button>
 
-        {/* 공유 버튼 */}
         <button
           onClick={handleShareClick}
           className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
@@ -1835,10 +2076,42 @@ function IsoverPage({ onBack = null }) {
           </svg>
         </button>
 
-      </div>
+        <button
+          onClick={handleZoomIn}
+          className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+          title="확대"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+          </svg>
+        </button>
 
-      {/* 하단 툴바 - 1200px 이하 */}
-      <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-gray-800 p-3">
+        <button
+          onClick={handleZoomOut}
+          className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+          title="축소"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+          </svg>
+        </button>
+
+        {isZoomed && (
+          <button
+            onClick={handleZoomReset}
+            className="w-8 h-8 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="원본 크기로 복원"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+          </button>
+        )}
+        </div>
+      )} */}
+
+      {/* 하단 툴바 - 모든 화면 크기에서 표시 */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-800 p-3">
         <div className="flex justify-center items-center gap-4">
           {/* 홈 버튼 */}
           <button
@@ -1894,8 +2167,43 @@ function IsoverPage({ onBack = null }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
             </svg>
           </button>
+
+          {/* 확대 버튼 */}
+          <button
+            onClick={handleZoomIn}
+            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="확대"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+          </button>
+
+          {/* 축소 버튼 */}
+          <button
+            onClick={handleZoomOut}
+            className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+            title="축소"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+            </svg>
+          </button>
+
+          {/* 확대/축소 리셋 버튼 */}
+          {isZoomed && (
+            <button
+              onClick={handleZoomReset}
+              className="w-10 h-10 text-white flex items-center justify-center hover:text-gray-300 hover:bg-gray-700 rounded transition-colors duration-300 cursor-pointer"
+              title="원본 크기로 복원"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          )}
         </div>
-      </div>
+        </div>
 
 
       {/* 3페이지 모달 */}
