@@ -2091,6 +2091,7 @@ function IsoverPage({ onBack = null }) {
                         position={{ x: 0, y: 0 }}
                         animationDelay={500}
                         modelPath="/IsoverFile/3dmodel/L-Bar.glb"
+                        // modelPath="/IsoverFile/3dmodel/face-rig-anims-opt.glb"
                         isModal={true}
                         cameraPosition={[8, 14, 14]}
                         cameraFov={5}
