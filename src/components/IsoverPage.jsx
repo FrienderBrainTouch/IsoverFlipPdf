@@ -17,7 +17,7 @@ function IsoverPage({ onBack = null }) {
     const screenHeight = window.innerHeight;
     
     // 화면의 40% 너비를 기준으로 하되, 최소 400px, 최대 600px
-    const targetWidth = Math.max(400, Math.min(600, screenWidth * 0.4));
+    const targetWidth = Math.max(400, Math.min(800, screenWidth * 0.4));
     
     // 원본 비율을 유지하여 높이 계산
     const targetHeight = targetWidth / originalAspectRatio;
@@ -396,9 +396,19 @@ function IsoverPage({ onBack = null }) {
    */
   const handleMouseDown = (e) => {
     if (isZoomed) {
-      setIsDragging(true);
-      dragStartRef.current = { x: e.clientX, y: e.clientY };
-      e.preventDefault();
+      // 영역 클릭 요소인지 확인 (클릭 가능한 영역이 아닌 경우에만 드래그 시작)
+      const target = e.target;
+      const isClickableArea = target.closest('[data-clickable="true"]') || 
+                              target.closest('button') || 
+                              target.closest('[onclick]') ||
+                              target.closest('.cursor-pointer') ||
+                              target.hasAttribute('onClick');
+      
+      if (!isClickableArea) {
+        setIsDragging(true);
+        dragStartRef.current = { x: e.clientX, y: e.clientY };
+        e.preventDefault();
+      }
     }
   };
 
@@ -435,8 +445,18 @@ function IsoverPage({ onBack = null }) {
    */
   const handleTouchStart = (e) => {
     if (isZoomed && e.touches.length === 1) {
-      setIsDragging(true);
-      dragStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      // 영역 클릭 요소인지 확인 (클릭 가능한 영역이 아닌 경우에만 드래그 시작)
+      const target = e.target;
+      const isClickableArea = target.closest('[data-clickable="true"]') || 
+                              target.closest('button') || 
+                              target.closest('[onclick]') ||
+                              target.closest('.cursor-pointer') ||
+                              target.hasAttribute('onClick');
+      
+      if (!isClickableArea) {
+        setIsDragging(true);
+        dragStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
     }
   };
 
@@ -996,11 +1016,11 @@ function IsoverPage({ onBack = null }) {
       {/* 중앙 플립북 컨테이너 */}
       <div className=" w-full h-full flex items-center justify-center p-4 relative">
         {/* 플립북 컨테이너 하단 텍스트 */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
+        {/* <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-30">
           <div className="bg-black/50 text-white px-4 py-2 rounded-full text-sm">
             무용접 파사드 시스템
           </div>
-        </div>
+        </div> */}
         
         <div className="flex items-center xl:gap-4">
           {/* 왼쪽 네비게이션 버튼들 - 항상 표시하되 표지 페이지에서는 비활성화 */}
@@ -1040,12 +1060,12 @@ function IsoverPage({ onBack = null }) {
             ref={flipBookContainerRef}
             className="flex items-center justify-center relative overflow-hidden"
             style={{ width: '100%', height: '100%' }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
+            onMouseDown={isZoomed ? handleMouseDown : undefined}
+            onMouseMove={isZoomed ? handleMouseMove : undefined}
+            onMouseUp={isZoomed ? handleMouseUp : undefined}
+            onMouseLeave={isZoomed ? handleMouseUp : undefined}
+            onTouchStart={isZoomed ? handleTouchStart : undefined}
+            onTouchEnd={isZoomed ? handleTouchEnd : undefined}
           >
             {/* 플립북 */}
             <div 
@@ -1184,6 +1204,7 @@ function IsoverPage({ onBack = null }) {
                     width: '40%',
                     height: '22%'
                   }}
+                  data-clickable="true"
                   onClick={handleArea2Click}
                   onMouseEnter={() => setHoveredArea2(2)}
                   onMouseLeave={() => setHoveredArea2(null)}
@@ -1200,6 +1221,7 @@ function IsoverPage({ onBack = null }) {
                     width: '40%',
                     height: '22%'
                   }}
+                  data-clickable="true"
                   onClick={handleArea3Click}
                   onMouseEnter={() => setHoveredArea2(3)}
                   onMouseLeave={() => setHoveredArea2(null)}
@@ -1216,6 +1238,7 @@ function IsoverPage({ onBack = null }) {
                     width: '40%',
                     height: '22%'
                   }}
+                  data-clickable="true"
                   onClick={handleArea4Click}
                   onMouseEnter={() => setHoveredArea2(4)}
                   onMouseLeave={() => setHoveredArea2(null)}
@@ -1232,6 +1255,7 @@ function IsoverPage({ onBack = null }) {
                     width: '40%',
                     height: '8%'
                   }}
+                  data-clickable="true"
                   onClick={handleArea5Click}
                   onMouseEnter={() => setHoveredArea2(5)}
                   onMouseLeave={() => setHoveredArea2(null)}
