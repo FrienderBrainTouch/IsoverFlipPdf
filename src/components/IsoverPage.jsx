@@ -3906,6 +3906,8 @@ function IsoverPage({ onBack = null }) {
         </div>
       )}
 
+      {/* Dialogflow 챗봇 플로팅 버튼 */}
+      <Chatbot />
     </div>
   );
 }
