@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDfMessenger } from '../hooks/useDfMessenger';
 
 function Chatbot({ onBotMessage, onUserMessage }) {
   const dfMessengerRef = useRef(null);
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   /** 1) df-messenger CSS/Script 로드 (중복 방지) */
   useEffect(() => {
+    // CSS 로드
     if (!document.querySelector('link[href*="df-messenger-default.css"]')) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
@@ -14,11 +16,23 @@ function Chatbot({ onBotMessage, onUserMessage }) {
       document.head.appendChild(link);
     }
 
-    if (!document.querySelector('script[src*="df-messenger.js"]')) {
+    // Script 로드
+    const existingScript = document.querySelector('script[src*="df-messenger.js"]');
+    if (existingScript) {
+      // 이미 로드되었으면 바로 설정
+      setIsScriptLoaded(true);
+    } else {
       const script = document.createElement('script');
       script.src =
         'https://www.gstatic.com/dialogflow-console/fast/df-messenger/prod/v1/df-messenger.js';
       script.async = true;
+      script.onload = () => {
+        console.log('✅ df-messenger 스크립트 로드 완료');
+        setIsScriptLoaded(true);
+      };
+      script.onerror = () => {
+        console.error('❌ df-messenger 스크립트 로드 실패');
+      };
       document.head.appendChild(script);
     }
   }, []);
@@ -107,6 +121,15 @@ function Chatbot({ onBotMessage, onUserMessage }) {
   });
 
   /** 4) UI: 메신저는 그대로, 위치/스타일만 제어 */
+  
+  // 스크립트 로드 전에는 렌더링하지 않음 (옵션)
+  if (!isScriptLoaded) {
+    console.log('⏳ df-messenger 스크립트 로딩 대기 중...');
+    return null;
+  }
+
+  console.log('🎯 Chatbot 렌더링 완료');
+  
   return (
     <div
       id="chatbot"
