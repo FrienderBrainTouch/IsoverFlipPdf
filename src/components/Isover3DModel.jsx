@@ -437,6 +437,7 @@ function Isover3DModel({
         top: isModal ? '0%' : '0%',
         left: isModal ? '0%' : '0%'
       }}
+      data-clickable="true"
     >
       {/* 3D 모델 컨테이너 */}
       <div 

@@ -108,6 +108,18 @@ function IsoverPage({ onBack = null }) {
   // 3페이지 모달 내 추가 영역 호버 상태 관리
   const [hoveredModalArea, setHoveredModalArea] = React.useState(null);
   
+  // 새로운 영역 모달 상태 관리
+  const [isNewAreaModalOpen, setIsNewAreaModalOpen] = React.useState(false);
+  
+  // 새로운 영역 모달창 확대/축소 상태 관리
+  const [newAreaModalZoomLevel, setNewAreaModalZoomLevel] = React.useState(1);
+  const [isNewAreaModalZoomed, setIsNewAreaModalZoomed] = React.useState(false);
+  
+  // 새로운 영역 모달창 드래그 상태
+  const [newAreaModalDragOffset, setNewAreaModalDragOffset] = React.useState({ x: 0, y: 0 });
+  const [isNewAreaModalDragging, setIsNewAreaModalDragging] = React.useState(false);
+  const newAreaModalDragStartRef = React.useRef({ x: 0, y: 0 });
+  
   // 7페이지 영상 상태 관리
   const [playingVideo, setPlayingVideo] = React.useState(null);
   const [showVideo, setShowVideo] = React.useState(false);
@@ -135,6 +147,15 @@ function IsoverPage({ onBack = null }) {
   // 플립북 컨테이너 참조
   const flipBookContainerRef = React.useRef(null);
   
+  // 모달창 확대/축소 상태 관리
+  const [modalZoomLevel, setModalZoomLevel] = React.useState(1);
+  const [isModalZoomed, setIsModalZoomed] = React.useState(false);
+  
+  // 모달창 드래그 상태
+  const [modalDragOffset, setModalDragOffset] = React.useState({ x: 0, y: 0 });
+  const [isModalDragging, setIsModalDragging] = React.useState(false);
+  const modalDragStartRef = React.useRef({ x: 0, y: 0 });
+  
 
   // SVG 페이지 데이터
   const pageData = [
@@ -160,7 +181,13 @@ function IsoverPage({ onBack = null }) {
   }, []);
 
   // 2단계: 흰 화면이 위로 사라지는 전환 (3D 모델 로딩 완료 후 실행)
-  const startTransition = React.useCallback(() => {
+  // 이 함수는 더 이상 사용되지 않음 - useEffect 내부로 이동됨
+
+  // 로고 애니메이션 완료 후 화면 전환
+  React.useEffect(() => {
+    if (logoOpacity === 1) {
+      // 로고 애니메이션이 완료되면 0.5초 후 2단계 시작
+      setTimeout(() => {
     console.log('2단계 애니메이션 시작');
     setWhiteScreenVisible(false);
     
@@ -172,17 +199,9 @@ function IsoverPage({ onBack = null }) {
         setShowFrontGif(true);
       }, 1000);
     }, 500);
-  }, []);
-
-  // 로고 애니메이션 완료 후 화면 전환
-  React.useEffect(() => {
-    if (logoOpacity === 1) {
-      // 로고 애니메이션이 완료되면 0.5초 후 2단계 시작
-      setTimeout(() => {
-        startTransition();
       }, 500);
     }
-  }, [logoOpacity, startTransition]);
+  }, [logoOpacity]);
 
   // 인트로 화면 애니메이션 시퀀스
   React.useEffect(() => {
@@ -232,6 +251,7 @@ function IsoverPage({ onBack = null }) {
       };
     }
   }, [showFrontGif]);
+
 
   // 페이지 변경 이벤트 핸들러
   const handlePageFlip = (e) => {
@@ -389,6 +409,87 @@ function IsoverPage({ onBack = null }) {
     setIsZoomed(false);
     setShowMinimap(false); // 리셋 시 미니맵 숨김
     setDragOffset({ x: 0, y: 0 }); // 드래그 오프셋도 리셋
+  };
+
+  /**
+   * 모달창 확대 핸들러
+   */
+  const handleModalZoomIn = () => {
+    const newZoomLevel = Math.min(modalZoomLevel + 0.2, 2); // 최대 2배까지 확대
+    setModalZoomLevel(newZoomLevel);
+    setIsModalZoomed(newZoomLevel !== 1);
+  };
+
+  /**
+   * 모달창 축소 핸들러
+   */
+  const handleModalZoomOut = () => {
+    const newZoomLevel = Math.max(modalZoomLevel - 0.2, 0.5); // 최소 0.5배까지 축소
+    setModalZoomLevel(newZoomLevel);
+    setIsModalZoomed(newZoomLevel !== 1);
+  };
+
+  /**
+   * 모달창 확대/축소 리셋 핸들러
+   */
+  const handleModalZoomReset = () => {
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+  };
+
+  // 모달창 드래그 핸들러들 (플립북 스타일로 수정)
+  const handleModalDragStart = (e) => {
+    // 클릭 가능한 영역인지 확인 (버튼, 클릭 가능한 요소 등)
+    const target = e.target;
+    const isClickableArea = target.closest('button') || 
+                            target.closest('[data-clickable="true"]') || 
+                            target.closest('[onclick]') ||
+                            target.closest('.cursor-pointer') ||
+                            target.hasAttribute('onClick');
+    
+    if (!isClickableArea) {
+      setIsModalDragging(true);
+      modalDragStartRef.current = { x: e.clientX, y: e.clientY };
+      e.preventDefault();
+    }
+  };
+
+  const handleModalDragMove = (e) => {
+    if (isModalDragging) {
+      const deltaX = e.clientX - modalDragStartRef.current.x;
+      const deltaY = e.clientY - modalDragStartRef.current.y;
+      
+      // 드래그 감도 조정 (더 부드럽게)
+      const sensitivity = 1.0;
+      
+      setModalDragOffset(prev => {
+        const newOffset = {
+          x: prev.x + (deltaX * sensitivity),
+          y: prev.y + (deltaY * sensitivity)
+        };
+        
+        // 화면 경계 내에서만 드래그 허용
+        const maxX = window.innerWidth * 0.3;
+        const maxY = window.innerHeight * 0.3;
+        
+        newOffset.x = Math.max(-maxX, Math.min(maxX, newOffset.x));
+        newOffset.y = Math.max(-maxY, Math.min(maxY, newOffset.y));
+        
+        return newOffset;
+      });
+      
+      modalDragStartRef.current = { x: e.clientX, y: e.clientY };
+      e.preventDefault();
+    }
+  };
+
+  const handleModalDragEnd = () => {
+    setIsModalDragging(false);
+  };
+
+  // 모달창 위치 리셋
+  const handleModalPositionReset = () => {
+    setModalDragOffset({ x: 0, y: 0 });
   };
 
   /**
@@ -609,9 +710,99 @@ function IsoverPage({ onBack = null }) {
   };
 
   /**
+   * 새로운 영역 클릭 핸들러
+   */
+  const handleNewAreaClick = () => {
+    setIsNewAreaModalOpen(true);
+  };
+
+  /**
+   * 새로운 영역 모달 닫기
+   */
+  const closeNewAreaModal = () => {
+    setIsNewAreaModalOpen(false);
+    // 모달 닫을 때 상태 리셋
+    setNewAreaModalZoomLevel(1);
+    setIsNewAreaModalZoomed(false);
+    setNewAreaModalDragOffset({ x: 0, y: 0 });
+    setIsNewAreaModalDragging(false);
+    newAreaModalDragStartRef.current = { x: 0, y: 0 };
+  };
+
+  /**
+   * 새로운 영역 모달창 확대
+   */
+  const handleNewAreaModalZoomIn = () => {
+    setNewAreaModalZoomLevel(prev => Math.min(prev + 0.2, 3));
+    setIsNewAreaModalZoomed(true);
+  };
+
+  /**
+   * 새로운 영역 모달창 축소
+   */
+  const handleNewAreaModalZoomOut = () => {
+    setNewAreaModalZoomLevel(prev => Math.max(prev - 0.2, 0.5));
+    if (newAreaModalZoomLevel <= 0.6) {
+      setIsNewAreaModalZoomed(false);
+    }
+  };
+
+  /**
+   * 새로운 영역 모달창 확대/축소 리셋
+   */
+  const handleNewAreaModalZoomReset = () => {
+    setNewAreaModalZoomLevel(1);
+    setIsNewAreaModalZoomed(false);
+  };
+
+  /**
+   * 새로운 영역 모달창 위치 리셋
+   */
+  const handleNewAreaModalPositionReset = () => {
+    setNewAreaModalDragOffset({ x: 0, y: 0 });
+  };
+
+  /**
+   * 새로운 영역 모달창 드래그 시작
+   */
+  const handleNewAreaModalDragStart = (e) => {
+    if (e.button !== 0) return; // 왼쪽 마우스 버튼만
+    setIsNewAreaModalDragging(true);
+    newAreaModalDragStartRef.current = {
+      x: e.clientX - newAreaModalDragOffset.x,
+      y: e.clientY - newAreaModalDragOffset.y
+    };
+  };
+
+  /**
+   * 새로운 영역 모달창 드래그 중
+   */
+  const handleNewAreaModalDragMove = (e) => {
+    if (!isNewAreaModalDragging) return;
+    setNewAreaModalDragOffset({
+      x: e.clientX - newAreaModalDragStartRef.current.x,
+      y: e.clientY - newAreaModalDragStartRef.current.y
+    });
+  };
+
+  /**
+   * 새로운 영역 모달창 드래그 종료
+   */
+  const handleNewAreaModalDragEnd = () => {
+    setIsNewAreaModalDragging(false);
+  };
+
+  /**
    * 3페이지 영역 클릭 핸들러
    */
   const handle3PageAreaClick = (areaNumber) => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
     if (areaNumber === 1) {
       // 첫번째 영역: 5페이지로 바로 이동
       if (flipBookRef.current) {
@@ -636,12 +827,26 @@ function IsoverPage({ onBack = null }) {
     setIsModalOpen(false);
     setSelectedArea(null);
     setHoveredModalArea(null);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
   };
 
   /**
    * 이미지 모달 열기 핸들러
    */
   const openImageModal = (imageType) => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
     setSelectedImageType(imageType);
     setIsImageModalOpen(true);
   };
@@ -653,6 +858,13 @@ function IsoverPage({ onBack = null }) {
     setIsImageModalOpen(false);
     setSelectedImageType(null);
     setHoveredModalArea(null);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
   };
 
   /**
@@ -661,12 +873,26 @@ function IsoverPage({ onBack = null }) {
   const closeAdditionalModal = () => {
     setIsAdditionalModalOpen(false);
     setSelectedAdditionalArea(null);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
   };
 
   /**
    * 4페이지 영역 클릭 핸들러
    */
   const handlePage4AreaClick = (areaNumber) => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
     setSelectedPage4Area(areaNumber);
     setIsPage4ModalOpen(true);
   };
@@ -677,6 +903,13 @@ function IsoverPage({ onBack = null }) {
   const closePage4Modal = () => {
     setIsPage4ModalOpen(false);
     setSelectedPage4Area(null);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
   };
 
   /**
@@ -787,6 +1020,13 @@ function IsoverPage({ onBack = null }) {
    * 5페이지 영역 클릭 핸들러
    */
   const handlePage5AreaClick = (areaNumber) => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
     if (areaNumber === 1) {
       // 첫 번째 영역 - 3D 모델 모달 열기
       setCurrentPartModel(null);
@@ -809,6 +1049,13 @@ function IsoverPage({ onBack = null }) {
    */
   const closePage5Modal = () => {
     setIsPage5ModalOpen(false);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
   };
 
   /**
@@ -839,6 +1086,13 @@ function IsoverPage({ onBack = null }) {
    * 6페이지 영역 클릭 핸들러
    */
   const handlePage6AreaClick = (areaNumber) => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
     setSelectedPage6Area(areaNumber);
     setIsPage6ModalOpen(true);
   };
@@ -849,6 +1103,13 @@ function IsoverPage({ onBack = null }) {
   const closePage6Modal = () => {
     setIsPage6ModalOpen(false);
     setSelectedPage6Area(null);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
   };
 
   /**
@@ -868,6 +1129,20 @@ function IsoverPage({ onBack = null }) {
       // 1번 영역: 영상 토글
       setShowVideo(!showVideo);
     }
+  };
+
+  /**
+   * 3D 모달 열기 핸들러 (확대/축소 상태 리셋 포함)
+   */
+  const open3DModal = () => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
+    setIs3DModalOpen(true);
   };
 
   /**
@@ -922,13 +1197,13 @@ function IsoverPage({ onBack = null }) {
           {/* Isover 로고 */}
           <div className="w-full h-full flex flex-col items-center justify-center">
             <img 
-              src="/IsoverFile/Interacive/Isover_Logo_Black.svg"
+              src="/IsoverFile/Interacive/Isover_Logo.svg"
               alt="Isover Logo"
               className="max-w-full max-h-full object-contain mb-4"
               style={{ opacity: logoOpacity }}
             />
             <img 
-              src="/IsoverFile/Interacive/Yoochang_Logo_Black.svg"
+              src="/IsoverFile/Interacive/Yoochang_Logo.svg"
               alt="Yoochang Logo"
               className="max-w-full max-h-full object-contain"
               style={{ opacity: logoOpacity }}
@@ -945,12 +1220,12 @@ function IsoverPage({ onBack = null }) {
       <div className="flex-shrink-0 w-[10%] min-w-[120px] max-w-[200px] pt-6 pl-4">
         <button onClick={handleHomeClick} className="cursor-pointer flex flex-col items-start w-full">
           <img
-            src="/IsoverFile/Interacive/Isover_Logo_Black.svg"
+            src="/IsoverFile/Interacive/Isover_Logo.svg"
             alt="Isover Logo"
             className="w-full h-auto object-contain mb-2"
           />
           <img
-            src="/IsoverFile/Interacive/Yoochang_Logo_Black.svg"
+            src="/IsoverFile/Interacive/Yoochang_Logo.svg"
             alt="Yoochang Logo"
             className="w-full h-auto object-contain"
           />
@@ -1329,6 +1604,22 @@ function IsoverPage({ onBack = null }) {
               >
                 {/* SVG 배경이 전체 페이지를 덮도록 함 */}
                 
+                {/* 새로운 영역 - 맨 위 왼쪽 */}
+                <div 
+                  className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isNewAreaModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 0 ? 'border-2 border-yellow-500' : ''}`}
+                  style={{
+                    position: 'absolute',
+                    top: '11%',
+                    left: '5%',
+                    width: '86%',
+                    height: '6%'
+                  }}
+                  onClick={handleNewAreaClick}
+                  onMouseEnter={() => setHoveredArea3(0)}
+                  onMouseLeave={() => setHoveredArea3(null)}
+                >
+                </div>
+                
                 {/* 3페이지 영역 6개 배치 */}
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 1 ? 'border-2 border-yellow-500' : ''}`}
@@ -1491,7 +1782,7 @@ function IsoverPage({ onBack = null }) {
                     width: '58%',
                     height: '21%'
                   }}
-                  onClick={() => setIs3DModalOpen(true)}
+                  onClick={open3DModal}
                   title="3D 모델 확대 보기"
                 >
                   {/* 3D 모델 직접 배치 */}
@@ -2240,17 +2531,96 @@ function IsoverPage({ onBack = null }) {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closeModal}
         >
-          <div
-            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
             {/* 닫기 버튼 */}
             <button
-              onClick={closeModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeModal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
             >
-              ×
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
 
             {/* 이미지 표시 */}
             <div className="flex items-center justify-center relative">
@@ -2390,17 +2760,96 @@ function IsoverPage({ onBack = null }) {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closeAdditionalModal}
         >
-          <div
-            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
             {/* 닫기 버튼 */}
             <button
-              onClick={closeAdditionalModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeAdditionalModal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
             >
-              ×
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
 
             {/* 이미지와 3D 모델 표시 */}
             <div className="relative flex items-center justify-center">
@@ -2521,17 +2970,96 @@ function IsoverPage({ onBack = null }) {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closePage4Modal}
         >
-          <div
-            className="bg-white rounded-2xl p-6 max-w-5xl max-h-[95vh] overflow-auto relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
             {/* 닫기 버튼 */}
             <button
-              onClick={closePage4Modal}
-              className="absolute top-2 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                closePage4Modal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
             >
-              ×
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-5xl max-h-[95vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
 
             {/* 이미지와 3D 모델 표시 */}
             <div className="relative flex items-center justify-center">
@@ -2609,17 +3137,96 @@ function IsoverPage({ onBack = null }) {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closePage5Modal}
         >
-          <div
-            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
             {/* 닫기 버튼 */}
             <button
-              onClick={closePage5Modal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                closePage5Modal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
             >
-              ×
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
 
             {/* 이미지 표시 */}
             <div className="flex items-center justify-center">
@@ -2651,17 +3258,96 @@ function IsoverPage({ onBack = null }) {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closePage6Modal}
         >
-          <div
-            className="bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
             {/* 닫기 버튼 */}
             <button
-              onClick={closePage6Modal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                closePage6Modal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
             >
-              ×
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-6xl max-h-[90vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
 
             {/* GIF 표시 */}
             <div className="flex items-center justify-center">
@@ -2928,17 +3614,96 @@ function IsoverPage({ onBack = null }) {
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={closeImageModal}
         >
-          <div
-            className="bg-white rounded-2xl p-6 max-w-7xl max-h-[95vh] overflow-auto relative shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
             {/* 닫기 버튼 */}
             <button
-              onClick={closeImageModal}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeImageModal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
             >
-              ×
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-7xl max-h-[95vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
 
             {/* 이미지 표시 */}
             <div className="flex items-center justify-center">
@@ -3014,6 +3779,126 @@ function IsoverPage({ onBack = null }) {
               >
                 <p>이미지를 불러올 수 없습니다.</p>
                 <p className="text-sm">경로: /IsoverFile/Popup/{selectedImageType}.jpg 또는 .png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 새로운 영역 모달창 */}
+      {isNewAreaModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closeNewAreaModal}
+        >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNewAreaModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNewAreaModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isNewAreaModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNewAreaModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(newAreaModalDragOffset.x !== 0 || newAreaModalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNewAreaModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 닫기 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                closeNewAreaModal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-auto relative shadow-2xl ${isNewAreaModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${newAreaModalZoomLevel}) translate(${newAreaModalDragOffset.x}px, ${newAreaModalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isNewAreaModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleNewAreaModalDragStart}
+            onMouseMove={isNewAreaModalDragging ? handleNewAreaModalDragMove : undefined}
+            onMouseUp={isNewAreaModalDragging ? handleNewAreaModalDragEnd : undefined}
+            onMouseLeave={isNewAreaModalDragging ? handleNewAreaModalDragEnd : undefined}
+          >
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src="/IsoverFile/Popup/top_3-1.png"
+                alt="무용접 파사드 시스템"
+                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  // 이미지 로드 실패 시 메시지 표시
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/top_3-1.png</p>
               </div>
             </div>
           </div>
