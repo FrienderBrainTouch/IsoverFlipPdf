@@ -2,6 +2,7 @@ import React from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import IsoverPageMobile from './IsoverPage-mobile';
 import Isover3DModel from './Isover3DModel';
+import Chatbot from './Chatbot';
 
 function IsoverPage({ onBack = null }) {
   // 화면 크기 상태 관리

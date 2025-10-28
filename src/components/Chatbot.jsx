@@ -121,11 +121,11 @@ function Chatbot({ onBotMessage, onUserMessage }) {
         <df-messenger
           ref={dfMessengerRef}
           project-id="hani-chatbot"
-          agent-id="d90a86ac-e04e-4685-80f2-eec780081d87"
+          agent-id="fa0057e4-157d-47f3-bba4-da114f1d4101"
           language-code="ko"
           max-query-length="-1"
         >
-          <df-messenger-chat-bubble chat-title="VQ" />
+          <df-messenger-chat-bubble chat-title="E카탈로그 도우미" />
         </df-messenger>
 
         <style>
@@ -133,10 +133,10 @@ function Chatbot({ onBotMessage, onUserMessage }) {
             df-messenger {
               z-index: 999;
               position: fixed;
-              bottom: 16px;
+              bottom: 80px;
               right: 16px;
-
-              /* theme tokens */
+              --df-messenger-chat-bubble-size: 48px;
+              --df-messenger-chat-bubble-icon-size: 20px;
               --df-messenger-font-color: #000;
               --df-messenger-font-family: Google Sans;
               --df-messenger-chat-background: #f3f6fc;
