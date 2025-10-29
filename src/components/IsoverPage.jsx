@@ -109,6 +109,10 @@ function IsoverPage({ onBack = null }) {
   // 3페이지 모달 내 추가 영역 호버 상태 관리
   const [hoveredModalArea, setHoveredModalArea] = React.useState(null);
   
+  // 추가 영역 이미지 모달 상태 관리
+  const [isAdditionalImageModalOpen, setIsAdditionalImageModalOpen] = React.useState(false);
+  const [selectedAdditionalImageType, setSelectedAdditionalImageType] = React.useState(null);
+  
   // 새로운 영역 모달 상태 관리
   const [isNewAreaModalOpen, setIsNewAreaModalOpen] = React.useState(false);
   
@@ -838,6 +842,37 @@ function IsoverPage({ onBack = null }) {
   };
 
   /**
+   * 추가 영역 이미지 모달 열기 핸들러
+   */
+  const openAdditionalImageModal = (imageType) => {
+    // 모달 열기 전에 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+    
+    setSelectedAdditionalImageType(imageType);
+    setIsAdditionalImageModalOpen(true);
+  };
+
+  /**
+   * 추가 영역 이미지 모달 닫기 핸들러
+   */
+  const closeAdditionalImageModal = () => {
+    setIsAdditionalImageModalOpen(false);
+    setSelectedAdditionalImageType(null);
+    setHoveredModalArea(null);
+    // 모달창 확대/축소 상태 리셋
+    setModalZoomLevel(1);
+    setIsModalZoomed(false);
+    // 모달창 드래그 상태 리셋
+    setModalDragOffset({ x: 0, y: 0 });
+    setIsModalDragging(false);
+    modalDragStartRef.current = { x: 0, y: 0 };
+  };
+
+  /**
    * 이미지 모달 열기 핸들러
    */
   const openImageModal = (imageType) => {
@@ -1499,10 +1534,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 1 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '26%',
+                    top: '25%',
                     left: '7%',
-                    width: '40%',
-                    height: '22%'
+                    width: '42%',
+                    height: '24%'
                   }}
                   onMouseEnter={() => setHoveredArea2(1)}
                   onMouseLeave={() => setHoveredArea2(null)}
@@ -1513,10 +1548,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 2 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '26%',
-                    right: '9%',
-                    width: '40%',
-                    height: '22%'
+                    top: '25%',
+                    right: '7%',
+                    width: '42%',
+                    height: '24%'
                   }}
                   data-clickable="true"
                   onClick={handleArea2Click}
@@ -1530,10 +1565,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '26%',
-                    left: '8%',
-                    width: '40%',
-                    height: '22%'
+                    bottom: '25%',
+                    left: '7%',
+                    width: '42%',
+                    height: '24%'
                   }}
                   data-clickable="true"
                   onClick={handleArea3Click}
@@ -1547,10 +1582,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 4 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '26%',
-                    right: '9%',
-                    width: '40%',
-                    height: '22%'
+                    bottom: '25%',
+                    right: '7%',
+                    width: '42%',
+                    height: '24%'
                   }}
                   data-clickable="true"
                   onClick={handleArea4Click}
@@ -1564,7 +1599,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 5 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '5%',
+                    bottom: '6%',
                     left: '30%',
                     width: '40%',
                     height: '8%'
@@ -1656,7 +1691,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '32%',
+                    top: '31.7%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1718,7 +1753,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '46%',
-                    right: '6%',
+                    right: '5%',
                     width: '27%',
                     height: '16.5%'
                   }}
@@ -1733,7 +1768,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '33%',
-                    right: '6%',
+                    right: '5%',
                     width: '27%',
                     height: '12.5%'
                   }}
@@ -1748,7 +1783,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '20%',
-                    right: '6%',
+                    right: '5%',
                     width: '27%',
                     height: '13%'
                   }}
@@ -1778,10 +1813,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer hover:bg-blue-500/10 transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '20%',
+                    bottom: '19%',
                     left: '5%',
-                    width: '58%',
-                    height: '21%'
+                    width: '59%',
+                    height: '22%'
                   }}
                   onClick={open3DModal}
                   title="3D 모델 확대 보기"
@@ -1875,8 +1910,8 @@ function IsoverPage({ onBack = null }) {
                     position: 'absolute',
                     bottom: '29%',
                     left: '5%',
-                    width: '89%',
-                    height: '19%'
+                    width: '90%',
+                    height: '20%'
                   }}
                   onClick={() => handlePage4AreaClick(3)}
                   onMouseEnter={() => setHoveredArea4(3)}
@@ -1891,7 +1926,7 @@ function IsoverPage({ onBack = null }) {
                     bottom: '7%',
                     left: '5%',
                     width: '89%',
-                    height: '20%'
+                    height: '21%'
                   }}
                   onClick={() => handlePage4AreaClick(4)}
                   onMouseEnter={() => setHoveredArea4(4)}
@@ -1932,10 +1967,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 1 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '25%',
+                    top: '24%',
                     left: '21%',
-                    width: '70.5%',
-                    height: '26%'
+                    width: '71.5%',
+                    height: '27%'
                   }}
                   onClick={() => handlePage5AreaClick(1)}
                   onMouseEnter={() => setHoveredArea5(1)}
@@ -1948,10 +1983,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 2 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '14%',
+                    bottom: '12%',
                     left: '5%',
                     width: '90%',
-                    height: '29%'
+                    height: '31%'
                   }}
                   onClick={() => handlePage5AreaClick(2)}
                   onMouseEnter={() => setHoveredArea5(2)}
@@ -1965,7 +2000,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '21%',
+                    top: '20.5%',
                     left: '5%',
                     width: '16%',
                     height: '2.5%'
@@ -1981,8 +2016,8 @@ function IsoverPage({ onBack = null }) {
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 4 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
-                    position: 'absolute',
-                    top: '31%',
+                    position: 'absolute', 
+                    top: '30.5%',
                     left: '5%',
                     width: '12%',
                     height: '2.5%'
@@ -2016,8 +2051,8 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 6 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '44%',
-                    left: '5%',
+                    top: '43.5%',
+                    left: '5.5%',
                     width: '9%',
                     height: '2.5%'
                   }}
@@ -2106,7 +2141,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     top: '42.1%',
-                    left: '10.3%',
+                    left: '10.9%',
                     width: '35.3%',
                     height: '17.1%'
                   }}
@@ -2150,7 +2185,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '17%',
-                    left: '10.3%',
+                    left: '10.9%',
                     width: '36%',
                     height: '17.1%'
                   }}
@@ -2288,9 +2323,9 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '6%',
-                    left: '6%',
+                    left: '5.5%',
                     width: '20%',
-                    height: '14%'
+                    height: '15%'
                   }}
                   onClick={() => handlePage7AreaClick(2)}
                   onMouseEnter={() => setHoveredArea7(2)}
@@ -2303,7 +2338,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea7 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '10%',
+                    bottom: '9%',
                     right: '6%',
                     width: '24%',
                     height: '10%'
@@ -2664,10 +2699,10 @@ function IsoverPage({ onBack = null }) {
                 <div 
                   className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '3-6-1' ? 'border-2 border-yellow-500' : ''}`}
                   style={{
-                    bottom: '18%',
-                    left: '11%',
+                    bottom: '12%',
+                    left: '12%',
                     width: '22%',
-                    height: '54%'
+                    height: '55%'
                   }}
                   onClick={() => openImageModal('3-6-1')}
                   onMouseEnter={() => setHoveredModalArea('3-6-1')}
@@ -2718,8 +2753,8 @@ function IsoverPage({ onBack = null }) {
                     <div 
                       className="absolute"
                       style={{
-                        top: '29%',
-                        right: '7%',
+                        top: '32%',
+                        right: '6%',
                         width: '30%',
                         height: '17%'
                       }}
@@ -2869,72 +2904,144 @@ function IsoverPage({ onBack = null }) {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative w-full h-full">
                   {selectedAdditionalArea === 7 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                      <Isover3DModel 
-                        isVisible={true} 
-                        opacity={1}
-                        scale={1}
-                        position={{ x: 0, y: 0 }}
-                        animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/L-Bar.glb"
-                        // modelPath="/IsoverFile/3dmodel/face-rig-anims-opt.glb"
-                        isModal={true}
-                        cameraPosition={[8, 14, 14]}
-                        cameraFov={5}
-                        customScale={1}
-                      />
-                    </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={1}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-Bar.glb"
+                          // modelPath="/IsoverFile/3dmodel/face-rig-anims-opt.glb"
+                          isModal={true}
+                          cameraPosition={[8, 14, 14]}
+                          cameraFov={5}
+                          customScale={1}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '7-right' ? 'border-2 border-yellow-500' : ''}`}
+                        style={{
+                          top: '18%',
+                          right: '5%',
+                          width: '19.5%',
+                          height: '62%'
+                        }}
+                        onClick={() => {
+                          openAdditionalImageModal('pae_3-1');
+                        }}
+                        onMouseEnter={() => setHoveredModalArea('7-right')}
+                        onMouseLeave={() => setHoveredModalArea(null)}
+                      >
+                      </div>
+                    </>
                   )}
                   
                   {selectedAdditionalArea === 8 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={1}
-                      scale={1}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/L-AnkerBracket.glb"
-                      isModal={true}
-                      cameraPosition={[1, 2, 2]}
-                      cameraFov={5}
-                      customScale={1}
-                    />
-                  </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={1}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-AnkerBracket.glb"
+                          isModal={true}
+                          cameraPosition={[1, 2, 2]}
+                          cameraFov={5}
+                          customScale={1}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '8-right' ? 'border-2 border-yellow-500' : ''}`}
+                        style={{
+                          top: '16%',
+                          right: '5%',
+                          width: '19%',
+                          height: '54%'
+                        }}
+                        onClick={() => {
+                          openAdditionalImageModal('pae_3-2');
+                        }}
+                        onMouseEnter={() => setHoveredModalArea('8-right')}
+                        onMouseLeave={() => setHoveredModalArea(null)}
+                      >
+                      </div>
+                    </>
                   )}
                   
                   {selectedAdditionalArea === 9 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={1}
-                      scale={1}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/L-HBar.glb"
-                      isModal={true}
-                      cameraPosition={[1, 2, 2]}
-                      cameraFov={10}
-                      customScale={1}
-                    />
-                  </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={1}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-HBar.glb"
+                          isModal={true}
+                          cameraPosition={[1, 2, 2]}
+                          cameraFov={10}
+                          customScale={1}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '9-right' ? 'border-2 border-yellow-500' : ''}`}
+                        style={{
+                          top: '26%',
+                          right: '5%',
+                          width: '19.5%',
+                          height: '50%'
+                        }}
+                        onClick={() => {
+                          openAdditionalImageModal('pae_3-3');
+                        }}
+                        onMouseEnter={() => setHoveredModalArea('9-right')}
+                        onMouseLeave={() => setHoveredModalArea(null)}
+                      >
+                      </div>
+                    </>
                   )}
                   
                   {selectedAdditionalArea === 10 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={1}
-                      scale={1}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/L-Holder.glb"
-                      isModal={true}
-                      cameraPosition={[1, 2, 2]}
-                      cameraFov={5}
-                      customScale={2}
-                    />
-                  </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={1}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-Holder.glb"
+                          isModal={true}
+                          cameraPosition={[1, 2, 2]}
+                          cameraFov={5}
+                          customScale={2}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '10-right' ? 'border-2 border-yellow-500' : ''}`}
+                        style={{
+                          top: '21%',
+                          right: '5%',
+                          width: '19%',
+                          height: '64%'
+                        }}
+                        onClick={() => {
+                          openAdditionalImageModal('pae_3-4');
+                        }}
+                        onMouseEnter={() => setHoveredModalArea('10-right')}
+                        onMouseLeave={() => setHoveredModalArea(null)}
+                      >
+                      </div>
+                    </>
                   )}
                   
                   {/* {selectedAdditionalArea === 11 && (
@@ -3900,6 +4007,162 @@ function IsoverPage({ onBack = null }) {
               >
                 <p>이미지를 불러올 수 없습니다.</p>
                 <p className="text-sm">경로: /IsoverFile/Popup/top_3-1.png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 추가 영역 이미지 모달창 */}
+      {isAdditionalImageModalOpen && selectedAdditionalImageType && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={closeAdditionalImageModal}
+        >
+          {/* 고정 버튼들 - 모달 외부에 배치 */}
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-60 flex gap-2" onClick={(e) => e.stopPropagation()}>
+            {/* 확대 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomIn();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="확대"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+              </svg>
+            </button>
+
+            {/* 축소 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleModalZoomOut();
+              }}
+              className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+              title="축소"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7" />
+              </svg>
+            </button>
+
+            {/* 확대/축소 리셋 버튼 */}
+            {isModalZoomed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalZoomReset();
+                }}
+                className="w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer"
+                title="원본 크기로 복원"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 위치 리셋 버튼 */}
+            {(modalDragOffset.x !== 0 || modalDragOffset.y !== 0) && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleModalPositionReset();
+                }}
+                className="w-12 h-12 bg-blue-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-blue-600 rounded-full shadow-lg border border-blue-400 transition-colors duration-300 cursor-pointer"
+                title="위치 리셋"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+            )}
+
+            {/* 닫기 버튼 */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                closeAdditionalImageModal();
+              }}
+              className="w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer"
+              title="닫기"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div
+            className={`bg-white rounded-2xl p-6 max-w-7xl max-h-[95vh] overflow-auto relative shadow-2xl ${isModalDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+            style={{
+              transform: `scale(${modalZoomLevel}) translate(${modalDragOffset.x}px, ${modalDragOffset.y}px)`,
+              transformOrigin: 'center center',
+              transition: isModalDragging ? 'none' : 'transform 0.3s ease-in-out'
+            }}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={handleModalDragStart}
+            onMouseMove={isModalDragging ? handleModalDragMove : undefined}
+            onMouseUp={isModalDragging ? handleModalDragEnd : undefined}
+            onMouseLeave={isModalDragging ? handleModalDragEnd : undefined}
+          >
+
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              {selectedAdditionalImageType === 'pae_3-1' && (
+                <img
+                  src="/IsoverFile/Popup/pae_3-1_img.png"
+                  alt="Additional Area 7 Image"
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+              )}
+              {selectedAdditionalImageType === 'pae_3-2' && (
+                <img
+                  src="/IsoverFile/Popup/pae_3-2_img.png"
+                  alt="Additional Area 8 Image"
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+              )}
+              {selectedAdditionalImageType === 'pae_3-3' && (
+                <img
+                  src="/IsoverFile/Popup/pae_3-3_img.png"
+                  alt="Additional Area 9 Image"
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+              )}
+              {selectedAdditionalImageType === 'pae_3-4' && (
+                <img
+                  src="/IsoverFile/Popup/pae_3-4_img.png"
+                  alt="Additional Area 10 Image"
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+              )}
+              
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/{selectedAdditionalImageType}_img.png</p>
               </div>
             </div>
           </div>
