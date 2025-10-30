@@ -548,7 +548,7 @@ function Isover3DModel({
                   enableDamping={true}
                   dampingFactor={0.05}
                   minDistance={4}
-                  maxDistance={15}
+                  maxDistance={20}
                   rotateSpeed={rotateSpeed}
                 />
               </Suspense>

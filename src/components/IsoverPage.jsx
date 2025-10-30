@@ -1492,9 +1492,9 @@ function IsoverPage({ onBack = null }) {
                         animationDelay={500}
                         modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET.glb"
                         isModal={false}
-                        cameraPosition={[8, 2, 50]}
-                        cameraFov={50}
-                        customScale={0.6}
+                        cameraPosition={[15, -5, 30]}
+                        cameraFov={15}
+                        customScale={0.8}
                         showWireframe={false}
                       />
                     </div>
@@ -1967,7 +1967,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 1 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '24%',
+                    top: '25%',
                     left: '21%',
                     width: '71.5%',
                     height: '27%'
@@ -1983,7 +1983,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 2 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '12%',
+                    bottom: '11%',
                     left: '5%',
                     width: '90%',
                     height: '31%'
@@ -2000,9 +2000,9 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '20.5%',
-                    left: '5%',
-                    width: '16%',
+                    top: '21.5%',
+                    left: '6%',
+                    width: '15%',
                     height: '2.5%'
                   }}
                   onClick={() => handlePage5AreaClick(3)}
@@ -2017,9 +2017,9 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 4 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute', 
-                    top: '30.5%',
-                    left: '5%',
-                    width: '12%',
+                    top: '31.5%',
+                    left: '6%',
+                    width: '11.5%',
                     height: '2.5%'
                   }}
                   onClick={() => handlePage5AreaClick(4)}
@@ -2034,9 +2034,9 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 5 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '36.5%',
-                    left: '5%',
-                    width: '12%',
+                    top: '37%',
+                    left: '6%',
+                    width: '11%',
                     height: '2.5%'
                   }}
                   onClick={() => handlePage5AreaClick(5)}
@@ -2051,9 +2051,9 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 6 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '43.5%',
-                    left: '5.5%',
-                    width: '9%',
+                    top: '44%',
+                    left: '6.5%',
+                    width: '8%',
                     height: '2.5%'
                   }}
                   onClick={() => handlePage5AreaClick(6)}
@@ -2735,7 +2735,7 @@ function IsoverPage({ onBack = null }) {
                         modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET.glb"
                         isModal={true}
                         cameraPosition={[2, 0, 8]}
-                        cameraFov={70}
+                        cameraFov={30}
                         customScale={0.5}
                         rotateSpeed={1.0}
                         showWireframe={false}
@@ -2916,7 +2916,7 @@ function IsoverPage({ onBack = null }) {
                           // modelPath="/IsoverFile/3dmodel/face-rig-anims-opt.glb"
                           isModal={true}
                           cameraPosition={[8, 14, 14]}
-                          cameraFov={5}
+                          cameraFov={20}
                           customScale={1}
                         />
                       </div>
@@ -2945,14 +2945,14 @@ function IsoverPage({ onBack = null }) {
                         <Isover3DModel 
                           isVisible={true} 
                           opacity={1}
-                          scale={1}
+                          scale={0.7}
                           position={{ x: 0, y: 0 }}
                           animationDelay={500}
                           modelPath="/IsoverFile/3dmodel/L-AnkerBracket.glb"
                           isModal={true}
-                          cameraPosition={[1, 2, 2]}
-                          cameraFov={5}
-                          customScale={1}
+                          cameraPosition={[4, 4, 8]}
+                          cameraFov={30}
+                          customScale={0.3}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -2980,14 +2980,14 @@ function IsoverPage({ onBack = null }) {
                         <Isover3DModel 
                           isVisible={true} 
                           opacity={1}
-                          scale={1}
+                          scale={0.7}
                           position={{ x: 0, y: 0 }}
                           animationDelay={500}
                           modelPath="/IsoverFile/3dmodel/L-HBar.glb"
                           isModal={true}
-                          cameraPosition={[1, 2, 2]}
-                          cameraFov={10}
-                          customScale={1}
+                          cameraPosition={[-10, 10, 20]}
+                          cameraFov={40}
+                          customScale={0.3}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -3021,8 +3021,8 @@ function IsoverPage({ onBack = null }) {
                           modelPath="/IsoverFile/3dmodel/L-Holder.glb"
                           isModal={true}
                           cameraPosition={[1, 2, 2]}
-                          cameraFov={5}
-                          customScale={2}
+                          cameraFov={30}
+                          customScale={0.3}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -3511,9 +3511,9 @@ function IsoverPage({ onBack = null }) {
                 modelPath="/IsoverFile/3dmodel/system_without_panel.glb"
                 isModal={true}
                 cameraPosition={[0, 0, 14]}
-                cameraFov={100000}
-                customScale={0.1}
-                rotateSpeed={-1.0}
+                cameraFov={35}
+                customScale={0.7}
+                rotateSpeed={1.0}
               />
             </div>
             
@@ -3600,8 +3600,8 @@ function IsoverPage({ onBack = null }) {
                   animationDelay={0}
                   modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel.glb"}
                   isModal={true}
-                  cameraPosition={currentPartModel ? [3, -2, 8] : [0, 0, 14]} // 파트 모델링과 system_with_panel 분리
-                  cameraFov={ 80}
+                  cameraPosition={[3, -2, 8]} // 파트 모델링과 system_with_panel 분리
+                  cameraFov={30}
                   customScale={currentPartModel ? getModelScaleByPart(selectedPart) : 0.3}
                   rotateSpeed={1.0}
                   showWireframe={!currentPartModel} // 파트 모델이 선택되면 박스 숨김
@@ -3686,8 +3686,8 @@ function IsoverPage({ onBack = null }) {
                   modelPath={getExteriorModelPath(selectedExteriorType)}
                   isModal={true}
                   cameraPosition={[3, -2, 8]}
-                  cameraFov={50}
-                  customScale={0.3}
+                  cameraFov={20}
+                  customScale={0.6}
                   rotateSpeed={1.0}
                   showWireframe={false}
                 />
