@@ -364,7 +364,7 @@ function Isover3DModel({
           setActualModelLoaded(true);
           setIsLoading(false);
         }
-      }, 15000); // 타임아웃 시간을 15초로 증가
+      }, 400000); // 타임아웃 시간을 300초로 증가
       
       setLoadingTimeout(timeout);
       
