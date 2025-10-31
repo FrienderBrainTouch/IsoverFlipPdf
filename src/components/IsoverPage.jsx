@@ -968,15 +968,15 @@ function IsoverPage({ onBack = null }) {
   const getModelPathByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
-        return "/IsoverFile/3dmodel/1_System_Fiber_SET.glb"; // 파이버시멘트보드
+        return "/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"; // 파이버시멘트보드
       case 2:
-        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb"; // AL 복합판넬
+        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET_test.glb"; // AL 복합판넬
       case 3:
-        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb"; // AL 시트판넬
+        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb"; // AL 시트판넬
       case 4:
-        return "/IsoverFile/3dmodel/4_System_Three_SET.glb"; // 조적판넬
+        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb"; // 조적판넬
       default:
-        return "/IsoverFile/3dmodel/system_with_panel.glb";
+        return "/IsoverFile/3dmodel/system_with_panel_test.glb";
     }
   };
 
@@ -1040,15 +1040,15 @@ function IsoverPage({ onBack = null }) {
   const getExteriorModelPath = (typeNumber) => {
     switch (typeNumber) {
       case 3:
-        return "/IsoverFile/3dmodel/1_System_Fiber_SET.glb"; // 파이버시멘트보드
+        return "/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"; // 파이버시멘트보드
       case 4:
-        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET.glb"; // AL 복합판넬
+        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET_test.glb"; // AL 복합판넬
       case 5:
-        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET.glb"; // AL 시트판넬
+        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb"; // AL 시트판넬
       case 6:
-        return "/IsoverFile/3dmodel/4_System_Three_SET.glb"; // 조적판넬
+        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb"; // 조적판넬
       default:
-        return "/IsoverFile/3dmodel/system_with_panel.glb";
+        return "/IsoverFile/3dmodel/system_with_panel_test.glb";
     }
   };
 
@@ -1490,7 +1490,7 @@ function IsoverPage({ onBack = null }) {
                         scale={0.3}
                         position={{ x: 0, y: 0 }}
                         animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET.glb"
+                        modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"
                         isModal={false}
                         cameraPosition={[15, -5, 30]}
                         cameraFov={15}
@@ -2732,7 +2732,7 @@ function IsoverPage({ onBack = null }) {
                         scale={1}
                         position={{ x: 0, y: 0 }}
                         animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET.glb"
+                        modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"
                         isModal={true}
                         cameraPosition={[2, 0, 8]}
                         cameraFov={30}
@@ -2765,7 +2765,7 @@ function IsoverPage({ onBack = null }) {
                         scale={1}
                         position={{ x: 0, y: 0 }}
                         animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/BlackFacing.glb"
+                        modelPath="/IsoverFile/3dmodel/BlackFacing_test.glb"
                         isModal={true}
                         cameraPosition={[4, 4, 8]}
                         cameraFov={5}
@@ -3598,7 +3598,7 @@ function IsoverPage({ onBack = null }) {
                   scale={0.7}
                   position={{ x: 0, y: 0 }}
                   animationDelay={0}
-                  modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel.glb"}
+                  modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel_test.glb"}
                   isModal={true}
                   cameraPosition={[3, -2, 8]} // 파트 모델링과 system_with_panel 분리
                   cameraFov={30}
