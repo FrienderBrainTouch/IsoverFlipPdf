@@ -189,10 +189,10 @@ function IsoverPageMobile({ onBack = null }) {
   // 로고 애니메이션 완료 후 화면 전환
   useEffect(() => {
     if (logoOpacity === 1) {
-      // 로고 애니메이션이 완료되면 2초 후 2단계 시작
+      // 로고 애니메이션이 완료되면 0.5초 후 2단계 시작
       setTimeout(() => {
         startTransition();
-      }, 2000);
+      }, 500);
     }
   }, [logoOpacity, startTransition]);
 
@@ -203,7 +203,7 @@ function IsoverPageMobile({ onBack = null }) {
     // 로고 애니메이션 시작
     const logoAnimation = () => {
       const startTime = performance.now();
-      const duration = 1500; // 1.5초
+      const duration = 1000; // 1초
 
       const animate = (currentTime) => {
         const elapsed = currentTime - startTime;
@@ -280,7 +280,7 @@ function IsoverPageMobile({ onBack = null }) {
     setTimeout(() => {
       const logoAnimation = () => {
         const startTime = performance.now();
-        const duration = 1500;
+        const duration = 1000;
 
         const animate = (currentTime) => {
           const elapsed = currentTime - startTime;
