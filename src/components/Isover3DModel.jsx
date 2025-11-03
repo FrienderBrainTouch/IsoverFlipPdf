@@ -519,10 +519,11 @@ function Isover3DModel({
             >
               <Suspense fallback={null}>
                 {/* 조명 설정 - HDRI 대신 기본 조명 사용 */}
-                <ambientLight intensity={0.4} />
-                <directionalLight position={[10, 10, 5]} intensity={1.2} />
-                <directionalLight position={[-10, -10, 5]} intensity={0.8} />
-                <pointLight position={[0, 10, 0]} intensity={0.6} />
+                <ambientLight intensity={3} />
+                <directionalLight position={[-3, 0, 6]} intensity={2} />
+                <pointLight position={[-3, 0, 6]} intensity={1.6} />
+
+                
                 
                 {/* 3D 모델 */}
                 <IsoverModel 
