@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Isover3DModel from './Isover3DModel';
-import Chatbot from './Chatbot';
+// import Chatbot from './Chatbot';
 
 /**
  * IsoverPage-mobile 컴포넌트
@@ -2414,7 +2414,7 @@ function IsoverPageMobile({ onBack = null }) {
       )}
 
       {/* Dialogflow 챗봇 플로팅 버튼 */}
-      <Chatbot />
+    {/*  <Chatbot /> */}
     </div>
   );
 }
