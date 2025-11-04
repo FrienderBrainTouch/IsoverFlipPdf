@@ -329,7 +329,7 @@ function IsoverPage({ onBack = null }) {
    * 프린터 버튼 클릭 핸들러
    */
   const handlePrintClick = () => {
-    const pdfUrl = '/IsoverFile/func-pdf/Isover-Catalog.pdf';
+    const pdfUrl = '/IsoverFile/func-pdf/무용접파사드시스템 카다로그.pdf';
     const pdfWindow = window.open(pdfUrl, '_blank');
     if (pdfWindow) {
       pdfWindow.onload = () => {
@@ -343,8 +343,8 @@ function IsoverPage({ onBack = null }) {
    */
   const handleDownloadClick = () => {
     const link = document.createElement('a');
-    link.href = '/IsoverFile/func-pdf/Isover-Catalog.pdf';
-    link.download = 'Isover-Catalog.pdf';
+    link.href = '/IsoverFile/func-pdf/무용접파사드시스템 카다로그.pdf';
+    link.download = '무용접파사드시스템 카다로그.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2711,39 +2711,6 @@ function IsoverPage({ onBack = null }) {
                 >
                 </div>
               )}
-              
-              {/* 2번째 영역일 때 파이버시멘트보드 3D 모델 영역 추가 */}
-              {selectedArea === 2 && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-full h-full">
-                    {/* 파이버시멘트보드 3D 모델 영역 */}
-                    <div 
-                      className="absolute"
-                      style={{
-                        top: '66%',
-                        left: '23%',
-                        width: '40%',
-                        height: '31%'
-                      }}
-                    >
-                      <Isover3DModel 
-                        isVisible={true} 
-                        opacity={1}
-                        scale={1}
-                        position={{ x: 0, y: 0 }}
-                        animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"
-                        isModal={true}
-                        cameraPosition={[2, 0, 8]}
-                        cameraFov={30}
-                        customScale={0.5}
-                        rotateSpeed={1.0}
-                        showWireframe={false}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {/* 3번째 영역일 때 블랙페이싱 3D 모델 영역 추가 */}
               {selectedArea === 3 && (
@@ -3817,51 +3784,18 @@ function IsoverPage({ onBack = null }) {
             <div className="flex items-center justify-center">
               {selectedImageType === '3-4-1' ? (
                 // 3-4-1 타입일 때 두 이미지를 나란히 표시
-                <div className="flex gap-4 max-w-full max-h-[85vh]">
-                  <img
-                    src="/IsoverFile/Popup/3-4-1-English.jpg"
-                    alt="3-4-1 English 이미지"
-                    className="max-w-[48%] max-h-[85vh] object-contain rounded-lg shadow-lg"
-                    onError={(e) => {
-                      // JPG가 없으면 PNG 시도
-                      if (e.target.src.includes('.jpg')) {
-                        e.target.src = "/IsoverFile/Popup/3-4-1-English.png";
-                      } else {
-                        // 이미지 로드 실패 시 메시지 표시
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'block';
-                      }
-                    }}
-                  />
+                <div className="flex max-w-full max-h-[85vh]">
                   <img
                     src="/IsoverFile/Popup/3-4-2-Korean.jpg"
                     alt="3-4-2 Korean 이미지"
-                    className="max-w-[48%] max-h-[85vh] object-contain rounded-lg shadow-lg"
+                    className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
                     onError={(e) => {
-                      // JPG가 없으면 PNG 시도
-                      if (e.target.src.includes('.jpg')) {
-                        e.target.src = "/IsoverFile/Popup/3-4-2-Korean.png";
-                      } else {
+
                         // 이미지 로드 실패 시 메시지 표시
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'block';
-                      }
                     }}
                   />
-                  <div
-                    className="hidden text-gray-500 text-center"
-                    style={{ display: 'none' }}
-                  >
-                    <p>이미지를 불러올 수 없습니다.</p>
-                    <p className="text-sm">경로: /IsoverFile/Popup/3-4-1-English.jpg 또는 .png</p>
-                  </div>
-                  <div
-                    className="hidden text-gray-500 text-center"
-                    style={{ display: 'none' }}
-                  >
-                    <p>이미지를 불러올 수 없습니다.</p>
-                    <p className="text-sm">경로: /IsoverFile/Popup/3-4-2-Korean.jpg 또는 .png</p>
-                  </div>
                 </div>
               ) : (
                 // 다른 타입일 때는 단일 이미지 표시
