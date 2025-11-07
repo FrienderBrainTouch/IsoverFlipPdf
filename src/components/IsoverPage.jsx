@@ -1493,7 +1493,7 @@ function IsoverPage({ onBack = null }) {
                         modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"
                         isModal={false}
                         cameraPosition={[15, -5, 30]}
-                        cameraFov={15}
+                        cameraFov={10}
                         customScale={0.8}
                         showWireframe={false}
                       />
