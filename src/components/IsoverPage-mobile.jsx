@@ -814,7 +814,7 @@ function IsoverPageMobile({ onBack = null }) {
                                 modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"
                                 isModal={false}
                                 cameraPosition={[8, 2, 30]}
-                                cameraFov={20}
+                                cameraFov={15}
                                 customScale={0.8}
                                 showWireframe={false}
                               />
@@ -889,7 +889,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '7%',
+                            bottom: '6%',
                             left: '30%',
                             width: '40%',
                             height: '8%'
@@ -923,7 +923,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '26%',
+                            top: '26.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -936,7 +936,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '29%',
+                            top: '29.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -949,7 +949,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '32%',
+                            top: '32.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -962,7 +962,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '35.1%',
+                            top: '35.7%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -975,7 +975,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '38.3%',
+                            top: '38.7%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -988,7 +988,7 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '41.5%',
+                            top: '42%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -1139,8 +1139,8 @@ function IsoverPageMobile({ onBack = null }) {
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '25%',
-                            left: '21%',
+                            top: '25.5%',
+                            left: '23%',
                             width: '70.5%',
                             height: '26%'
                           }}
@@ -1170,7 +1170,7 @@ function IsoverPageMobile({ onBack = null }) {
                             position: 'absolute',
                             top: '22%',
                             left: '7%',
-                            width: '16%',
+                            width: '21%',
                             height: '2.5%'
                           }}
                           onClick={() => handlePage5AreaClick(3)}
@@ -1215,7 +1215,7 @@ function IsoverPageMobile({ onBack = null }) {
                             position: 'absolute',
                             top: '44%',
                             left: '7%',
-                            width: '9%',
+                            width: '15%',
                             height: '2.5%'
                           }}
                           onClick={() => handlePage5AreaClick(6)}
@@ -1234,7 +1234,7 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             top: '19%',
-                            left: '12.3%',
+                            left: '11.3%',
                             width: '34.3%',
                             height: '17.1%'
                           }}
@@ -1247,7 +1247,7 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             top: '19%',
-                            right: '10.5%',
+                            right: '9.5%',
                             width: '34.3%',
                             height: '17.1%'
                           }}
@@ -1260,7 +1260,7 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             top: '42%',
-                            left: '12.3%',
+                            left: '11.3%',
                             width: '36%',
                             height: '17.1%'
                           }}
@@ -1273,7 +1273,7 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             top: '42%',
-                            right: '10.5%',
+                            right: '9.5%',
                             width: '34.5%',
                             height: '17.1%'
                           }}
@@ -1286,7 +1286,7 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             bottom: '17%',
-                            left: '12.3%',
+                            left: '11.3%',
                             width: '34.5%',
                             height: '17.1%'
                           }}
@@ -1299,7 +1299,7 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             bottom: '17%',
-                            right: '10.5%',
+                            right: '9.5%',
                             width: '34.5%',
                             height: '17.1%'
                           }}
@@ -1366,8 +1366,8 @@ function IsoverPageMobile({ onBack = null }) {
                             position: 'absolute',
                             bottom: '4.2%',
                             left: '5.5%',
-                            width: '21%',
-                            height: '18%'
+                            width: '24%',
+                            height: '22%'
                           }}
                           onClick={() => handlePage7AreaClick(2)}
                         >
@@ -1379,9 +1379,9 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             bottom: '9.2%',
-                            right: '8.5%',
-                            width: '22%',
-                            height: '11%'
+                            right: '6.5%',
+                            width: '28%',
+                            height: '13%'
                           }}
                           onClick={() => handlePage7AreaClick(3)}
                         >
@@ -1514,7 +1514,7 @@ function IsoverPageMobile({ onBack = null }) {
                   className={`absolute cursor-pointer rounded-lg z-10`}
                   style={{
                     top: '32%',
-                    left: '10.5%',
+                    left: '14.5%',
                     width: '24%',
                     height: '64%',
                     zIndex: 10
@@ -1535,10 +1535,10 @@ function IsoverPageMobile({ onBack = null }) {
                 <div 
                   className={`absolute cursor-pointer rounded-lg z-10`}
                   style={{
-                    bottom: '18%',
-                    left: '11%',
+                    bottom: '12%',
+                    left: '12%',
                     width: '22%',
-                    height: '54%',
+                    height: '55%',
                     zIndex: 10
                   }}
                   onClick={(e) => {
@@ -1560,10 +1560,10 @@ function IsoverPageMobile({ onBack = null }) {
                     <div 
                       className="absolute"
                       style={{
-                        top: '32%',
+                        top: '31%',
                         right: '6%',
                         width: '30%',
-                        height: '17%'
+                        height: '16%'
                       }}
                     >
                       <Isover3DModel 

@@ -32,8 +32,11 @@ THREE.DefaultLoadingManager.onError = (url) => {
 function HighlightBox({ position, size, color = 0x00ff00, opacity = 0, onHover, onClick, isActive = false }) {
   const [isHovered, setIsHovered] = useState(false);
   
-  // 박스를 완전히 투명하게 설정 (호버 시에도 투명)
-  const currentOpacity = 0; // 항상 투명
+  // 박스 투명도 설정: 활성화/호버 시만 보이게, 비활성 상태는 투명도 0
+  const baseOpacity = opacity; // prop으로 전달된 기본 투명도
+  const currentOpacity = isHovered || isActive 
+    ? Math.min(baseOpacity + 0.2, 1.0) // 호버/활성화 시 더 밝게 (최대 1.0)
+    : 0; // 비활성 상태는 완전 투명
   const highlightColor = color;
   
   return (
@@ -68,12 +71,25 @@ function HighlightBox({ position, size, color = 0x00ff00, opacity = 0, onHover, 
 /**
  * 4개의 파트 박스를 배치하는 컴포넌트
  */
-function PartBoxes({ modelPath, customScale = null, onPartClick }) {
+function PartBoxes({ modelPath, customScale = null, onPartClick, boxOpacity = 0.2 }) {
   const { scene } = useGLTF(modelPath);
   const [modelData, setModelData] = useState(null);
   const [hoveredBox, setHoveredBox] = useState(null);
   const [activeBox, setActiveBox] = useState(0); // 현재 활성화된 박스 인덱스
   const [isModelReady, setIsModelReady] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1025);
+  const [isAnimationPaused, setIsAnimationPaused] = useState(false); // 애니메이션 일시정지 상태
+  const [selectedBox, setSelectedBox] = useState(null); // 사용자가 선택한 박스
+
+  // 모바일 감지
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1025);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // 커서 제어를 위한 useEffect
   React.useEffect(() => {
@@ -122,21 +138,35 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
     }
   }, [scene]);
 
-  // 박스 활성화 애니메이션
+  // 박스 활성화 애니메이션: 1번부터 차례대로 하나씩만 활성화
   React.useEffect(() => {
-    if (!modelData) return;
+    if (!modelData || isAnimationPaused) return;
 
+    // 처음에는 0번(1번 박스)부터 시작
+    setActiveBox(0);
+    
     const interval = setInterval(() => {
-      setActiveBox(prev => (prev + 1) % 4); // 0, 1, 2, 3 순환
+      setActiveBox(prev => (prev + 1) % 4); // 0, 1, 2, 3 순환 (한 번에 하나만 활성화)
     }, 2000); // 2초마다 변경
 
     return () => clearInterval(interval);
-  }, [modelData]);
+  }, [modelData, isAnimationPaused]);
 
   if (!modelData || !isModelReady) return null;
 
-  // 각 박스별 개별 크기 정의 (모델 크기 기준)
-  const boxSizes = [
+  // 모바일/데스크톱에 따른 박스 크기 정의
+  const boxSizes = isMobile ? [
+    // 모바일 버전 - 박스 크기 조정
+    // 1번 박스 (파이버시멘트보드)
+    [modelData.size[0] * 0.4, modelData.size[1] * 1.2, modelData.size[2] * 2],
+    // 2번 박스 (AL 복합판넬)
+    [modelData.size[0] * 0.2, modelData.size[1] * 1.2, modelData.size[2] * 2],
+    // 3번 박스 (AL 시트판넬)
+    [modelData.size[0] * 0.2, modelData.size[1] * 1.2, modelData.size[2] * 2],
+    // 4번 박스 (조적판넬)
+    [modelData.size[0] * 0.2, modelData.size[1] * 1.2, modelData.size[2] * 2]
+  ] : [
+    // 데스크톱 버전 - 기존 크기
     // 1번 박스 (파이버시멘트보드) - 다른 크기
     [modelData.size[0] * 1.2, modelData.size[1] * 3.5, modelData.size[2] * 5.0],
     // 2번 박스 (AL 복합판넬) - 기본 크기
@@ -147,16 +177,52 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
     [modelData.size[0] * 0.6, modelData.size[1] * 3.5, modelData.size[2] * 5.0]
   ];
 
-  // 4개의 박스 위치 (각 패널에 배치 - 2번째 패널 제외)
-  // 이미지 분석: 1번(왼쪽), 3번(중앙), 4번(오른쪽), 5번(가장 오른쪽) 패널에 배치
-  const boxPositions = [
-    [-modelData.size[0] * 1.1, modelData.size[1] * 0.15, modelData.size[2] * 0.15], // 1번 패널 (왼쪽) - 파이버시멘트보드
-    [modelData.size[0] * 0.3, modelData.size[1] * 0.2, modelData.size[2] * 0.15], // 3번 패널 (중앙) - AL 복합판넬
-    [modelData.size[0] * 0.3 + modelData.size[0] * 0.55, modelData.size[1] * 0.2, modelData.size[2] * 0.15], // 4번 패널 (오른쪽) - AL 시트판넬
-    [modelData.size[0] * 0.3 + modelData.size[0] * 1.1, modelData.size[1] * 0.2, modelData.size[2] * 0.15] // 5번 패널 (가장 오른쪽) - 조적판넬
+  // 모바일/데스크톱에 따른 박스 위치 정의
+  const boxPositions = isMobile ? [
+    // 모바일 버전 - 박스 위치 조정
+    [-modelData.size[0] * 0.4, modelData.size[1] * 0.01, modelData.size[2] * 0.15], // 1번 패널 (왼쪽) - 파이버시멘트보드
+    [modelData.size[0] * 0.1, modelData.size[1] * 0.02, modelData.size[2] * 0.15], // 3번 패널 (중앙) - AL 복합판넬
+    [modelData.size[0] * 0.1 + modelData.size[0] * 0.2, modelData.size[1] * 0.02, modelData.size[2] * 0.15], // 4번 패널 (오른쪽) - AL 시트판넬
+    [modelData.size[0] * 0.1 + modelData.size[0] * 0.42, modelData.size[1] * 0.02, modelData.size[2] * 0.15] // 5번 패널 (가장 오른쪽) - 조적판넬
+  ] : [
+    // 데스크톱 버전 - 기존 위치
+    // 이미지 분석: 1번(왼쪽), 3번(중앙), 4번(오른쪽), 5번(가장 오른쪽) 패널에 배치
+    [-modelData.size[0] * 1.1, modelData.size[1] * 0.1, modelData.size[2] * 0.1], // 1번 패널 (왼쪽) - 파이버시멘트보드
+    [modelData.size[0] * 0.3, modelData.size[1] * 0.15, modelData.size[2] * 0.1], // 3번 패널 (중앙) - AL 복합판넬
+    [modelData.size[0] * 0.3 + modelData.size[0] * 0.55, modelData.size[1] * 0.15, modelData.size[2] * 0.1], // 4번 패널 (오른쪽) - AL 시트판넬
+    [modelData.size[0] * 0.3 + modelData.size[0] * 1.1, modelData.size[1] * 0.15, modelData.size[2] * 0.1] // 5번 패널 (가장 오른쪽) - 조적판넬
   ];
 
-  const boxColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00]; // 빨강, 녹색, 파랑, 노랑
+  const boxColors = [0xff0000, 0x00ff00,0xffa500 , 0x0000ff]; // 빨강, 녹색,밝은 주황색 , 파랑
+
+  // 호버 시 애니메이션 멈추기
+  const handleBoxHover = (isHovered, index) => {
+    setHoveredBox(isHovered ? index : null);
+    if (isHovered) {
+      setIsAnimationPaused(true);
+      setActiveBox(index); // 호버한 박스 활성화
+    } else if (selectedBox === null) {
+      // 선택된 박스가 없을 때만 애니메이션 재개
+      setIsAnimationPaused(false);
+    }
+  };
+
+  // 클릭 시 애니메이션 멈추고 선택된 박스 활성화
+  const handleBoxClick = (index) => {
+    console.log(`Part ${index + 1} clicked`);
+    setIsAnimationPaused(true);
+    setSelectedBox(index);
+    setActiveBox(index);
+    onPartClick && onPartClick(index + 1);
+  };
+
+  // 실제 활성화 상태: 선택된 박스가 있으면 선택된 박스만, 없으면 애니메이션 활성화 박스
+  const getIsActive = (index) => {
+    if (selectedBox !== null) {
+      return selectedBox === index;
+    }
+    return activeBox === index;
+  };
 
   return (
     <group scale={customScale || 1}>
@@ -166,15 +232,10 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
           position={position}
           size={boxSizes[index]}
           color={boxColors[index]}
-          opacity={0} // 기본적으로 완전 투명
-          isActive={activeBox === index} // 현재 활성화된 박스
-          onHover={(isHovered) => {
-            setHoveredBox(isHovered ? index : null);
-          }}
-          onClick={() => {
-            console.log(`Part ${index + 1} clicked`);
-            onPartClick && onPartClick(index + 1);
-          }}
+          opacity={boxOpacity} // prop으로 전달된 투명도 (0으로 설정하면 안 보임)
+          isActive={getIsActive(index)} // 현재 활성화된 박스
+          onHover={(isHovered) => handleBoxHover(isHovered, index)}
+          onClick={() => handleBoxClick(index)}
         />
       ))}
     </group>
@@ -185,7 +246,7 @@ function PartBoxes({ modelPath, customScale = null, onPartClick }) {
  * 3D 모델 컴포넌트
  * GLB 파일을 로드하고 회전 애니메이션을 적용합니다.
  */
-function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null, onModelLoad = null }) {
+function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null, onModelLoad = null, boxOpacity = 0.2 }) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -289,6 +350,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
           modelPath={modelPath} 
           customScale={customScale} 
           onPartClick={onPartClick}
+          boxOpacity={boxOpacity}
         />
       )}
     </group>
@@ -334,7 +396,8 @@ function Isover3DModel({
   rotateSpeed = 1.0,
   showWireframe = false,
   onPartClick = null,
-  onModelLoad = null
+  onModelLoad = null,
+  boxOpacity = 0.2
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -531,7 +594,8 @@ function Isover3DModel({
                   customScale={customScale} 
                   showWireframe={showWireframe} 
                   onPartClick={onPartClick} 
-                  onModelLoad={handleLoad} 
+                  onModelLoad={handleLoad}
+                  boxOpacity={boxOpacity} 
                 />
                 
                 {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}

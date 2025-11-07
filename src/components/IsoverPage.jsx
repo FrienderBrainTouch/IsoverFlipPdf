@@ -974,7 +974,7 @@ function IsoverPage({ onBack = null }) {
       case 3:
         return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb"; // AL 시트판넬
       case 4:
-        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb"; // 조적판넬
+        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb"; // 벽돌판넬
       default:
         return "/IsoverFile/3dmodel/system_with_panel_test.glb";
     }
@@ -992,7 +992,7 @@ function IsoverPage({ onBack = null }) {
       case 3:
         return "AL 시트판넬";
       case 4:
-        return "조적판넬";
+        return "벽돌판넬";
       default:
         return "전체 시스템";
     }
@@ -1028,7 +1028,7 @@ function IsoverPage({ onBack = null }) {
       case 5:
         return "AL 시트판넬";
       case 6:
-        return "조적판넬";
+        return "벽돌판넬";
       default:
         return "외장재";
     }
@@ -1493,7 +1493,7 @@ function IsoverPage({ onBack = null }) {
                         modelPath="/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"
                         isModal={false}
                         cameraPosition={[15, -5, 30]}
-                        cameraFov={20}
+                        cameraFov={15}
                         customScale={0.8}
                         showWireframe={false}
                       />
@@ -1535,7 +1535,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     top: '25%',
-                    left: '7%',
+                    left: '8%',
                     width: '42%',
                     height: '24%'
                   }}
@@ -1566,7 +1566,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '25%',
-                    left: '7%',
+                    left: '8%',
                     width: '42%',
                     height: '24%'
                   }}
@@ -1599,7 +1599,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 5 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '6%',
+                    bottom: '5.5%',
                     left: '30%',
                     width: '40%',
                     height: '8%'
@@ -1645,7 +1645,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isNewAreaModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 0 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '11%',
+                    top: '11.5%',
                     left: '5%',
                     width: '86%',
                     height: '6%'
@@ -1661,7 +1661,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 1 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '25.5%',
+                    top: '26%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1676,7 +1676,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 2 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '28.7%',
+                    top: '29%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1691,7 +1691,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '31.7%',
+                    top: '32.5%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1706,7 +1706,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 4 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '35.1%',
+                    top: '35.7%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1721,7 +1721,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 5 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '38.3%',
+                    top: '38.7%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1736,7 +1736,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 6 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '41.5%',
+                    top: '42%',
                     left: '9%',
                     width: '35%',
                     height: '2.5%'
@@ -1813,8 +1813,8 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer hover:bg-blue-500/10 transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    bottom: '19%',
-                    left: '5%',
+                    bottom: '18.5%',
+                    left: '5.5%',
                     width: '59%',
                     height: '22%'
                   }}
@@ -1880,7 +1880,7 @@ function IsoverPage({ onBack = null }) {
                     position: 'absolute',
                     top: '10%',
                     left: '5%',
-                    width: '89%',
+                    width: '90%',
                     height: '19%'
                   }}
                   onClick={() => handlePage4AreaClick(1)}
@@ -1895,7 +1895,7 @@ function IsoverPage({ onBack = null }) {
                     position: 'absolute',
                     top: '31%',
                     left: '5%',
-                    width: '89%',
+                    width: '90%',
                     height: '19%'
                   }}
                   onClick={() => handlePage4AreaClick(2)}
@@ -1908,7 +1908,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea4 === 3 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '29%',
+                    bottom: '28%',
                     left: '5%',
                     width: '90%',
                     height: '20%'
@@ -1923,7 +1923,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea4 === 4 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '7%',
+                    bottom: '6%',
                     left: '5%',
                     width: '89%',
                     height: '21%'
@@ -1968,7 +1968,7 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     top: '25%',
-                    left: '21%',
+                    left: '23%',
                     width: '71.5%',
                     height: '27%'
                   }}
@@ -2002,7 +2002,7 @@ function IsoverPage({ onBack = null }) {
                     position: 'absolute',
                     top: '21.5%',
                     left: '6%',
-                    width: '15%',
+                    width: '21.5%',
                     height: '2.5%'
                   }}
                   onClick={() => handlePage5AreaClick(3)}
@@ -2046,20 +2046,20 @@ function IsoverPage({ onBack = null }) {
                 >
                 </div>
                 
-                {/* 조적판넬 */}
+                {/* 벽돌판넬 */}
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isPage5ExteriorModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 6 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
                     top: '44%',
                     left: '6.5%',
-                    width: '8%',
+                    width: '14%',
                     height: '2.5%'
                   }}
                   onClick={() => handlePage5AreaClick(6)}
                   onMouseEnter={() => setHoveredArea5(6)}
                   onMouseLeave={() => setHoveredArea5(null)}
-                  title="조적판넬 상세 정보"
+                  title="벽돌판넬 상세 정보"
                 >
                 </div>
                 
@@ -2118,10 +2118,10 @@ function IsoverPage({ onBack = null }) {
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                   style={{
                     position: 'absolute',
-                    top: '18.3%',
-                    right: '9%',
+                    top: '18.5%',
+                    right: '8.1%',
                     width: '35.5%',
-                    height: '17.1%'
+                    height: '17.5%'
                   }}
                   onClick={() => handlePage6AreaClick(2)}
                   onMouseEnter={() => setHoveredArea6(2)}
@@ -2163,9 +2163,9 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     top: '42.1%',
-                    right: '8.8%',
-                    width: '36%',
-                    height: '17.1%'
+                    right: '8.1%',
+                    width: '35.5%',
+                    height: '17.5%'
                   }}
                   onClick={() => handlePage6AreaClick(4)}
                   onMouseEnter={() => setHoveredArea6(4)}
@@ -2207,9 +2207,9 @@ function IsoverPage({ onBack = null }) {
                   style={{
                     position: 'absolute',
                     bottom: '17%',
-                    right: '8.8%',
-                    width: '36%',
-                    height: '17.1%'
+                    right: '8.1%',
+                    width: '35.5%',
+                    height: '17.5%'
                   }}
                   onClick={() => handlePage6AreaClick(6)}
                   onMouseEnter={() => setHoveredArea6(6)}
@@ -2322,10 +2322,10 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea7 === 2 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    bottom: '6%',
+                    bottom: '5%',
                     left: '5.5%',
-                    width: '20%',
-                    height: '15%'
+                    width: '23%',
+                    height: '19%'
                   }}
                   onClick={() => handlePage7AreaClick(2)}
                   onMouseEnter={() => setHoveredArea7(2)}
@@ -2340,8 +2340,8 @@ function IsoverPage({ onBack = null }) {
                     position: 'absolute',
                     bottom: '9%',
                     right: '6%',
-                    width: '24%',
-                    height: '10%'
+                    width: '27%',
+                    height: '12%'
                   }}
                   onClick={() => handlePage7AreaClick(3)}
                   onMouseEnter={() => setHoveredArea7(3)}
@@ -2682,7 +2682,7 @@ function IsoverPage({ onBack = null }) {
                   className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '3-4-1' ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     top: '32%',
-                    left: '10.5%',
+                    left: '15%',
                     width: '24%',
                     height: '64%'
                   }}
@@ -2720,10 +2720,10 @@ function IsoverPage({ onBack = null }) {
                     <div 
                       className="absolute"
                       style={{
-                        top: '32%',
+                        top: '31%',
                         right: '6%',
                         width: '30%',
-                        height: '17%'
+                        height: '16%'
                       }}
                     >
                       <Isover3DModel 
