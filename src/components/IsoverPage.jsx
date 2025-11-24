@@ -78,6 +78,7 @@ function IsoverPage({ onBack = null }) {
   const [hoveredArea5, setHoveredArea5] = React.useState(null);
   const [hoveredArea7, setHoveredArea7] = React.useState(null);
   const [hoveredModalArea, setHoveredModalArea] = React.useState(null);
+  const [hoveredGif, setHoveredGif] = React.useState(null);
   const [isAdditionalImageModalOpen, setIsAdditionalImageModalOpen] = React.useState(false);
   const [selectedAdditionalImageType, setSelectedAdditionalImageType] = React.useState(null);
   const [isNewAreaModalOpen, setIsNewAreaModalOpen] = React.useState(false);
@@ -130,7 +131,6 @@ function IsoverPage({ onBack = null }) {
   React.useEffect(() => {
     if (logoOpacity === 1) {
       setTimeout(() => {
-        console.log('2단계 애니메이션 시작');
         setWhiteScreenVisible(false);
         
         setTimeout(() => {
@@ -480,7 +480,6 @@ function IsoverPage({ onBack = null }) {
 
   const handleTouchAreaMouseDown = (direction) => {
     setMouseEventsEnabled(true);
-    console.log('useMouseEvents 상태: 활성화됨');
     
     if (direction === 'left') {
       goToPreviousPage();
@@ -492,13 +491,11 @@ function IsoverPage({ onBack = null }) {
   const handleTouchAreaMouseUp = () => {
     setTimeout(() => {
       setMouseEventsEnabled(false);
-      console.log('useMouseEvents 상태: 비활성화됨');
     }, 200);
   };
 
   const handleTouchAreaTouchStart = (direction) => {
     setMouseEventsEnabled(true);
-    console.log('useMouseEvents 상태: 활성화됨 (터치)');
     
     if (direction === 'left') {
       goToPreviousPage();
@@ -510,7 +507,6 @@ function IsoverPage({ onBack = null }) {
   const handleTouchAreaTouchEnd = () => {
     setTimeout(() => {
       setMouseEventsEnabled(false);
-      console.log('useMouseEvents 상태: 비활성화됨 (터치)');
     }, 200);
   };
 
@@ -619,18 +615,13 @@ function IsoverPage({ onBack = null }) {
     setIsModalOpen(false);
     setSelectedArea(null);
     setHoveredModalArea(null);
-    // 모달창 확대/축소 상태 리셋
     setModalZoomLevel(1);
     setIsModalZoomed(false);
-    // 모달창 드래그 상태 리셋
     setModalDragOffset({ x: 0, y: 0 });
     setIsModalDragging(false);
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 추가 영역 이미지 모달 열기 핸들러
-   */
   const openAdditionalImageModal = (imageType) => {
     setModalZoomLevel(1);
     setIsModalZoomed(false);
@@ -642,25 +633,17 @@ function IsoverPage({ onBack = null }) {
     setIsAdditionalImageModalOpen(true);
   };
 
-  /**
-   * 추가 영역 이미지 모달 닫기 핸들러
-   */
   const closeAdditionalImageModal = () => {
     setIsAdditionalImageModalOpen(false);
     setSelectedAdditionalImageType(null);
     setHoveredModalArea(null);
-    // 모달창 확대/축소 상태 리셋
     setModalZoomLevel(1);
     setIsModalZoomed(false);
-    // 모달창 드래그 상태 리셋
     setModalDragOffset({ x: 0, y: 0 });
     setIsModalDragging(false);
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 이미지 모달 열기 핸들러
-   */
   const openImageModal = (imageType) => {
     setModalZoomLevel(1);
     setIsModalZoomed(false);
@@ -672,40 +655,27 @@ function IsoverPage({ onBack = null }) {
     setIsImageModalOpen(true);
   };
 
-  /**
-   * 이미지 모달 닫기 핸들러
-   */
   const closeImageModal = () => {
     setIsImageModalOpen(false);
     setSelectedImageType(null);
     setHoveredModalArea(null);
-    // 모달창 확대/축소 상태 리셋
     setModalZoomLevel(1);
     setIsModalZoomed(false);
-    // 모달창 드래그 상태 리셋
     setModalDragOffset({ x: 0, y: 0 });
     setIsModalDragging(false);
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 추가 모달 닫기 핸들러
-   */
   const closeAdditionalModal = () => {
     setIsAdditionalModalOpen(false);
     setSelectedAdditionalArea(null);
-    // 모달창 확대/축소 상태 리셋
     setModalZoomLevel(1);
     setIsModalZoomed(false);
-    // 모달창 드래그 상태 리셋
     setModalDragOffset({ x: 0, y: 0 });
     setIsModalDragging(false);
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 4페이지 영역 클릭 핸들러
-   */
   const handlePage4AreaClick = (areaNumber) => {
     if (areaNumber === 1) {
       window.open('https://www.isover.co.kr/documents/jepum-kadalogeu/jeohaesang-211021-wedeopeurupeu-3dan-ripeulres-3-pyeolcimmyeon-0.pdf', '_blank');
@@ -725,38 +695,24 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 4페이지 모달 닫기 핸들러
-   */
   const closePage4Modal = () => {
     setIsPage4ModalOpen(false);
     setSelectedPage4Area(null);
-    // 모달창 확대/축소 상태 리셋
     setModalZoomLevel(1);
     setIsModalZoomed(false);
-    // 모달창 드래그 상태 리셋
     setModalDragOffset({ x: 0, y: 0 });
     setIsModalDragging(false);
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 4페이지 영역 2번 전용 모달 열기 핸들러 (테스트용)
-   */
   const handlePage4Area2Click = () => {
     setIsPage4Area2ModalOpen(true);
   };
 
-  /**
-   * 4페이지 영역 2번 전용 모달 닫기 핸들러 (테스트용)
-   */
   const closePage4Area2Modal = () => {
     setIsPage4Area2ModalOpen(false);
   };
 
-  /**
-   * 파트별 모델 경로 반환 함수
-   */
   const getModelPathByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
@@ -772,9 +728,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 파트별 이름 반환 함수
-   */
   const getPartName = (partNumber) => {
     switch (partNumber) {
       case 1:
@@ -790,9 +743,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 파트별 모델 스케일 반환 함수
-   */
   const getModelScaleByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
@@ -808,9 +758,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 외장재 타입별 이름 반환 함수
-   */
   const getExteriorTypeName = (typeNumber) => {
     switch (typeNumber) {
       case 3:
@@ -826,9 +773,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 외장재 타입별 모델 경로 반환 함수
-   */
   const getExteriorModelPath = (typeNumber) => {
     switch (typeNumber) {
       case 3:
@@ -844,9 +788,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 5페이지 영역 클릭 핸들러
-   */
   const handlePage5AreaClick = (areaNumber) => {
     setModalZoomLevel(1);
     setIsModalZoomed(false);
@@ -859,9 +800,6 @@ function IsoverPage({ onBack = null }) {
     setIsPage5ModalOpen(true);
   };
 
-  /**
-   * 6페이지 영역 클릭 핸들러 (기존 5페이지)
-   */
   const handlePage6AreaClick = (areaNumber) => {
     setModalZoomLevel(1);
     setIsModalZoomed(false);
@@ -885,9 +823,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 5페이지 모달 닫기 핸들러
-   */
   const closePage5Modal = () => {
     setIsPage5ModalOpen(false);
     setSelectedPage5Area(null);
@@ -899,30 +834,19 @@ function IsoverPage({ onBack = null }) {
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 5페이지 외장재 모달 닫기 핸들러
-   */
   const closePage5ExteriorModal = () => {
     setIsPage5ExteriorModalOpen(false);
     setSelectedExteriorType(null);
   };
 
-  /**
-   * 6페이지 3D 모델 파트 클릭 핸들러 (기존 5페이지)
-   */
   const handlePage6PartClick = (partNumber) => {
-    console.log(`Part ${partNumber} clicked`);
     setSelectedPart(partNumber);
     setIsPage53DModelLoading(true);
-    
     const partModelPath = getModelPathByPart(partNumber);
     setCurrentPartModel(partModelPath);
     setModalKey(prev => prev + 1);
   };
 
-  /**
-   * 7페이지 영역 클릭 핸들러 (기존 6페이지 - GIF 모달)
-   */
   const handlePage7AreaClick = (areaNumber) => {
     setModalZoomLevel(1);
     setIsModalZoomed(false);
@@ -934,24 +858,16 @@ function IsoverPage({ onBack = null }) {
     setIsPage6ModalOpen(true);
   };
 
-  /**
-   * 6페이지 모달 닫기 핸들러
-   */
   const closePage6Modal = () => {
     setIsPage6ModalOpen(false);
     setSelectedPage6Area(null);
-    // 모달창 확대/축소 상태 리셋
     setModalZoomLevel(1);
     setIsModalZoomed(false);
-    // 모달창 드래그 상태 리셋
     setModalDragOffset({ x: 0, y: 0 });
     setIsModalDragging(false);
     modalDragStartRef.current = { x: 0, y: 0 };
   };
 
-  /**
-   * 8페이지 영역 클릭 핸들러 (기존 7페이지 - 영상)
-   */
   const handlePage8AreaClick = (areaNumber) => {
     if (areaNumber === 2) {
       window.open('https://www.isover.co.kr/', '_blank');
@@ -964,9 +880,6 @@ function IsoverPage({ onBack = null }) {
     }
   };
 
-  /**
-   * 3D 모달 열기 핸들러 (확대/축소 상태 리셋 포함)
-   */
   const open3DModal = () => {
     setModalZoomLevel(1);
     setIsModalZoomed(false);
@@ -977,16 +890,10 @@ function IsoverPage({ onBack = null }) {
     setIs3DModalOpen(true);
   };
 
-  /**
-   * 영상 닫기 핸들러
-   */
   const closeVideo = () => {
     setShowVideo(false);
   };
 
-  /**
-   * 페이지 네비게이션 함수들
-   */
   const goToFirstPage = () => {
     if (flipBookRef.current) {
       flipBookRef.current.pageFlip().turnToPage(0);
@@ -1255,8 +1162,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* front.gif 전체 사이즈 배치 */}
                 {showFrontGif && (
                   <div className="absolute inset-0 w-full h-full">
@@ -1327,8 +1232,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 5개의 div 영역을 absolute로 배치 */}
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea2 === 1 ? 'border-2 border-yellow-500' : ''}`}
@@ -1438,8 +1341,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 새로운 영역 - 맨 위 왼쪽 */}
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isNewAreaModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea3 === 0 ? 'border-2 border-yellow-500' : ''}`}
@@ -1687,14 +1588,12 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 4페이지 영역 4개 배치 */}
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea4 === 1 ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     position: 'absolute',
-                    top: '10%',
+                    top: '11%',
                     left: '5%',
                     width: '90%',
                     height: '19%'
@@ -1776,8 +1675,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 5페이지 영역 7개 배치 */}
                 {/* 맨 위 영역 - EQUITONE 링크 */}
                 <div 
@@ -1930,8 +1827,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 6페이지 영역 2개 배치 (기존 5페이지 기능) */}
                 <div 
                   className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen) ? 'pointer-events-none' : ''} ${hoveredArea5 === 1 ? 'border-2 border-yellow-500' : ''}`}
@@ -2059,8 +1954,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 7페이지 영역 6개 배치 */}
                 <div 
                   className="absolute cursor-pointer transition-all duration-300 rounded-lg"
@@ -2237,8 +2130,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 8페이지 영역 4개 배치 */}
                 {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                 <div 
@@ -2345,8 +2236,6 @@ function IsoverPage({ onBack = null }) {
                   backgroundPosition: 'center'
                 }}
               >
-                {/* SVG 배경이 전체 페이지를 덮도록 함 */}
-                
                 {/* 9페이지는 마지막 페이지이므로 터치 영역 없음 */}
               </div>
             </div>
@@ -2652,13 +2541,13 @@ function IsoverPage({ onBack = null }) {
                 }}
               />
               
-              {/* 4번째 영역에 추가 영역 배치 */}
-              {selectedArea === 4 && (
+              {/* 2번째 영역에 추가 영역 배치 */}
+              {selectedArea === 2 && (
                 <div 
                   className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '3-4-1' ? 'border-2 border-yellow-500' : ''}`}
                   style={{
                     top: '32%',
-                    left: '15%',
+                    left: '26%',
                     width: '24%',
                     height: '64%'
                   }}
@@ -2698,7 +2587,7 @@ function IsoverPage({ onBack = null }) {
                     className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '3-6-1' ? 'border-2 border-yellow-500' : ''}`}
                     style={{
                       bottom: '6%',
-                      left: '8%',
+                      left: '26.5%',
                       width: '23.5%',
                       height: '48%'
                     }}
@@ -2712,10 +2601,10 @@ function IsoverPage({ onBack = null }) {
                   <div 
                     className="absolute"
                     style={{
-                      bottom: '6%',
-                      left: '33%',
+                      bottom: '7%',
+                      right: '25%',
                       width: '23.5%',
-                      height: '48%',
+                      height: '46%',
                       display: 'flex',
                       flexDirection: 'column',
                       gap: '4%'
@@ -2724,12 +2613,14 @@ function IsoverPage({ onBack = null }) {
                     <img
                       src="/IsoverFile/Interacive/gif-file/1124_1.gif"
                       alt="1124_1 GIF"
-                      className="w-full h-[48%] object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                      className={`w-full h-[48%] rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_1' ? 'border-2 border-yellow-500' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1124_1.gif");
                         setIsGifModalOpen(true);
                       }}
+                      onMouseEnter={() => setHoveredGif('1124_1')}
+                      onMouseLeave={() => setHoveredGif(null)}
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
@@ -2737,12 +2628,14 @@ function IsoverPage({ onBack = null }) {
                     <img
                       src="/IsoverFile/Interacive/gif-file/1124_2.gif"
                       alt="1124_2 GIF"
-                      className="w-full h-[48%] object-contain rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                      className={`w-full h-[48%] rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_2' ? 'border-2 border-yellow-500' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1124_2.gif");
                         setIsGifModalOpen(true);
                       }}
+                      onMouseEnter={() => setHoveredGif('1124_2')}
+                      onMouseLeave={() => setHoveredGif(null)}
                       onError={(e) => {
                         e.target.style.display = 'none';
                       }}
@@ -2921,8 +2814,13 @@ function IsoverPage({ onBack = null }) {
                           modelPath="/IsoverFile/3dmodel/L-Bar.glb"
                           isModal={true}
                           cameraPosition={[8, 14, 14]}
-                          cameraFov={20}
+                          cameraFov={25}
                           customScale={1}
+                          ambientLightIntensity={4}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 2, -0.5]}
+                          pointLightPosition={[0.5, 0.5, -0.5]}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -2959,6 +2857,11 @@ function IsoverPage({ onBack = null }) {
                           cameraPosition={[4, 4, 8]}
                           cameraFov={30}
                           customScale={0.3}
+                          ambientLightIntensity={6}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 2, -0.5]}
+                          pointLightPosition={[0, 2, -0.5]}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -2966,9 +2869,9 @@ function IsoverPage({ onBack = null }) {
                         className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '8-right' ? 'border-2 border-yellow-500' : ''}`}
                         style={{
                           top: '16%',
-                          right: '5%',
-                          width: '19%',
-                          height: '54%'
+                          right: '1%',
+                          width: '24%',
+                          height: '67%'
                         }}
                         onClick={() => {
                           openAdditionalImageModal('pae_3-2');
@@ -2995,6 +2898,11 @@ function IsoverPage({ onBack = null }) {
                           cameraPosition={[-10, 10, 20]}
                           cameraFov={40}
                           customScale={0.3}
+                          ambientLightIntensity={6}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 1, -0.5]}
+                          pointLightPosition={[0, 2, -0.5]}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -3002,9 +2910,9 @@ function IsoverPage({ onBack = null }) {
                         className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '9-right' ? 'border-2 border-yellow-500' : ''}`}
                         style={{
                           top: '26%',
-                          right: '5%',
-                          width: '19.5%',
-                          height: '50%'
+                          right: '2%',
+                          width: '22.5%',
+                          height: '56%'
                         }}
                         onClick={() => {
                           openAdditionalImageModal('pae_3-3');
@@ -3031,6 +2939,11 @@ function IsoverPage({ onBack = null }) {
                           cameraPosition={[1, 2, 2]}
                           cameraFov={30}
                           customScale={0.3}
+                          ambientLightIntensity={6}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 2, -0.5]}
+                          pointLightPosition={[0, 2, -0.5]}
                         />
                       </div>
                       {/* 오른쪽 추가 영역 */}
@@ -3553,7 +3466,7 @@ function IsoverPage({ onBack = null }) {
           <div 
             className={`relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden ${currentPartModel ? 'p-0' : ''}`}
             onClick={(e) => e.stopPropagation()}
-            key={`3d-modal-${modalKey}-${selectedPart}`} // 모달 새로고침을 위한 키 (파트 변경 포함)
+            key={`3d-modal-${modalKey}-${selectedPart}`}
           >
             {/* 모달 헤더 - 전체 시스템일 때만 표시 */}
             {!currentPartModel && (
@@ -3603,13 +3516,13 @@ function IsoverPage({ onBack = null }) {
                   animationDelay={0}
                   modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel_test.glb"}
                   isModal={true}
-                  cameraPosition={[3, -2, 8]} // 파트 모델링과 system_with_panel 분리
+                  cameraPosition={[3, -2, 8]}
                   cameraFov={30}
                   customScale={currentPartModel ? getModelScaleByPart(selectedPart) : 0.3}
                   rotateSpeed={1.0}
-                  showWireframe={!currentPartModel} // 파트 모델이 선택되면 박스 숨김
+                  showWireframe={!currentPartModel}
                   onPartClick={handlePage6PartClick}
-                  onModelLoad={() => setIsPage53DModelLoading(false)} // 모델 로딩 완료 시 로딩 상태 해제
+                  onModelLoad={() => setIsPage53DModelLoading(false)}
                 />
               </div>
             </div>
@@ -3672,7 +3585,6 @@ function IsoverPage({ onBack = null }) {
                   alt={`외장재 타입 ${selectedExteriorType} 배경 이미지`}
                   className="max-w-full max-h-full object-contain"
                   onError={(e) => {
-                    // PNG가 없으면 기본 이미지 사용
                     e.target.src = "/IsoverFile/Popup/5-2.png";
                   }}
                 />

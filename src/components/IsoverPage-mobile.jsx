@@ -1,109 +1,90 @@
 import React, { useState, useEffect, useRef } from "react";
 import Isover3DModel from './Isover3DModel';
-// import Chatbot from './Chatbot';
 
 /**
  * IsoverPage-mobile 컴포넌트
- * 
- * 이 컴포넌트는 모바일용 Isover 페이지를 구현합니다.
- * 주요 기능:
- * - 초기 로딩 애니메이션 (VQ 로고)
- * - 흰 화면에서 본 화면으로의 전환 효과
- * - 중앙 이미지 애니메이션
+ * 모바일용 Isover 페이지 구현
+ * - 초기 로딩 애니메이션 및 화면 전환
  * - 스크롤 방식 페이지 네비게이션
- * - 네비게이션 및 툴바 기능
+ * - 각 페이지별 모달 및 인터랙션 기능
  */
 function IsoverPageMobile({ onBack = null }) {
-  // 상태 관리 변수들
-  const [showIntro, setShowIntro] = useState(true); // 인트로 화면 표시 여부
-  const [logoOpacity, setLogoOpacity] = useState(0); // 로고 투명도
-  const [whiteScreenVisible, setWhiteScreenVisible] = useState(true); // 흰 화면 표시 여부
-  const [mainScreenVisible, setMainScreenVisible] = useState(false); // 본 화면 표시 여부
-  const [imageScale, setImageScale] = useState(1.2); // 중앙 이미지 스케일 (120%에서 시작)
-  const [imageOpacity, setImageOpacity] = useState(0); // 중앙 이미지 투명도
+  // 인트로 및 애니메이션 상태
+  const [showIntro, setShowIntro] = useState(true);
+  const [logoOpacity, setLogoOpacity] = useState(0);
+  const [whiteScreenVisible, setWhiteScreenVisible] = useState(true);
+  const [mainScreenVisible, setMainScreenVisible] = useState(false);
+  const [imageScale, setImageScale] = useState(1.2);
+  const [imageOpacity, setImageOpacity] = useState(0);
 
-  // 3D 모델 뷰어 상태 관리 (표지 페이지에서만 표시)
+  // 3D 모델 관련 상태
   const [show3DModel, setShow3DModel] = useState(true);
-  
-  // 3D 모델 모달 상태 관리
   const [is3DModalOpen, setIs3DModalOpen] = useState(false);
-  
-  // front.gif 표시 상태 관리
   const [showFrontGif, setShowFrontGif] = useState(false);
   const [showSvgBackground, setShowSvgBackground] = useState(false);
 
-  // 3페이지 모달 상태 관리
+  // 3페이지 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
-  
-  // 3페이지 이미지 모달 상태 관리
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [selectedImageType, setSelectedImageType] = useState(null); // '3-4-1', '3-4-2', '3-6-1'
-  
-  // 추가 4개 영역 모달 상태 관리
+  const [selectedImageType, setSelectedImageType] = useState(null);
   const [isAdditionalModalOpen, setIsAdditionalModalOpen] = useState(false);
   const [selectedAdditionalArea, setSelectedAdditionalArea] = useState(null);
-  
-  // 4페이지 모달 상태 관리
+
+  // 4페이지 모달 상태
   const [isPage4ModalOpen, setIsPage4ModalOpen] = useState(false);
   const [selectedPage4Area, setSelectedPage4Area] = useState(null);
-  
-  // 4페이지 영역 2번 전용 모달 상태 관리 (테스트용)
   const [isPage4Area2ModalOpen, setIsPage4Area2ModalOpen] = useState(false);
-  
-  // 5페이지 모달 상태 관리
+
+  // 5페이지 모달 상태
   const [isPage5ModalOpen, setIsPage5ModalOpen] = useState(false);
-  
-  // 5페이지 3D 모델 모달 상태 관리
+  const [selectedPage5Area, setSelectedPage5Area] = useState(null);
+  const [isPage5ModalFromPage6, setIsPage5ModalFromPage6] = useState(false);
   const [isPage53DModalOpen, setIsPage53DModalOpen] = useState(false);
-  const [selectedPart, setSelectedPart] = useState(1); // 선택된 파트 (1-4)
-  const [currentPartModel, setCurrentPartModel] = useState(null); // 현재 표시할 파트 모델
-  const [isPage53DModelLoading, setIsPage53DModelLoading] = useState(false); // 5페이지 3D 모델 로딩 상태
-  const [modalKey, setModalKey] = useState(0); // 모달 새로고침을 위한 키
-  
-  // 5페이지 외장재 모달 상태 관리
+  const [selectedPart, setSelectedPart] = useState(1);
+  const [currentPartModel, setCurrentPartModel] = useState(null);
+  const [isPage53DModelLoading, setIsPage53DModelLoading] = useState(false);
+  const [modalKey, setModalKey] = useState(0);
   const [isPage5ExteriorModalOpen, setIsPage5ExteriorModalOpen] = useState(false);
-  const [selectedExteriorType, setSelectedExteriorType] = useState(null); // 선택된 외장재 타입 (3-6)
-  
-  // 6페이지 모달 상태 관리
+  const [selectedExteriorType, setSelectedExteriorType] = useState(null);
+
+  // 6페이지 모달 상태
   const [isPage6ModalOpen, setIsPage6ModalOpen] = useState(false);
   const [selectedPage6Area, setSelectedPage6Area] = useState(null);
-  
-  // 추가 영역 이미지 모달 상태 관리 (돋보기 없이 단순 이미지 표시)
+
+  // 기타 모달 상태
   const [isAdditionalImageModalOpen, setIsAdditionalImageModalOpen] = useState(false);
   const [selectedAdditionalImageType, setSelectedAdditionalImageType] = useState(null);
+  const [isNewAreaModalOpen, setIsNewAreaModalOpen] = useState(false);
+  const [isGifModalOpen, setIsGifModalOpen] = useState(false);
+  const [selectedGifSrc, setSelectedGifSrc] = useState(null);
+  const [hoveredGif, setHoveredGif] = useState(null);
+  const [isArea5SliderModalOpen, setIsArea5SliderModalOpen] = useState(false);
+  const [area5SliderIndex, setArea5SliderIndex] = useState(0);
+  const area5SliderImages = [
+    '/IsoverFile/Popup/pae_3_5_1.jpg',
+    '/IsoverFile/Popup/pae_3_5_2.jpg',
+    '/IsoverFile/Popup/pae_3_5_3.jpg',
+    '/IsoverFile/Popup/pae_3_5_4.jpg'
+  ];
   
-  // 7페이지 영상 상태 관리
+  // 영상 재생 상태
   const [playingVideo, setPlayingVideo] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
 
-  // ref 변수들
   const animationRef = useRef(null);
 
-  /**
-   * 중앙 이미지 애니메이션 시작 함수
-   */
   const startImageAnimation = () => {
-    // 배경 이미지는 즉시 표시
     setImageScale(1);
     setImageOpacity(1);
   };
 
-
-
-  /**
-   * 반응형 이미지 크기 계산 함수
-   * @param {number} baseSize - 기본 크기
-   * @returns {number} 조정된 크기
-   */
   const getResponsiveImageSize = (baseSize) => {
     const isLargeScreen = window.innerWidth >= 1024;
     return isLargeScreen ? baseSize : baseSize * 0.8;
   };
 
-
-
-  // Isover 페이지별 이미지 데이터 (9페이지)
+  // 페이지별 이미지 데이터
   const pageImages = [
     {
       id: 0,
@@ -132,45 +113,42 @@ function IsoverPageMobile({ onBack = null }) {
     {
       id: 4,
       name: "페이지 4",
-      backgroundImage: "/IsoverFile/IsoverPage/page_5.svg", // 새로운 5페이지
+      backgroundImage: "/IsoverFile/IsoverPage/page_5.svg",
       overlays: []
     },
     {
       id: 5,
       name: "페이지 5",
-      backgroundImage: "/IsoverFile/IsoverPage/page_6.svg", // 기존 5페이지 → 6페이지
+      backgroundImage: "/IsoverFile/IsoverPage/page_6.svg",
       overlays: []
     },
     {
       id: 6,
       name: "페이지 6",
-      backgroundImage: "/IsoverFile/IsoverPage/page_7.svg", // 기존 6페이지 → 7페이지
+      backgroundImage: "/IsoverFile/IsoverPage/page_7.svg",
       overlays: []
     },
     {
       id: 7,
       name: "페이지 7",
-      backgroundImage: "/IsoverFile/IsoverPage/page_8.svg", // 기존 7페이지 → 8페이지
+      backgroundImage: "/IsoverFile/IsoverPage/page_8.svg",
       overlays: []
     },
     {
       id: 8,
       name: "페이지 8",
-      backgroundImage: "/IsoverFile/IsoverPage/page_9.svg", // 새로운 9페이지
+      backgroundImage: "/IsoverFile/IsoverPage/page_9.svg",
       overlays: []
     }
   ];
 
 
-  // front.gif 4초 후 자동 비활성화, 3.5초에 SVG 배경 활성화
   useEffect(() => {
     if (showFrontGif) {
-      // 3.5초에 SVG 배경 활성화
       const svgTimer = setTimeout(() => {
         setShowSvgBackground(true);
       }, 3000);
 
-      // 4초에 gif 비활성화
       const gifTimer = setTimeout(() => {
         setShowFrontGif(false);
       }, 3000);
@@ -182,46 +160,34 @@ function IsoverPageMobile({ onBack = null }) {
     }
   }, [showFrontGif]);
 
-  // 2단계: 흰 화면이 위로 사라지는 전환
   const startTransition = React.useCallback(() => {
-    console.log('2단계 애니메이션 시작');
     setWhiteScreenVisible(false);
     
-    // 전환 완료 후 본 화면 표시
     setTimeout(() => {
       setMainScreenVisible(true);
       startImageAnimation();
-      // 인트로 완료 후 1초 뒤에 GIF 시작
       setTimeout(() => {
         setShowFrontGif(true);
       }, 1000);
     }, 500);
   }, []);
 
-  // 로고 애니메이션 완료 후 화면 전환
   useEffect(() => {
     if (logoOpacity === 1) {
-      // 로고 애니메이션이 완료되면 0.5초 후 2단계 시작
       setTimeout(() => {
         startTransition();
       }, 500);
     }
   }, [logoOpacity, startTransition]);
 
-  /**
-   * 컴포넌트 마운트 시 애니메이션 시퀀스 실행
-   */
   useEffect(() => {
-    // 로고 애니메이션 시작
     const logoAnimation = () => {
       const startTime = performance.now();
-      const duration = 1000; // 1초
+      const duration = 1000;
 
       const animate = (currentTime) => {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
-        // ease-out 효과 적용
         const easeOut = 1 - Math.pow(1 - progress, 3);
         setLogoOpacity(easeOut);
 
@@ -233,12 +199,10 @@ function IsoverPageMobile({ onBack = null }) {
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    // 로고 애니메이션 시작
     setTimeout(() => {
       logoAnimation();
     }, 500);
 
-    // 컴포넌트 언마운트 시 정리
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -246,19 +210,11 @@ function IsoverPageMobile({ onBack = null }) {
     };
   }, []);
 
-  /**
-   * 표지 페이지 애니메이션 시작 함수
-   */
   const startCoverPageAnimation = () => {
-    // 애니메이션 상태 초기화
     resetAnimationStates();
   };
 
-  /**
-   * 애니메이션 상태 초기화 함수
-   */
   const resetAnimationStates = () => {
-    // 기존 애니메이션 정리
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
@@ -270,17 +226,12 @@ function IsoverPageMobile({ onBack = null }) {
 
 
 
-  /**
-   * 홈 버튼 클릭 핸들러 - IsoverPage 재시작 또는 뒤로 가기
-   */
   const handleHomeClick = () => {
-    // onBack이 있으면 뒤로 가기, 없으면 IsoverPage 재시작
     if (onBack) {
       onBack();
       return;
     }
 
-    // 상태 초기화
     setShowIntro(true);
     setLogoOpacity(0);
     setWhiteScreenVisible(true);
@@ -288,7 +239,6 @@ function IsoverPageMobile({ onBack = null }) {
     setImageScale(1.2);
     setImageOpacity(0);
 
-    // 로고 애니메이션 재시작
     setTimeout(() => {
       const logoAnimation = () => {
         const startTime = performance.now();
@@ -297,7 +247,6 @@ function IsoverPageMobile({ onBack = null }) {
         const animate = (currentTime) => {
           const elapsed = currentTime - startTime;
           const progress = Math.min(elapsed / duration, 1);
-          
           const easeOut = 1 - Math.pow(1 - progress, 3);
           setLogoOpacity(easeOut);
 
@@ -309,15 +258,10 @@ function IsoverPageMobile({ onBack = null }) {
         animationRef.current = requestAnimationFrame(animate);
       };
 
-      // 로고 애니메이션 시작
       logoAnimation();
     }, 500);
   };
 
-
-  /**
-   * 프린터 버튼 클릭 핸들러 - PDF를 열고 프린트
-   */
   const handlePrintClick = () => {
     const pdfUrl = "/IsoverFile/func-pdf/무용접파사드시스템 카다로그.pdf";
     const pdfWindow = window.open(pdfUrl, "_blank");
@@ -328,9 +272,6 @@ function IsoverPageMobile({ onBack = null }) {
     }
   };
 
-  /**
-   * PDF 다운로드 버튼 클릭 핸들러
-   */
   const handleDownloadClick = () => {
     const link = document.createElement("a");
     link.href = "/IsoverFile/func-pdf/무용접파사드시스템 카다로그.pdf";
@@ -340,9 +281,6 @@ function IsoverPageMobile({ onBack = null }) {
     document.body.removeChild(link);
   };
 
-  /**
-   * 공유 버튼 클릭 핸들러
-   */
   const handleShareClick = () => {
     if (navigator.share) {
       navigator.share({
@@ -350,14 +288,12 @@ function IsoverPageMobile({ onBack = null }) {
         text: 'Isover에 대해 확인해보세요!',
         url: window.location.href,
       }).then(() => {
-        // Web Share API 성공 후에도 클립보드에 복사
         navigator.clipboard.writeText(window.location.href).then(() => {
           console.log('Isover 링크가 클립보드에 복사되었습니다!');
         }).catch(() => {
           console.log('클립보드 복사에 실패했습니다.');
         });
       }).catch(() => {
-        // Web Share API 실패 시 클립보드에 복사
         navigator.clipboard.writeText(window.location.href).then(() => {
           alert('Isover 링크가 클립보드에 복사되었습니다!');
         }).catch(() => {
@@ -365,7 +301,6 @@ function IsoverPageMobile({ onBack = null }) {
         });
       });
     } else {
-      // Web Share API를 지원하지 않는 경우 클립보드에 복사
       navigator.clipboard.writeText(window.location.href).then(() => {
         alert('Isover 링크가 클립보드에 복사되었습니다!');
       }).catch(() => {
@@ -374,9 +309,6 @@ function IsoverPageMobile({ onBack = null }) {
     }
   };
 
-  /**
-   * 목차 버튼 클릭 핸들러
-   */
   const handleTocClick = () => {
     const targetPage = document.querySelector('[data-page-index="1"]');
     if (targetPage) {
@@ -384,18 +316,11 @@ function IsoverPageMobile({ onBack = null }) {
     }
   };
 
-  /**
-   * 3D 모델 뷰어 토글 핸들러 (표지 페이지에서만 작동)
-   */
   const handle3DModelToggle = () => {
     setShow3DModel(!show3DModel);
   };
 
-  /**
-   * 영역별 클릭 핸들러들
-   */
   const handleArea1Click = () => {
-    // 1번 영역: 3번 페이지로 스크롤
     const targetPage = document.querySelector('[data-page-index="2"]');
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: 'smooth' });
@@ -403,7 +328,6 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   const handleArea2Click = () => {
-    // 2번 영역: 4번 페이지로 스크롤 (1페이지 건너뛰기)
     const targetPage = document.querySelector('[data-page-index="3"]');
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: 'smooth' });
@@ -411,15 +335,13 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   const handleArea3Click = () => {
-    // 3번 영역: 6번 페이지로 스크롤 (1페이지 건너뛰기)
-    const targetPage = document.querySelector('[data-page-index="5"]');
+    const targetPage = document.querySelector('[data-page-index="4"]');
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   const handleArea4Click = () => {
-    // 4번 영역: 7번 페이지로 스크롤 (2페이지 건너뛰기)
     const targetPage = document.querySelector('[data-page-index="6"]');
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: 'smooth' });
@@ -427,148 +349,114 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   const handleArea5Click = () => {
-    // 5번 영역: 유튜브 링크 새 탭에서 열기
     window.open('https://www.youtube.com/@%EC%83%9D%EA%B3%A0%EB%B1%85%EC%9D%B4%EC%86%8C%EB%B0%94%EC%BD%94%EB%A6%AC%EC%95%84/videos', '_blank');
   };
 
-  /**
-   * 3페이지 영역 클릭 핸들러
-   */
+  const handleNewAreaClick = () => {
+    setIsNewAreaModalOpen(true);
+  };
+
+  const closeNewAreaModal = () => {
+    setIsNewAreaModalOpen(false);
+  };
+
   const handle3PageAreaClick = (areaNumber) => {
     if (areaNumber === 1) {
-      // 첫번째 영역: 6페이지로 바로 이동
-      const targetPage = document.querySelector('[data-page-index="5"]');
+      setSelectedArea(1);
+      setIsModalOpen(true);
+    } else if (areaNumber === 7) {
+      const targetPage = document.querySelector('[data-page-index="4"]');
       if (targetPage) {
         targetPage.scrollIntoView({ behavior: 'smooth' });
       }
     } else if (areaNumber <= 6) {
-      // 기존 6개 영역 (2-6번)
       setSelectedArea(areaNumber);
       setIsModalOpen(true);
     } else {
-      // 추가 4개 영역 (7-10번)
       setSelectedAdditionalArea(areaNumber);
       setIsAdditionalModalOpen(true);
     }
   };
 
-  /**
-   * 6페이지로 이동하는 핸들러 (기존 5페이지)
-   */
   const handleGoToPage6 = () => {
-    console.log('🚀 handleGoToPage6 호출됨 - 6페이지로 이동 시작');
-    // 모달 닫기
     closeModal();
-    console.log('🚀 모달 닫기 완료');
-    // 6페이지로 스크롤 이동 (페이지 인덱스는 0부터 시작하므로 5)
     const targetPage = document.querySelector('[data-page-index="5"]');
     if (targetPage) {
-      console.log('🚀 6페이지 요소 찾음, 스크롤 이동 시작');
       targetPage.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      console.log('🚀 6페이지 요소를 찾을 수 없음');
     }
   };
 
-  /**
-   * 모달 닫기 핸들러
-   */
   const closeModal = () => {
-    console.log('❌ closeModal 호출됨 - 3페이지 모달 닫기');
     setIsModalOpen(false);
     setSelectedArea(null);
-    console.log('❌ 3페이지 모달 상태 초기화 완료');
   };
 
-  /**
-   * 추가 모달 닫기 핸들러
-   */
   const closeAdditionalModal = () => {
     setIsAdditionalModalOpen(false);
     setSelectedAdditionalArea(null);
   };
 
-  /**
-   * 이미지 모달 열기 핸들러
-   */
   const openImageModal = (imageType) => {
-    console.log('🖼️ openImageModal 호출됨:', imageType);
     setSelectedImageType(imageType);
     setIsImageModalOpen(true);
-    console.log('🖼️ 이미지 모달 상태 설정 완료:', imageType);
   };
 
-  // 추가 영역 이미지 모달 열기/닫기 (돋보기 컨트롤 없이)
   const openAdditionalImageModal = (imageType) => {
     setSelectedAdditionalImageType(imageType);
     setIsAdditionalImageModalOpen(true);
   };
+
   const closeAdditionalImageModal = () => {
     setIsAdditionalImageModalOpen(false);
     setSelectedAdditionalImageType(null);
   };
 
-  /**
-   * 이미지 모달 닫기 핸들러
-   */
   const closeImageModal = () => {
-    console.log('🖼️ closeImageModal 호출됨 - 이미지 모달 닫기');
     setIsImageModalOpen(false);
     setSelectedImageType(null);
-    console.log('🖼️ 이미지 모달 상태 초기화 완료');
   };
 
-  /**
-   * 4페이지 영역 클릭 핸들러
-   */
   const handlePage4AreaClick = (areaNumber) => {
-    setSelectedPage4Area(areaNumber);
-    setIsPage4ModalOpen(true);
+    if (areaNumber === 1) {
+      window.open('https://www.isover.co.kr/documents/jepum-kadalogeu/jeohaesang-211021-wedeopeurupeu-3dan-ripeulres-3-pyeolcimmyeon-0.pdf', '_blank');
+    } else if (areaNumber === 2) {
+      window.open('https://www.isover.co.kr/documents/jepum-kadalogeu/pesns-aais-2023.pdf', '_blank');
+    } else if (areaNumber === 3) {
+      window.open('https://www.isover.co.kr/documents/jepum-kadalogeu/pesns-fr-usf.pdf', '_blank');
+    } else {
+      setSelectedPage4Area(areaNumber);
+      setIsPage4ModalOpen(true);
+    }
   };
 
-  /**
-   * 4페이지 모달 닫기 핸들러
-   */
   const closePage4Modal = () => {
     setIsPage4ModalOpen(false);
     setSelectedPage4Area(null);
   };
 
-  /**
-   * 4페이지 영역 2번 전용 모달 열기 핸들러 (테스트용)
-   */
   const handlePage4Area2Click = () => {
     setIsPage4Area2ModalOpen(true);
   };
 
-  /**
-   * 4페이지 영역 2번 전용 모달 닫기 핸들러 (테스트용)
-   */
   const closePage4Area2Modal = () => {
     setIsPage4Area2ModalOpen(false);
   };
 
-  /**
-   * 파트별 모델 경로 반환 함수
-   */
   const getModelPathByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
-        return "/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"; // 파이버시멘트보드
+        return "/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb";
       case 2:
-        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET_test.glb"; // AL 복합판넬
+        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET_test.glb";
       case 3:
-        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb"; // AL 시트판넬
+        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb";
       case 4:
-        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb"; // 조적판넬
+        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb";
       default:
         return "/IsoverFile/3dmodel/system_with_panel_test.glb";
     }
   };
 
-  /**
-   * 파트별 이름 반환 함수
-   */
   const getPartName = (partNumber) => {
     switch (partNumber) {
       case 1:
@@ -584,27 +472,21 @@ function IsoverPageMobile({ onBack = null }) {
     }
   };
 
-  /**
-   * 파트별 모델 스케일 반환 함수
-   */
   const getModelScaleByPart = (partNumber) => {
     switch (partNumber) {
       case 1:
-        return 0.5; // 1_System_Fiber_SET
+        return 0.5;
       case 2:
-        return 0.5; // 2_System_Alu-Complex_SET
+        return 0.5;
       case 3:
-        return 0.5; // 3_System_Alu-Sheet_SET
+        return 0.5;
       case 4:
-        return 0.5; // 4_System_Three_SET
+        return 0.5;
       default:
-        return 0.3; // 기본 모델
+        return 0.3;
     }
   };
 
-  /**
-   * 외장재 타입별 이름 반환 함수
-   */
   const getExteriorTypeName = (typeNumber) => {
     switch (typeNumber) {
       case 3:
@@ -620,108 +502,101 @@ function IsoverPageMobile({ onBack = null }) {
     }
   };
 
-  /**
-   * 외장재 타입별 모델 경로 반환 함수
-   */
   const getExteriorModelPath = (typeNumber) => {
     switch (typeNumber) {
       case 3:
-        return "/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb"; // 파이버시멘트보드
+        return "/IsoverFile/3dmodel/1_System_Fiber_SET_test.glb";
       case 4:
-        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET_test.glb"; // AL 복합판넬
+        return "/IsoverFile/3dmodel/2_System_Alu-Complex_SET_test.glb";
       case 5:
-        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb"; // AL 시트판넬
+        return "/IsoverFile/3dmodel/3_System_Alu-Sheet_SET_test.glb";
       case 6:
-        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb"; // 조적판넬
+        return "/IsoverFile/3dmodel/4_System_Three_SET_test.glb";
       default:
         return "/IsoverFile/3dmodel/system_with_panel_test.glb";
     }
   };
 
-  /**
-   * 5페이지 영역 클릭 핸들러
-   */
   const handlePage5AreaClick = (areaNumber) => {
-    if (areaNumber === 1) {
-      // 첫 번째 영역 - 3D 모델 모달 열기
-      setCurrentPartModel(null);
-      setSelectedPart(1);
-      setIsPage53DModelLoading(true); // 로딩 상태 시작
-      setModalKey(prev => prev + 1); // 모달 새로고침을 위한 키 증가
-      setIsPage53DModalOpen(true);
-    } else if (areaNumber === 2) {
-      // 두 번째 영역만 모달 열기
+    if (areaNumber === 0) {
+      window.open('http://m.yoochang.com/product_view.html?product_id=106', '_blank');
+    } else if (areaNumber === 1) {
+      setSelectedPage5Area(1);
+      setIsPage5ModalFromPage6(false);
       setIsPage5ModalOpen(true);
-    } else if (areaNumber >= 3 && areaNumber <= 6) {
-      // 외장재 영역들 (3-6번) - 외장재 모달 열기
-      setSelectedExteriorType(areaNumber);
-      setIsPage5ExteriorModalOpen(true);
+    } else if (areaNumber === 2) {
+      setSelectedPage5Area(2);
+      setIsPage5ModalFromPage6(false);
+      setIsPage5ModalOpen(true);
+    } else if (areaNumber === 3) {
+      setSelectedPage5Area(3);
+      setIsPage5ModalFromPage6(false);
+      setIsPage5ModalOpen(true);
+    } else if (areaNumber >= 4 && areaNumber <= 6) {
+      setSelectedPage5Area(areaNumber);
+      setIsPage5ModalFromPage6(false);
+      setIsPage5ModalOpen(true);
     }
   };
 
-  /**
-   * 5페이지 3D 모델 파트 클릭 핸들러
-   */
-  const handlePage5PartClick = (partNumber) => {
-    console.log(`Part ${partNumber} clicked`);
+  const handlePage6PartClick = (partNumber) => {
     setSelectedPart(partNumber);
-    setIsPage53DModelLoading(true); // 파트 변경 시 로딩 상태 시작
-    
-    // 파트별 모델 경로 설정
+    setIsPage53DModelLoading(true);
     const partModelPath = getModelPathByPart(partNumber);
     setCurrentPartModel(partModelPath);
-    
-    // 모달 새로고침을 위한 키 증가
     setModalKey(prev => prev + 1);
   };
 
-  /**
-   * 5페이지 모달 닫기 핸들러
-   */
   const closePage5Modal = () => {
     setIsPage5ModalOpen(false);
+    setSelectedPage5Area(null);
+    setIsPage5ModalFromPage6(false);
   };
 
-  /**
-   * 5페이지 외장재 모달 닫기 핸들러
-   */
   const closePage5ExteriorModal = () => {
     setIsPage5ExteriorModalOpen(false);
     setSelectedExteriorType(null);
   };
 
-  /**
-   * 6페이지 영역 클릭 핸들러
-   */
   const handlePage6AreaClick = (areaNumber) => {
-    setSelectedPage6Area(areaNumber);
-    setIsPage6ModalOpen(true);
+    if (areaNumber === 1) {
+      setCurrentPartModel(null);
+      setSelectedPart(1);
+      setIsPage53DModelLoading(true);
+      setModalKey(prev => prev + 1);
+      setIsPage53DModalOpen(true);
+    } else if (areaNumber === 2) {
+      setSelectedPage5Area(2);
+      setIsPage5ModalFromPage6(true);
+      setIsPage5ModalOpen(true);
+    } else if (areaNumber >= 3 && areaNumber <= 6) {
+      setSelectedExteriorType(areaNumber);
+      setIsPage5ExteriorModalOpen(true);
+    }
   };
 
-  /**
-   * 6페이지 모달 닫기 핸들러
-   */
   const closePage6Modal = () => {
     setIsPage6ModalOpen(false);
     setSelectedPage6Area(null);
   };
 
-  /**
-   * 7페이지 영역 클릭 핸들러
-   */
   const handlePage7AreaClick = (areaNumber) => {
+    setSelectedPage6Area(areaNumber);
+    setIsPage6ModalOpen(true);
+  };
+
+  const handlePage8AreaClick = (areaNumber) => {
     if (areaNumber === 2) {
-      // 왼쪽 로고 영역: Isover 링크
       window.open('https://www.isover.co.kr/', '_blank');
     } else if (areaNumber === 3) {
-      // 오른쪽 로고 영역: Yoochang 링크
       window.open('http://www.yoochang.com/', '_blank');
+    } else if (areaNumber === 4) {
+      window.open('https://www.isover.co.kr/', '_blank');
+    } else if (areaNumber === 1) {
+      setShowVideo(!showVideo);
     }
   };
 
-  /**
-   * 영상 닫기 핸들러
-   */
   const closeVideo = () => {
     setShowVideo(false);
   };
@@ -842,13 +717,13 @@ function IsoverPageMobile({ onBack = null }) {
                       <>
                         {/* 5개의 div 영역을 absolute로 배치 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '24%',
-                            left: '9%',
-                            width: '40%',
-                            height: '25%'
+                            top: '25%',
+                            left: '8%',
+                            width: '42%',
+                            height: '24%'
                           }}
                           onClick={handleArea1Click}
                           title="3번 페이지로 이동"
@@ -856,13 +731,13 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '24%',
-                            right: '9%',
-                            width: '40%',
-                            height: '25%'
+                            top: '25%',
+                            right: '7%',
+                            width: '42%',
+                            height: '24%'
                           }}
                           onClick={handleArea2Click}
                           title="4번 페이지로 이동"
@@ -870,13 +745,13 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '24%',
-                            left: '9%',
-                            width: '40%',
-                            height: '25%'
+                            bottom: '25%',
+                            left: '8%',
+                            width: '42%',
+                            height: '24%'
                           }}
                           onClick={handleArea3Click}
                           title="5번 페이지로 이동"
@@ -884,24 +759,24 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '24%',
-                            right: '9%',
-                            width: '40%',
-                            height: '25%'
+                            bottom: '25%',
+                            right: '7%',
+                            width: '42%',
+                            height: '24%'
                           }}
                           onClick={handleArea4Click}
-                          title="6번 페이지로 이동"
+                          title="7번 페이지로 이동"
                         >
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '6%',
+                            bottom: '5.5%',
                             left: '30%',
                             width: '40%',
                             height: '8%'
@@ -916,26 +791,26 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 3번째 페이지 클릭 영역들 */}
                     {index === 2 && (
                       <>
-                        {/* 3페이지 상단 신규 영역 */}
+                        {/* 새로운 영역 - 맨 위 왼쪽 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '12%',
+                            top: '12.5%',
                             left: '5%',
-                            width: '90%',
+                            width: '86%',
                             height: '6%'
                           }}
-                          onClick={() => openImageModal('top_3-1')}
+                          onClick={handleNewAreaClick}
                         >
                         </div>
                         
-                        {/* 3페이지 영역 6개 배치 */}
+                        {/* 3페이지 영역 7개 배치 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '26.5%',
+                            top: '24.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -945,10 +820,10 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '29.5%',
+                            top: '27.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -958,10 +833,10 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '32.5%',
+                            top: '30.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -971,10 +846,10 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '35.7%',
+                            top: '33.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -984,10 +859,10 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '38.7%',
+                            top: '36.5%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -997,10 +872,10 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '42%',
+                            top: '40%',
                             left: '9%',
                             width: '35%',
                             height: '2.5%'
@@ -1009,56 +884,70 @@ function IsoverPageMobile({ onBack = null }) {
                         >
                         </div>
                         
-                        {/* 추가 4개 영역 */}
+                        {/* 7번째 영역 - 6번 영역 아래 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '46%',
-                            right: '6%',
-                            width: '27%',
-                            height: '16.5%'
+                            top: '43%',
+                            left: '9%',
+                            width: '35%',
+                            height: '2.5%'
                           }}
                           onClick={() => handle3PageAreaClick(7)}
                         >
                         </div>
                         
+                        {/* 추가 4개 영역 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '33%',
-                            right: '6%',
+                            bottom: '46%',
+                            right: '5%',
                             width: '27%',
-                            height: '12.5%'
+                            height: '16.5%'
                           }}
                           onClick={() => handle3PageAreaClick(8)}
                         >
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '20%',
-                            right: '6%',
+                            bottom: '33%',
+                            right: '5%',
                             width: '27%',
-                            height: '13%'
+                            height: '12.5%'
                           }}
                           onClick={() => handle3PageAreaClick(9)}
                         >
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '7%',
-                            right: '6%',
+                            bottom: '20%',
+                            right: '5%',
+                            width: '27%',
+                            height: '13%'
+                          }}
+                          onClick={() => handle3PageAreaClick(10)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            bottom: '6%',
+                            right: '5%',
                             width: '27%',
                             height: '13.5%'
                           }}
-                          onClick={() => handle3PageAreaClick(10)}
+                          onClick={() => handle3PageAreaClick(11)}
                         >
                         </div>
                         
@@ -1067,10 +956,10 @@ function IsoverPageMobile({ onBack = null }) {
                           className="absolute cursor-pointer hover:bg-blue-500/10 transition-all duration-300 rounded-lg"
                           style={{
                             position: 'absolute',
-                            bottom: '20%',
-                            left: '6%',
-                            width: '58%',
-                            height: '21%'
+                            bottom: '18.5%',
+                            left: '5.5%',
+                            width: '59%',
+                            height: '22%'
                           }}
                           onClick={() => setIs3DModalOpen(true)}
                           title="3D 모델 확대 보기"
@@ -1090,12 +979,12 @@ function IsoverPageMobile({ onBack = null }) {
                       <>
                         {/* 4페이지 영역 4개 배치 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '10%',
                             left: '5%',
-                            width: '89%',
+                            width: '90%',
                             height: '19%'
                           }}
                           onClick={() => handlePage4AreaClick(1)}
@@ -1103,12 +992,12 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '31%',
                             left: '5%',
-                            width: '89%',
+                            width: '90%',
                             height: '19%'
                           }}
                           onClick={() => handlePage4AreaClick(2)}
@@ -1116,26 +1005,26 @@ function IsoverPageMobile({ onBack = null }) {
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '29%',
+                            bottom: '28%',
                             left: '5%',
-                            width: '89%',
-                            height: '19%'
+                            width: '90%',
+                            height: '20%'
                           }}
                           onClick={() => handlePage4AreaClick(3)}
                         >
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '7%',
+                            bottom: '6%',
                             left: '5%',
                             width: '89%',
-                            height: '20%'
+                            height: '21%'
                           }}
                           onClick={() => handlePage4AreaClick(4)}
                         >
@@ -1143,102 +1032,199 @@ function IsoverPageMobile({ onBack = null }) {
                       </>
                     )}
 
-                    {/* 5번째 페이지 클릭 영역들 (새로운 페이지 - 아직 클릭 영역 없음) */}
+                    {/* 5번째 페이지 클릭 영역들 (새로운 페이지) */}
                     {index === 4 && (
                       <>
-                        {/* 새로운 5페이지 - 추후 클릭 영역 추가 예정 */}
+                        {/* 맨 위 영역 - EQUITONE 링크 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            top: '6%',
+                            left: '5%',
+                            width: '23%',
+                            height: '4%'
+                          }}
+                          onClick={() => handlePage5AreaClick(0)}
+                          title="EQUITONE 제품 정보 보기"
+                        >
+                        </div>
+                        
+                        {/* 1번째 영역 - 위 오른쪽 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            top: '14%',
+                            right: '6%',
+                            width: '47%',
+                            height: '17%'
+                          }}
+                          onClick={() => handlePage5AreaClick(1)}
+                        >
+                        </div>
+                        
+                        {/* 2번째 영역 - 1번째 아래 가로로 길게 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            top: '31%',
+                            left: '5%',
+                            width: '90%',
+                            height: '14%'
+                          }}
+                          onClick={() => handlePage5AreaClick(2)}
+                        >
+                        </div>
+                        
+                        {/* 3번째 영역 - 2번째 아래 가로로 길게 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            top: '45%',
+                            left: '5%',
+                            width: '90%',
+                            height: '25%'
+                          }}
+                          onClick={() => handlePage5AreaClick(3)}
+                        >
+                        </div>
+                        
+                        {/* 4번째 영역 - 하단 왼쪽 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            bottom: '5%',
+                            left: '6%',
+                            width: '27%',
+                            height: '21%'
+                          }}
+                          onClick={() => handlePage5AreaClick(4)}
+                        >
+                        </div>
+                        
+                        {/* 5번째 영역 - 하단 중앙 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            bottom: '5%',
+                            left: '36%',
+                            width: '28%',
+                            height: '21%'
+                          }}
+                          onClick={() => handlePage5AreaClick(5)}
+                        >
+                        </div>
+                        
+                        {/* 6번째 영역 - 하단 오른쪽 */}
+                        <div 
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
+                          style={{
+                            position: 'absolute',
+                            bottom: '5%',
+                            right: '7%',
+                            width: '27%',
+                            height: '21%'
+                          }}
+                          onClick={() => handlePage5AreaClick(6)}
+                        >
+                        </div>
                       </>
                     )}
 
                     {/* 6번째 페이지 클릭 영역들 (기존 5페이지 - 3D 모델) */}
                     {index === 5 && (
                       <>
-                        {/* 6페이지 영역 2개 배치 */}
+                        {/* 6페이지 영역 2개 배치 (기존 5페이지 기능) */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '25.5%',
+                            top: '25%',
                             left: '23%',
-                            width: '70.5%',
-                            height: '26%'
+                            width: '71.5%',
+                            height: '27%'
                           }}
-                          onClick={() => handlePage5AreaClick(1)}
+                          onClick={() => handlePage6AreaClick(1)}
                           title="3D 모델 확대 보기"
                         >
                         </div>
                         
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '12%',
+                            bottom: '11%',
                             left: '5%',
                             width: '90%',
                             height: '31%'
                           }}
-                          onClick={() => handlePage5AreaClick(2)}
+                          onClick={() => handlePage6AreaClick(2)}
                         >
                         </div>
 
                         {/* 4가지 외장재 텍스트 영역들 */}
                         {/* 파이버시멘트보드 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            top: '22%',
-                            left: '7%',
-                            width: '21%',
+                            top: '21.5%',
+                            left: '6%',
+                            width: '21.5%',
                             height: '2.5%'
                           }}
-                          onClick={() => handlePage5AreaClick(3)}
+                          onClick={() => handlePage6AreaClick(3)}
                           title="파이버시멘트보드 상세 정보"
                         >
                         </div>
                         
                         {/* AL 복합판넬 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
-                            position: 'absolute',
-                            top: '32%',
-                            left: '7%',
-                            width: '12%',
+                            position: 'absolute', 
+                            top: '31.5%',
+                            left: '6%',
+                            width: '11.5%',
                             height: '2.5%'
                           }}
-                          onClick={() => handlePage5AreaClick(4)}
+                          onClick={() => handlePage6AreaClick(4)}
                           title="AL 복합판넬 상세 정보"
                         >
                         </div>
                         
                         {/* AL 시트판넬 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '37%',
-                            left: '7%',
-                            width: '12%',
+                            left: '6%',
+                            width: '11%',
                             height: '2.5%'
                           }}
-                          onClick={() => handlePage5AreaClick(5)}
+                          onClick={() => handlePage6AreaClick(5)}
                           title="AL 시트판넬 상세 정보"
                         >
                         </div>
                         
-                        {/* 조적판넬 */}
+                        {/* 벽돌판넬 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
                             top: '44%',
-                            left: '7%',
-                            width: '15%',
+                            left: '6.5%',
+                            width: '14%',
                             height: '2.5%'
                           }}
-                          onClick={() => handlePage5AreaClick(6)}
-                          title="조적판넬 상세 정보"
+                          onClick={() => handlePage6AreaClick(6)}
+                          title="벽돌판넬 상세 정보"
                         >
                         </div>
                       </>
@@ -1252,12 +1238,12 @@ function IsoverPageMobile({ onBack = null }) {
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '19%',
-                            left: '11.3%',
-                            width: '34.3%',
+                            top: '18.3%',
+                            left: '11%',
+                            width: '35.3%',
                             height: '17.1%'
                           }}
-                          onClick={() => handlePage6AreaClick(1)}
+                          onClick={() => handlePage7AreaClick(1)}
                         >
                         </div>
                         
@@ -1265,12 +1251,12 @@ function IsoverPageMobile({ onBack = null }) {
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '19%',
-                            right: '9.5%',
-                            width: '34.3%',
-                            height: '17.1%'
+                            top: '18.5%',
+                            right: '8.1%',
+                            width: '35.5%',
+                            height: '17.5%'
                           }}
-                          onClick={() => handlePage6AreaClick(2)}
+                          onClick={() => handlePage7AreaClick(2)}
                         >
                         </div>
                         
@@ -1278,25 +1264,38 @@ function IsoverPageMobile({ onBack = null }) {
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                           style={{
                             position: 'absolute',
-                            top: '42%',
-                            left: '11.3%',
+                            top: '42.1%',
+                            left: '10.9%',
+                            width: '35.3%',
+                            height: '17.1%'
+                          }}
+                          onClick={() => handlePage7AreaClick(3)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            top: '42.1%',
+                            right: '8.1%',
+                            width: '35.5%',
+                            height: '17.5%'
+                          }}
+                          onClick={() => handlePage7AreaClick(4)}
+                        >
+                        </div>
+                        
+                        <div 
+                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
+                          style={{
+                            position: 'absolute',
+                            bottom: '17%',
+                            left: '10.9%',
                             width: '36%',
                             height: '17.1%'
                           }}
-                          onClick={() => handlePage6AreaClick(3)}
-                        >
-                        </div>
-                        
-                        <div 
-                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
-                          style={{
-                            position: 'absolute',
-                            top: '42%',
-                            right: '9.5%',
-                            width: '34.5%',
-                            height: '17.1%'
-                          }}
-                          onClick={() => handlePage6AreaClick(4)}
+                          onClick={() => handlePage7AreaClick(5)}
                         >
                         </div>
                         
@@ -1305,33 +1304,20 @@ function IsoverPageMobile({ onBack = null }) {
                           style={{
                             position: 'absolute',
                             bottom: '17%',
-                            left: '11.3%',
-                            width: '34.5%',
-                            height: '17.1%'
+                            right: '8.1%',
+                            width: '35.5%',
+                            height: '17.5%'
                           }}
-                          onClick={() => handlePage6AreaClick(5)}
-                        >
-                        </div>
-                        
-                        <div 
-                          className="absolute cursor-pointer transition-all duration-300 rounded-lg"
-                          style={{
-                            position: 'absolute',
-                            bottom: '17%',
-                            right: '9.5%',
-                            width: '34.5%',
-                            height: '17.1%'
-                          }}
-                          onClick={() => handlePage6AreaClick(6)}
+                          onClick={() => handlePage7AreaClick(6)}
                         >
                         </div>
                         
                         {/* 7페이지 마지막 영역 (유튜브 링크) */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '6%',
+                            bottom: '5.5%',
                             left: '32%',
                             width: '36%',
                             height: '4%'
@@ -1346,63 +1332,77 @@ function IsoverPageMobile({ onBack = null }) {
                     {/* 8번째 페이지 클릭 영역들 (기존 7페이지 - 영상) */}
                     {index === 7 && (
                       <>
-                        {/* 8페이지 영역 3개 배치 */}
+                        {/* 8페이지 영역 4개 배치 */}
                         {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                         <div 
-                          className="absolute cursor-pointer transition-all duration-300 hover:scale-103 rounded-lg"
+                          className="absolute cursor-pointer transition-all duration-300 hover:scale-103"
                           style={{
                             position: 'absolute',
-                            top: '16%',
+                            top: '18%',
                             left: '15%',
                             width: '70%',
                             height: '41%',
-                            clipPath: 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
+                            clipPath: showVideo ? 'none' : 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
                           }}
-                          onClick={() => {
-                            // 이미지 클릭 시 모달에서 영상 실행
-                            setShowVideo(true);
-                          }}
+                          onClick={() => handlePage8AreaClick(1)}
                         >
-                          {/* 이미지 표시 */}
-                          <div 
-                            className="absolute inset-0 rounded-lg"
-                            style={{
-                              clipPath: 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
-                            }}
-                          >
-                            <img
-                              src="/IsoverFile/Interacive/video/액션캡 영상 이미지.png"
-                              alt="액션캠 영상 이미지"
-                              className="w-full h-full object-cover rounded-lg"
-                            />
-                          </div>
+                          {/* 이미지 표시 (영상이 재생되지 않을 때) */}
+                          {!showVideo && (
+                            <div 
+                              className="absolute inset-0 rounded-lg"
+                              style={{
+                                clipPath: 'polygon(0 25%, 100% 0%, 100% 75%, 0% 100%)'
+                              }}
+                            >
+                              <img
+                                src="/IsoverFile/Interacive/video/액션캡 영상 이미지.png"
+                                alt="액션캠 영상 이미지"
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            </div>
+                          )}
+                          
+                          {/* 영상 표시 (영상이 재생될 때) */}
+                          {showVideo && (
+                            <div className="absolute inset-0 rounded-lg">
+                              <video
+                                className="w-full h-full object-cover rounded-lg"
+                                controls
+                                autoPlay
+                                onEnded={closeVideo}
+                              >
+                                <source src="/IsoverFile/Interacive/video/Isover_목업시공 액션캠.mp4" type="video/mp4" />
+                                영상을 재생할 수 없습니다.
+                              </video>
+                            </div>
+                          )}
                         </div>
                         
-                        {/* 2. 하단 왼쪽 영역 */}
+                        {/* 2. 왼쪽 로고 영역 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '4.2%',
-                            left: '5.5%',
+                            bottom: '5%',
+                            left: '6.5%',
                             width: '24%',
-                            height: '22%'
+                            height: '20%'
                           }}
-                          onClick={() => handlePage7AreaClick(2)}
+                          onClick={() => handlePage8AreaClick(2)}
                         >
                         </div>
                         
-                        {/* 3. 하단 오른쪽 영역 */}
+                        {/* 3. 오른쪽 로고 영역 */}
                         <div 
-                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
+                          className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo || isNewAreaModalOpen || isGifModalOpen || isArea5SliderModalOpen) ? 'pointer-events-none' : ''}`}
                           style={{
                             position: 'absolute',
-                            bottom: '9.2%',
-                            right: '6.5%',
-                            width: '28%',
+                            bottom: '9%',
+                            right: '6%',
+                            width: '27%',
                             height: '13%'
                           }}
-                          onClick={() => handlePage7AreaClick(3)}
+                          onClick={() => handlePage8AreaClick(3)}
                         >
                         </div>
                       </>
@@ -1491,16 +1491,8 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            console.log('🎭 3페이지 모달 배경 클릭됨');
-            console.log('🎭 이벤트 타겟:', e.target);
-            console.log('🎭 이벤트 currentTarget:', e.currentTarget);
-            console.log('🎭 타겟과 currentTarget이 같은가?', e.target === e.currentTarget);
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
-              console.log('🎭 배경 클릭으로 인한 모달 닫기');
               closeModal();
-            } else {
-              console.log('🎭 모달 내용 클릭 - 모달 닫지 않음');
             }
           }}
         >
@@ -1527,28 +1519,25 @@ function IsoverPageMobile({ onBack = null }) {
                   if (e.target.src.includes('.png')) {
                     e.target.src = `/IsoverFile/Popup/${selectedArea}.jpg`;
                   } else {
-                    // 이미지 로드 실패 시 메시지 표시
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'block';
                   }
                 }}
               />
               
-              {/* 4번째 영역에 추가 영역 배치 */}
-              {selectedArea === 4 && (
+              {/* 2번째 영역에 추가 영역 배치 */}
+              {selectedArea === 2 && (
                 <div 
                   className={`absolute cursor-pointer rounded-lg z-10`}
                   style={{
                     top: '32%',
-                    left: '14.5%',
+                    left: '26%',
                     width: '24%',
                     height: '64%',
                     zIndex: 10
                   }}
                   onClick={(e) => {
-                    console.log('🎯 4번째 영역 클릭됨 - 이벤트 전파 방지');
-                    e.stopPropagation(); // 이벤트 전파 방지
-                    console.log('🎯 4번째 영역 - openImageModal 호출');
+                    e.stopPropagation();
                     openImageModal('3-4-1');
                   }}
                   title="3-4-1, 3-4-2 이미지 보기"
@@ -1556,30 +1545,96 @@ function IsoverPageMobile({ onBack = null }) {
                 </div>
               )}
               
-              {/* 6번째 영역에 추가 영역 배치 */}
-              {selectedArea === 6 && (
+              {/* 5번째 영역에 오른쪽 추가 영역 배치 */}
+              {selectedArea === 5 && (
                 <div 
                   className={`absolute cursor-pointer rounded-lg z-10`}
                   style={{
-                    bottom: '12%',
-                    left: '12%',
-                    width: '22%',
-                    height: '55%',
+                    top: '32%',
+                    right: '8%',
+                    width: '27%',
+                    height: '60%',
                     zIndex: 10
                   }}
                   onClick={(e) => {
-                    console.log('🎯 6번째 영역 클릭됨 - 이벤트 전파 방지');
-                    e.stopPropagation(); // 이벤트 전파 방지
-                    console.log('🎯 6번째 영역 - openImageModal 호출');
-                    openImageModal('3-6-1');
+                    e.stopPropagation();
+                    setArea5SliderIndex(0);
+                    setIsArea5SliderModalOpen(true);
                   }}
-                  title="3-6-1 이미지 보기"
+                  title="이미지 슬라이더 보기"
                 >
                 </div>
               )}
+              
+              {/* 6번째 영역에 추가 영역 배치 */}
+              {selectedArea === 6 && (
+                <>
+                  <div 
+                    className={`absolute cursor-pointer rounded-lg z-10`}
+                    style={{
+                      bottom: '6%',
+                      left: '26.5%',
+                      width: '23.5%',
+                      height: '48%',
+                      zIndex: 10
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openImageModal('3-6-1');
+                    }}
+                    title="3-6-1 이미지 보기"
+                  >
+                  </div>
+                  {/* GIF 2개 배치 - 클릭 영역 옆 */}
+                  <div 
+                    className="absolute"
+                    style={{
+                      bottom: '7%',
+                      right: '25%',
+                      width: '23.5%',
+                      height: '46%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4%',
+                      zIndex: 10
+                    }}
+                  >
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/1124_1.gif"
+                      alt="1124_1 GIF"
+                      className={`w-full h-[48%] rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_1' ? 'border-2 border-yellow-500' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1124_1.gif");
+                        setIsGifModalOpen(true);
+                      }}
+                      onMouseEnter={() => setHoveredGif('1124_1')}
+                      onMouseLeave={() => setHoveredGif(null)}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    <img
+                      src="/IsoverFile/Interacive/gif-file/1124_2.gif"
+                      alt="1124_2 GIF"
+                      className={`w-full h-[48%] rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_2' ? 'border-2 border-yellow-500' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1124_2.gif");
+                        setIsGifModalOpen(true);
+                      }}
+                      onMouseEnter={() => setHoveredGif('1124_2')}
+                      onMouseLeave={() => setHoveredGif(null)}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                  </div>
+                </>
+              )}
 
-              {/* 3번째 영역일 때 블랙페이싱 3D 모델 영역 추가 */}
-              {selectedArea === 3 && (
+              {/* 1번째 영역일 때 블랙페이싱 3D 모델 영역 추가 */}
+              {selectedArea === 1 && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative w-full h-full">
                     {/* 블랙페이싱 3D 모델 영역 */}
@@ -1623,9 +1678,6 @@ function IsoverPageMobile({ onBack = null }) {
                     zIndex: 1
                   }}
                   onClick={(e) => {
-                    console.log('🚀 6페이지로 이동하는 영역 클릭됨 (1번 영역)');
-                    console.log('🚀 이벤트 타겟:', e.target);
-                    console.log('🚀 이벤트 currentTarget:', e.currentTarget);
                     handleGoToPage6();
                   }}
                   title="6페이지로 이동"
@@ -1650,7 +1702,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closeAdditionalModal();
             }
@@ -1671,11 +1722,10 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 이미지와 3D 모델 표시 */}
             <div className="relative flex items-center justify-center">
               <img
-                src={`/IsoverFile/Popup/pae_3-${selectedAdditionalArea - 6}.png`}
+                src={`/IsoverFile/Popup/pae_3-${selectedAdditionalArea - 7}.png`}
                 alt={`영역 ${selectedAdditionalArea}`}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -1684,82 +1734,152 @@ function IsoverPageMobile({ onBack = null }) {
               {/* 3D 모델 영역 - 각 영역마다 다른 모델 */}
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="relative w-full h-full">
-                  {selectedAdditionalArea === 7 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                      <Isover3DModel 
-                        isVisible={true} 
-                        opacity={1}
-                        scale={1}
-                        position={{ x: 0, y: 0 }}
-                        animationDelay={500}
-                        modelPath="/IsoverFile/3dmodel/L-Bar.glb"
-                        isModal={true}
-                        cameraPosition={[8, 14, 14]}
-                        cameraFov={20}
-                        customScale={1}
-                      />
-                    </div>
-                  )}
-                  
+                  {/* 영역 8: 수직바 (pae_3-1.png) - 기존 7번 */}
                   {selectedAdditionalArea === 8 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={1}
-                      scale={1}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/L-AnkerBracket.glb"
-                      isModal={true}
-                      cameraPosition={[4, 3, 8]}
-                      cameraFov={30}
-                      customScale={0.3}
-                    />
-                  </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={1}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-Bar.glb"
+                          isModal={true}
+                          cameraPosition={[8, 14, 14]}
+                          cameraFov={25}
+                          customScale={1}
+                          ambientLightIntensity={4}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 2, -0.5]}
+                          pointLightPosition={[0.5, 0.5, -0.5]}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className="absolute"
+                        style={{
+                          top: '18%',
+                          right: '5%',
+                          width: '19.5%',
+                          height: '62%'
+                        }}
+                        onClick={() => openAdditionalImageModal('pae_3-1')}
+                      >
+                      </div>
+                    </>
                   )}
                   
+                  {/* 영역 9: 스마트형 단영브라켓 (앙카브라켓) (pae_3-2.png) - 기존 8번 */}
                   {selectedAdditionalArea === 9 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={1}
-                      scale={1}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/L-HBar.glb"
-                      isModal={true}
-                      cameraPosition={[-10, 10, 20]}
-                      cameraFov={40}
-                      customScale={0.3}
-                    />
-                  </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={0.7}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-AnkerBracket.glb"
+                          isModal={true}
+                          cameraPosition={[4, 4, 8]}
+                          cameraFov={30}
+                          customScale={0.3}
+                          ambientLightIntensity={6}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 2, -0.5]}
+                          pointLightPosition={[0, 2, -0.5]}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className="absolute"
+                        style={{
+                          top: '16%',
+                          right: '1%',
+                          width: '24%',
+                          height: '67%'
+                        }}
+                        onClick={() => openAdditionalImageModal('pae_3-2')}
+                      >
+                      </div>
+                    </>
                   )}
                   
+                  {/* 영역 10: 수평바 (pae_3-3.png) - 기존 9번 */}
                   {selectedAdditionalArea === 10 && (
-                    <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
-                    <Isover3DModel 
-                      isVisible={true} 
-                      opacity={1}
-                      scale={1}
-                      position={{ x: 0, y: 0 }}
-                      animationDelay={500}
-                      modelPath="/IsoverFile/3dmodel/L-Holder.glb"
-                      isModal={true}
-                      cameraPosition={[1, 2, 2]}
-                      cameraFov={30}
-                      customScale={0.3}
-                    />
-                  </div>
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={0.7}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-HBar.glb"
+                          isModal={true}
+                          cameraPosition={[-10, 10, 20]}
+                          cameraFov={40}
+                          customScale={0.3}
+                          ambientLightIntensity={6}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 1, -0.5]}
+                          pointLightPosition={[0, 2, -0.5]}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className="absolute"
+                        style={{
+                          top: '26%',
+                          right: '2%',
+                          width: '22.5%',
+                          height: '56%'
+                        }}
+                        onClick={() => openAdditionalImageModal('pae_3-3')}
+                      >
+                      </div>
+                    </>
                   )}
-
-                  {/* 오른쪽 추가 영역 (7~10 공통) - 투명 클릭 영역 */}
-                  {(selectedAdditionalArea >= 7 && selectedAdditionalArea <= 10) && (
-                    <div 
-                      className="absolute"
-                      style={{ top: '18%', right: '5%', width: '19%', height: '60%' }}
-                      onClick={() => openAdditionalImageModal(`pae_3-${selectedAdditionalArea - 6}`)}
-                    >
-                    </div>
+                  
+                  {/* 영역 11: 수평브라켓 (pae_3-4.png) - 기존 10번 */}
+                  {selectedAdditionalArea === 11 && (
+                    <>
+                      <div className="absolute top-[8%] left-[5%] w-[25%] h-[80%]">
+                        <Isover3DModel 
+                          isVisible={true} 
+                          opacity={1}
+                          scale={1}
+                          position={{ x: 0, y: 0 }}
+                          animationDelay={500}
+                          modelPath="/IsoverFile/3dmodel/L-Holder.glb"
+                          isModal={true}
+                          cameraPosition={[1, 2, 2]}
+                          cameraFov={30}
+                          customScale={0.3}
+                          ambientLightIntensity={6}
+                          directionalLightIntensity={100}
+                          pointLightIntensity={100}
+                          directionalLightPosition={[0, 2, -0.5]}
+                          pointLightPosition={[0, 2, -0.5]}
+                        />
+                      </div>
+                      {/* 오른쪽 추가 영역 */}
+                      <div 
+                        className="absolute"
+                        style={{
+                          top: '21%',
+                          right: '5%',
+                          width: '19%',
+                          height: '64%'
+                        }}
+                        onClick={() => openAdditionalImageModal('pae_3-4')}
+                      >
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -1769,7 +1889,7 @@ function IsoverPageMobile({ onBack = null }) {
                 style={{ display: 'none' }}
               >
                 <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/pae_3-{selectedAdditionalArea - 6}.png</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/pae_3-{selectedAdditionalArea - 7}.png</p>
               </div>
             </div>
           </div>
@@ -1781,7 +1901,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closePage4Modal();
             }
@@ -1806,7 +1925,6 @@ function IsoverPageMobile({ onBack = null }) {
                 alt={`영역 ${selectedPage4Area}`}
                 className="max-w-full max-h-[75vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -1830,7 +1948,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closePage4Area2Modal();
             }
@@ -1855,7 +1972,6 @@ function IsoverPageMobile({ onBack = null }) {
                 alt="영역 2 (테스트용)"
                 className="max-w-full min-h-[40vh] max-h-[75vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -1875,11 +1991,10 @@ function IsoverPageMobile({ onBack = null }) {
       )}
 
       {/* 5페이지 모달 */}
-      {isPage5ModalOpen && (
+      {isPage5ModalOpen && selectedPage5Area && (
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closePage5Modal();
             }
@@ -1900,11 +2015,10 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 이미지 표시 */}
             <div className="flex items-center justify-center">
               <img
-                src="/IsoverFile/Popup/5-2.png"
-                alt="5페이지 2번째 영역"
+                src={isPage5ModalFromPage6 && selectedPage5Area === 2 ? '/IsoverFile/Popup/5-2.png' : `/IsoverFile/Popup/pae_new_5-${selectedPage5Area}.${selectedPage5Area <= 3 ? 'png' : 'jpg'}`}
+                alt={`5페이지 ${selectedPage5Area}번째 영역`}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // 이미지 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -1914,7 +2028,7 @@ function IsoverPageMobile({ onBack = null }) {
                 style={{ display: 'none' }}
               >
                 <p>이미지를 불러올 수 없습니다.</p>
-                <p className="text-sm">경로: /IsoverFile/Popup/5-2.png</p>
+                <p className="text-sm">경로: {isPage5ModalFromPage6 && selectedPage5Area === 2 ? '/IsoverFile/Popup/5-2.png' : `/IsoverFile/Popup/pae_new_5-${selectedPage5Area}.${selectedPage5Area <= 3 ? 'png' : 'jpg'}`}</p>
               </div>
             </div>
           </div>
@@ -1926,7 +2040,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               setIsPage53DModalOpen(false);
               setCurrentPartModel(null);
@@ -1938,14 +2051,14 @@ function IsoverPageMobile({ onBack = null }) {
           <div 
             className={`relative w-[90vw] h-[90vh] bg-white rounded-lg shadow-2xl overflow-hidden ${currentPartModel ? 'p-0' : ''}`}
             onClick={(e) => e.stopPropagation()}
-            key={`3d-modal-${modalKey}-${selectedPart}`} // 모달 새로고침을 위한 키 (파트 변경 포함)
+            key={`3d-modal-${modalKey}-${selectedPart}`}
           >
             {/* 모달 헤더 - 전체 시스템일 때만 표시 */}
             {!currentPartModel && (
               <div className="absolute top-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200 p-4">
                 <div className="flex justify-center items-center">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    5페이지 3D 모델 뷰어 - 전체 시스템
+                    6페이지 3D 모델 뷰어 - 전체 시스템
                   </h3>
                 </div>
               </div>
@@ -1959,10 +2072,9 @@ function IsoverPageMobile({ onBack = null }) {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <img
                     src={`/IsoverFile/Popup/pae_5-${selectedPart}.png`}
-                    alt={`5페이지 배경 이미지 ${selectedPart}`}
+                    alt={`6페이지 배경 이미지 ${selectedPart}`}
                     className="max-w-full max-h-full object-contain"
                     onError={(e) => {
-                      // PNG가 없으면 기본 이미지 사용
                       e.target.src = "/IsoverFile/Popup/5-2.png";
                     }}
                   />
@@ -1989,13 +2101,13 @@ function IsoverPageMobile({ onBack = null }) {
                   animationDelay={0}
                   modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel_test.glb"}
                   isModal={true}
-                  cameraPosition={currentPartModel ? [3, -2, 8] : [0, 0, 14]} // 파트 모델링과 system_with_panel 분리
-                  cameraFov={currentPartModel ? 30 : 40}
+                  cameraPosition={currentPartModel ? [3, -2, 8] : [0, 0, 14]}
+                  cameraFov={currentPartModel ? 40 : 45}
                   customScale={currentPartModel ? getModelScaleByPart(selectedPart) : 0.8}
                   rotateSpeed={1.0}
-                  showWireframe={!currentPartModel} // 파트 모델이 선택되면 박스 숨김
-                  onPartClick={handlePage5PartClick}
-                  onModelLoad={() => setIsPage53DModelLoading(false)} // 모델 로딩 완료 시 로딩 상태 해제
+                  showWireframe={!currentPartModel}
+                  onPartClick={handlePage6PartClick}
+                  onModelLoad={() => setIsPage53DModelLoading(false)}
                 />
               </div>
             </div>
@@ -2043,7 +2155,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closePage6Modal();
             }
@@ -2076,7 +2187,6 @@ function IsoverPageMobile({ onBack = null }) {
                 alt={`영역 ${selectedPage6Area} GIF`}
                 className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-lg"
                 onError={(e) => {
-                  // GIF 로드 실패 시 메시지 표시
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'block';
                 }}
@@ -2098,7 +2208,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               setShowVideo(false);
             }
@@ -2137,7 +2246,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closeImageModal();
             }
@@ -2158,21 +2266,18 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 이미지 표시 */}
             <div className="flex items-center justify-center">
               {selectedImageType === '3-4-1' ? (
-                // 3-4-1 타입일 때 두 이미지를 나란히 표시
                 <div className="flex max-w-full max-h-[85vh]">
                   <img
                     src="/IsoverFile/Popup/3-4-2-Korean.jpg"
                     alt="3-4-2 Korean 이미지"
                     className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
                     onError={(e) => {
-                        // 이미지 로드 실패 시 메시지 표시
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'block';
                     }}
                   />
                 </div>
               ) : (
-                // 다른 타입일 때는 단일 이미지 표시
                 <img
                   src={`/IsoverFile/Popup/${selectedImageType}.jpg`}
                   alt={`${selectedImageType} 이미지`}
@@ -2182,7 +2287,6 @@ function IsoverPageMobile({ onBack = null }) {
                     if (e.target.src.includes('.jpg')) {
                       e.target.src = `/IsoverFile/Popup/${selectedImageType}.png`;
                     } else {
-                      // 이미지 로드 실패 시 메시지 표시
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'block';
                     }
@@ -2249,12 +2353,56 @@ function IsoverPageMobile({ onBack = null }) {
         </div>
       )}
 
+      {/* 새로운 영역 모달창 */}
+      {isNewAreaModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              closeNewAreaModal();
+            }
+          }}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-4xl max-h-[90vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={closeNewAreaModal}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-3xl font-bold z-10 transition-colors duration-300"
+            >
+              ×
+            </button>
+
+            {/* 이미지 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src="/IsoverFile/Popup/top_3-1.png"
+                alt="무용접 파사드 시스템"
+                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>이미지를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: /IsoverFile/Popup/top_3-1.png</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 5페이지 외장재 모달창 */}
       {isPage5ExteriorModalOpen && selectedExteriorType && (
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               closePage5ExteriorModal();
             }
@@ -2274,7 +2422,6 @@ function IsoverPageMobile({ onBack = null }) {
                   alt={`외장재 타입 ${selectedExteriorType} 배경 이미지`}
                   className="max-w-full max-h-full object-contain"
                   onError={(e) => {
-                    // PNG가 없으면 기본 이미지 사용
                     e.target.src = "/IsoverFile/Popup/5-2.png";
                   }}
                 />
@@ -2291,8 +2438,8 @@ function IsoverPageMobile({ onBack = null }) {
                   modelPath={getExteriorModelPath(selectedExteriorType)}
                   isModal={true}
                   cameraPosition={[3, -2, 8]}
-                  cameraFov={50}
-                  customScale={0.8}
+                  cameraFov={40}
+                  customScale={getModelScaleByPart(selectedExteriorType - 2)}
                   rotateSpeed={1.0}
                   showWireframe={false}
                 />
@@ -2323,7 +2470,6 @@ function IsoverPageMobile({ onBack = null }) {
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={(e) => {
-            // 배경 클릭 시에만 모달 닫기 (모달 내용 클릭 시에는 닫지 않음)
             if (e.target === e.currentTarget) {
               setIs3DModalOpen(false);
             }
@@ -2367,6 +2513,142 @@ function IsoverPageMobile({ onBack = null }) {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GIF 확대 모달 */}
+      {isGifModalOpen && selectedGifSrc && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setIsGifModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-7xl max-h-[95vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={() => setIsGifModalOpen(false)}
+              className="absolute top-4 right-4 w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer z-10"
+              title="닫기"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* GIF 표시 */}
+            <div className="flex items-center justify-center">
+              <img
+                src={selectedGifSrc}
+                alt="확대된 GIF"
+                className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'block';
+                }}
+              />
+              <div
+                className="hidden text-gray-500 text-center"
+                style={{ display: 'none' }}
+              >
+                <p>GIF를 불러올 수 없습니다.</p>
+                <p className="text-sm">경로: {selectedGifSrc}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5번째 영역 이미지 슬라이더 모달 */}
+      {isArea5SliderModalOpen && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={() => setIsArea5SliderModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-7xl max-h-[95vh] overflow-auto relative shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 닫기 버튼 */}
+            <button
+              onClick={() => setIsArea5SliderModalOpen(false)}
+              className="absolute top-4 right-4 w-12 h-12 bg-red-500/95 backdrop-blur-sm text-white flex items-center justify-center hover:bg-red-600 rounded-full shadow-lg border border-red-400 transition-colors duration-300 cursor-pointer z-10"
+              title="닫기"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* 슬라이더 컨테이너 */}
+            <div className="relative flex items-center justify-center">
+              {/* 왼쪽 화살표 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setArea5SliderIndex((prev) => (prev === 0 ? area5SliderImages.length - 1 : prev - 1));
+                }}
+                className="absolute left-4 w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer z-10"
+                title="이전 이미지"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              {/* 이미지 표시 */}
+              <div className="flex items-center justify-center max-w-full max-h-[85vh]">
+                <img
+                  src={area5SliderImages[area5SliderIndex]}
+                  alt={`슬라이더 이미지 ${area5SliderIndex + 1}`}
+                  className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+                <div
+                  className="hidden text-gray-500 text-center"
+                  style={{ display: 'none' }}
+                >
+                  <p>이미지를 불러올 수 없습니다.</p>
+                  <p className="text-sm">경로: {area5SliderImages[area5SliderIndex]}</p>
+                </div>
+              </div>
+
+              {/* 오른쪽 화살표 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setArea5SliderIndex((prev) => (prev === area5SliderImages.length - 1 ? 0 : prev + 1));
+                }}
+                className="absolute right-4 w-12 h-12 bg-white/95 backdrop-blur-sm text-gray-700 flex items-center justify-center hover:text-gray-900 hover:bg-white rounded-full shadow-lg border border-gray-200 transition-colors duration-300 cursor-pointer z-10"
+                title="다음 이미지"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+
+            {/* 이미지 인디케이터 */}
+            <div className="flex justify-center gap-2 mt-4">
+              {area5SliderImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setArea5SliderIndex(index);
+                  }}
+                  className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                    index === area5SliderIndex ? 'bg-blue-500' : 'bg-gray-300'
+                  }`}
+                  title={`이미지 ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>

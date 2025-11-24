@@ -246,13 +246,14 @@ function PartBoxes({ modelPath, customScale = null, onPartClick, boxOpacity = 0.
  * 3D 모델 컴포넌트
  * GLB 파일을 로드하고 회전 애니메이션을 적용합니다.
  */
-function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null, onModelLoad = null, boxOpacity = 0.2 }) {
+function IsoverModel({ modelPath, customScale = null, showWireframe = false, onPartClick = null, onModelLoad = null, boxOpacity = 0.2, onModelCenterCalculated = null }) {
   const { scene } = useGLTF(modelPath);
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [isModelFullyLoaded, setIsModelFullyLoaded] = useState(false);
   const [actualModelLoaded, setActualModelLoaded] = useState(false);
+  const [modelCenter, setModelCenter] = useState([0, 0, 0]);
 
   // 자동 회전 애니메이션 비활성화
   // useFrame((state, delta) => {
@@ -303,9 +304,6 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
           const box = new THREE.Box3().setFromObject(scene);
           const center = box.getCenter(new THREE.Vector3());
           
-          // 중심을 원점으로 이동
-          scene.position.set(-center.x, -center.y, -center.z);
-          
           // 스케일 조정 (커스텀 스케일이 있으면 사용, 없으면 자동 계산)
           if (customScale !== null) {
             scene.scale.setScalar(customScale);
@@ -314,6 +312,47 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
             const maxSize = Math.max(size.x, size.y, size.z);
             const scale = 2 / maxSize; // 적절한 크기로 조정
             scene.scale.setScalar(scale);
+          }
+          
+          // 스케일 조정 후 다시 바운딩 박스 계산
+          const scaledBox = new THREE.Box3().setFromObject(scene);
+          const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+          
+          // 중심을 원점으로 이동 (모델 자체의 위치를 조정)
+          scene.position.set(-scaledCenter.x, -scaledCenter.y, -scaledCenter.z);
+          
+          // 최종 확인: 바운딩 박스가 원점에 있는지 확인
+          const finalBox = new THREE.Box3().setFromObject(scene);
+          const finalCenter = finalBox.getCenter(new THREE.Vector3());
+          
+          // 여전히 원점이 아니면 추가 조정
+          if (Math.abs(finalCenter.x) > 0.0001 || Math.abs(finalCenter.y) > 0.0001 || Math.abs(finalCenter.z) > 0.0001) {
+            scene.position.x -= finalCenter.x;
+            scene.position.y -= finalCenter.y;
+            scene.position.z -= finalCenter.z;
+          }
+          
+          // 최종 확인
+          const verifyBox = new THREE.Box3().setFromObject(scene);
+          const verifyCenter = verifyBox.getCenter(new THREE.Vector3());
+          
+          // 모델 중심 위치 저장 (원점으로 이동했으므로 [0, 0, 0])
+          const modelCenterPos = [0, 0, 0];
+          setModelCenter(modelCenterPos);
+          
+          // 디버그: 모델 중심 위치 확인
+          console.log('[3D] 모델 중심 위치:', {
+            model: getModelDisplayName(modelPath),
+            originalCenter: center,
+            scaledCenter: scaledCenter,
+            adjustedPosition: scene.position,
+            verifyCenter: verifyCenter,
+            finalCenter: modelCenterPos
+          });
+          
+          // 모델 중심 위치 콜백 호출
+          if (onModelCenterCalculated) {
+            onModelCenterCalculated(finalCenter);
           }
           
           setActualModelLoaded(true);
@@ -337,7 +376,7 @@ function IsoverModel({ modelPath, customScale = null, showWireframe = false, onP
   }, [scene, customScale, isInitialized, onModelLoad, modelPath]);
 
   return (
-    <group>
+    <group position={[0, 0, 0]}>
       <primitive
         ref={meshRef}
         object={scene}
@@ -397,7 +436,13 @@ function Isover3DModel({
   showWireframe = false,
   onPartClick = null,
   onModelLoad = null,
-  boxOpacity = 0.2
+  boxOpacity = 0.2,
+  ambientLightIntensity = 3,
+  directionalLightIntensity = 2,
+  pointLightIntensity = 1.6,
+  directionalLightPosition = [-3, 0, 6],
+  pointLightPosition = [-3, 0, 6],
+  backgroundColor = null
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -406,6 +451,7 @@ function Isover3DModel({
   const [animationPosition, setAnimationPosition] = useState({ x: 0, y: 0 });
   const [loadingTimeout, setLoadingTimeout] = useState(null);
   const [actualModelLoaded, setActualModelLoaded] = useState(false);
+  const [modelCenter, setModelCenter] = useState([0, 0, 0]);
 
   // 로더 진행률 (drei)
   const { active, progress, errors, item, loaded, total } = useProgress();
@@ -465,6 +511,7 @@ function Isover3DModel({
     setIsLoading(true);
     setHasError(false);
     setActualModelLoaded(false);
+    setModelCenter([0, 0, 0]); // 모델 중심 초기화
   }, [modelPath]);
 
   // 애니메이션 효과
@@ -577,14 +624,18 @@ function Isover3DModel({
               style={{ 
                 width: '100%', 
                 height: '100%',
-                cursor: 'default'
+                cursor: 'default',
+                backgroundColor: backgroundColor || 'transparent'
               }}
+              gl={{ alpha: backgroundColor ? false : true }}
             >
               <Suspense fallback={null}>
+                {/* 배경색 설정 */}
+                {backgroundColor && <color attach="background" args={[backgroundColor]} />}
                 {/* 조명 설정 - HDRI 대신 기본 조명 사용 */}
-                <ambientLight intensity={3} />
-                <directionalLight position={[-3, 0, 6]} intensity={2} />
-                <pointLight position={[-3, 0, 6]} intensity={1.6} />
+                <ambientLight intensity={ambientLightIntensity} />
+                <directionalLight position={directionalLightPosition} intensity={directionalLightIntensity} />
+                <pointLight position={pointLightPosition} intensity={pointLightIntensity} />
 
                 
                 
@@ -595,13 +646,14 @@ function Isover3DModel({
                   showWireframe={showWireframe} 
                   onPartClick={onPartClick} 
                   onModelLoad={handleLoad}
-                  boxOpacity={boxOpacity} 
+                  boxOpacity={boxOpacity}
+                  onModelCenterCalculated={setModelCenter}
                 />
                 
                 {/* 환경 설정 - HDRI 로딩 오류 방지를 위해 제거 */}
                 {/* <Environment preset="studio" /> */}
                 
-                {/* 오빗 컨트롤 - 모델링 중심(0,0,0) 기준 회전 */}
+                {/* 오빗 컨트롤 - 모델링 중심 기준 회전 */}
                 <OrbitControls
                   enablePan={false}
                   enableZoom={true}
@@ -609,7 +661,7 @@ function Isover3DModel({
                   autoRotate={false}
                   maxPolarAngle={Math.PI}
                   minPolarAngle={0}
-                  target={[0, 0, 0]}
+                  target={modelCenter}
                   enableDamping={true}
                   dampingFactor={0.05}
                   minDistance={4}
