@@ -103,7 +103,7 @@ function IsoverPageMobile({ onBack = null }) {
 
 
 
-  // Isover 페이지별 이미지 데이터 (7페이지)
+  // Isover 페이지별 이미지 데이터 (9페이지)
   const pageImages = [
     {
       id: 0,
@@ -132,19 +132,31 @@ function IsoverPageMobile({ onBack = null }) {
     {
       id: 4,
       name: "페이지 4",
-      backgroundImage: "/IsoverFile/IsoverPage/page_5.svg",
+      backgroundImage: "/IsoverFile/IsoverPage/page_5.svg", // 새로운 5페이지
       overlays: []
     },
     {
       id: 5,
       name: "페이지 5",
-      backgroundImage: "/IsoverFile/IsoverPage/page_6.svg",
+      backgroundImage: "/IsoverFile/IsoverPage/page_6.svg", // 기존 5페이지 → 6페이지
       overlays: []
     },
     {
       id: 6,
       name: "페이지 6",
-      backgroundImage: "/IsoverFile/IsoverPage/page_7.svg",
+      backgroundImage: "/IsoverFile/IsoverPage/page_7.svg", // 기존 6페이지 → 7페이지
+      overlays: []
+    },
+    {
+      id: 7,
+      name: "페이지 7",
+      backgroundImage: "/IsoverFile/IsoverPage/page_8.svg", // 기존 7페이지 → 8페이지
+      overlays: []
+    },
+    {
+      id: 8,
+      name: "페이지 8",
+      backgroundImage: "/IsoverFile/IsoverPage/page_9.svg", // 새로운 9페이지
       overlays: []
     }
   ];
@@ -399,16 +411,16 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   const handleArea3Click = () => {
-    // 3번 영역: 5번 페이지로 스크롤 (1페이지 건너뛰기)
-    const targetPage = document.querySelector('[data-page-index="4"]');
+    // 3번 영역: 6번 페이지로 스크롤 (1페이지 건너뛰기)
+    const targetPage = document.querySelector('[data-page-index="5"]');
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   const handleArea4Click = () => {
-    // 4번 영역: 6번 페이지로 스크롤 (2페이지 건너뛰기)
-    const targetPage = document.querySelector('[data-page-index="5"]');
+    // 4번 영역: 7번 페이지로 스크롤 (2페이지 건너뛰기)
+    const targetPage = document.querySelector('[data-page-index="6"]');
     if (targetPage) {
       targetPage.scrollIntoView({ behavior: 'smooth' });
     }
@@ -424,8 +436,8 @@ function IsoverPageMobile({ onBack = null }) {
    */
   const handle3PageAreaClick = (areaNumber) => {
     if (areaNumber === 1) {
-      // 첫번째 영역: 5페이지로 바로 이동
-      const targetPage = document.querySelector('[data-page-index="4"]');
+      // 첫번째 영역: 6페이지로 바로 이동
+      const targetPage = document.querySelector('[data-page-index="5"]');
       if (targetPage) {
         targetPage.scrollIntoView({ behavior: 'smooth' });
       }
@@ -441,20 +453,20 @@ function IsoverPageMobile({ onBack = null }) {
   };
 
   /**
-   * 5페이지로 이동하는 핸들러
+   * 6페이지로 이동하는 핸들러 (기존 5페이지)
    */
-  const handleGoToPage5 = () => {
-    console.log('🚀 handleGoToPage5 호출됨 - 5페이지로 이동 시작');
+  const handleGoToPage6 = () => {
+    console.log('🚀 handleGoToPage6 호출됨 - 6페이지로 이동 시작');
     // 모달 닫기
     closeModal();
     console.log('🚀 모달 닫기 완료');
-    // 5페이지로 스크롤 이동 (페이지 인덱스는 0부터 시작하므로 4)
-    const targetPage = document.querySelector('[data-page-index="4"]');
+    // 6페이지로 스크롤 이동 (페이지 인덱스는 0부터 시작하므로 5)
+    const targetPage = document.querySelector('[data-page-index="5"]');
     if (targetPage) {
-      console.log('🚀 5페이지 요소 찾음, 스크롤 이동 시작');
+      console.log('🚀 6페이지 요소 찾음, 스크롤 이동 시작');
       targetPage.scrollIntoView({ behavior: 'smooth' });
     } else {
-      console.log('🚀 5페이지 요소를 찾을 수 없음');
+      console.log('🚀 6페이지 요소를 찾을 수 없음');
     }
   };
 
@@ -1131,10 +1143,17 @@ function IsoverPageMobile({ onBack = null }) {
                       </>
                     )}
 
-                    {/* 5번째 페이지 클릭 영역들 */}
+                    {/* 5번째 페이지 클릭 영역들 (새로운 페이지 - 아직 클릭 영역 없음) */}
                     {index === 4 && (
                       <>
-                        {/* 5페이지 영역 2개 배치 */}
+                        {/* 새로운 5페이지 - 추후 클릭 영역 추가 예정 */}
+                      </>
+                    )}
+
+                    {/* 6번째 페이지 클릭 영역들 (기존 5페이지 - 3D 모델) */}
+                    {index === 5 && (
+                      <>
+                        {/* 6페이지 영역 2개 배치 */}
                         <div 
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
@@ -1225,10 +1244,10 @@ function IsoverPageMobile({ onBack = null }) {
                       </>
                     )}
 
-                    {/* 6번째 페이지 클릭 영역들 */}
-                    {index === 5 && (
+                    {/* 7번째 페이지 클릭 영역들 (기존 6페이지 - GIF 모달) */}
+                    {index === 6 && (
                       <>
-                        {/* 6페이지 영역 6개 배치 */}
+                        {/* 7페이지 영역 6개 배치 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 rounded-lg"
                           style={{
@@ -1307,7 +1326,7 @@ function IsoverPageMobile({ onBack = null }) {
                         >
                         </div>
                         
-                        {/* 6페이지 마지막 영역 (유튜브 링크) */}
+                        {/* 7페이지 마지막 영역 (유튜브 링크) */}
                         <div 
                           className={`absolute cursor-pointer transition-all duration-300 rounded-lg ${(isModalOpen || isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
                           style={{
@@ -1324,10 +1343,10 @@ function IsoverPageMobile({ onBack = null }) {
                       </>
                     )}
 
-                    {/* 7번째 페이지 클릭 영역들 */}
-                    {index === 6 && (
+                    {/* 8번째 페이지 클릭 영역들 (기존 7페이지 - 영상) */}
+                    {index === 7 && (
                       <>
-                        {/* 7페이지 영역 3개 배치 */}
+                        {/* 8페이지 영역 3개 배치 */}
                         {/* 1. 큰 영역 (중앙) - 영상 배치용 */}
                         <div 
                           className="absolute cursor-pointer transition-all duration-300 hover:scale-103 rounded-lg"
@@ -1386,6 +1405,13 @@ function IsoverPageMobile({ onBack = null }) {
                           onClick={() => handlePage7AreaClick(3)}
                         >
                         </div>
+                      </>
+                    )}
+
+                    {/* 9번째 페이지 클릭 영역들 (새로운 페이지) */}
+                    {index === 8 && (
+                      <>
+                        {/* 새로운 9페이지 - 추후 클릭 영역 추가 예정 */}
                       </>
                     )}
 
@@ -1585,7 +1611,7 @@ function IsoverPageMobile({ onBack = null }) {
                 </div>
               )}
               
-              {/* 5페이지로 이동하는 클릭 영역 - 첫 번째 영역에서만 표시 */}
+              {/* 6페이지로 이동하는 클릭 영역 - 첫 번째 영역에서만 표시 */}
               {selectedArea === 1 && (
                 <div
                   className={`absolute cursor-pointer transition-all duration-300 hover:scale-105 hover:border-2 hover:border-[#FEDB66] rounded-lg ${(isAdditionalModalOpen || isPage4ModalOpen || isPage4Area2ModalOpen || isPage5ModalOpen || isPage53DModalOpen || isPage6ModalOpen || is3DModalOpen || isImageModalOpen || isPage5ExteriorModalOpen || showVideo) ? 'pointer-events-none' : ''}`}
@@ -1597,12 +1623,12 @@ function IsoverPageMobile({ onBack = null }) {
                     zIndex: 1
                   }}
                   onClick={(e) => {
-                    console.log('🚀 5페이지로 이동하는 영역 클릭됨 (1번 영역)');
+                    console.log('🚀 6페이지로 이동하는 영역 클릭됨 (1번 영역)');
                     console.log('🚀 이벤트 타겟:', e.target);
                     console.log('🚀 이벤트 currentTarget:', e.currentTarget);
-                    handleGoToPage5();
+                    handleGoToPage6();
                   }}
-                  title="5페이지로 이동"
+                  title="6페이지로 이동"
                 >
                 </div>
               )}
