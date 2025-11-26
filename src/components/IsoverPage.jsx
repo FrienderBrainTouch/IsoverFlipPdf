@@ -240,7 +240,7 @@ function IsoverPage({ onBack = null }) {
   };
 
   const handlePrintClick = () => {
-    const pdfUrl = '/IsoverFile/func-pdf/무용접파사드시스템 카다로그.pdf';
+    const pdfUrl = '/IsoverFile/func-pdf/무용접파사드시스템.pdf';
     const pdfWindow = window.open(pdfUrl, '_blank');
     if (pdfWindow) {
       pdfWindow.onload = () => {
@@ -251,8 +251,8 @@ function IsoverPage({ onBack = null }) {
 
   const handleDownloadClick = () => {
     const link = document.createElement('a');
-    link.href = '/IsoverFile/func-pdf/무용접파사드시스템 카다로그.pdf';
-    link.download = '무용접파사드시스템 카다로그.pdf';
+    link.href = '/IsoverFile/func-pdf/무용접파사드시스템.pdf';
+    link.download = '무용접파사드시스템.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -2580,16 +2580,64 @@ function IsoverPage({ onBack = null }) {
                 </div>
               )}
               
+              {/* 3번째 영역에 GIF 2개 배치 - 왼쪽 하단 가로로 나란히 */}
+              {selectedArea === 3 && (
+                <div 
+                  className="absolute"
+                  style={{
+                    bottom: '14%',
+                    left: '3%',
+                    width: '67%',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '4%',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <img
+                    src="/IsoverFile/Interacive/gif-file/1126_2.gif"
+                    alt="1126_2 GIF"
+                    className={`w-[42%] h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1126_2' ? 'border-2 border-yellow-500' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1126_2.gif");
+                      setIsGifModalOpen(true);
+                    }}
+                    onMouseEnter={() => setHoveredGif('1126_2')}
+                    onMouseLeave={() => setHoveredGif(null)}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <img
+                    src="/IsoverFile/Interacive/gif-file/1126_1.gif"
+                    alt="1126_1 GIF"
+                    className={`w-[42%] h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1126_1' ? 'border-2 border-yellow-500' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1126_1.gif");
+                      setIsGifModalOpen(true);
+                    }}
+                    onMouseEnter={() => setHoveredGif('1126_1')}
+                    onMouseLeave={() => setHoveredGif(null)}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
+              
               {/* 6번째 영역에 추가 영역 배치 */}
               {selectedArea === 6 && (
                 <>
                   <div 
                     className={`absolute cursor-pointer rounded-lg ${hoveredModalArea === '3-6-1' ? 'border-2 border-yellow-500' : ''}`}
                     style={{
-                      bottom: '6%',
-                      left: '26.5%',
-                      width: '23.5%',
-                      height: '48%'
+                      top: '10%',
+                      right: '6.5%',
+                      width: '22.5%',
+                      height: '44%'
                     }}
                     onClick={() => openImageModal('3-6-1')}
                     onMouseEnter={() => setHoveredModalArea('3-6-1')}
@@ -2597,23 +2645,25 @@ function IsoverPage({ onBack = null }) {
                     title="3-6-1 이미지 보기"
                   >
                   </div>
-                  {/* GIF 2개 배치 - 클릭 영역 옆 */}
+                  {/* GIF 3개 배치 - 가로로 하단에 나란히 */}
                   <div 
                     className="absolute"
                     style={{
-                      bottom: '7%',
-                      right: '25%',
-                      width: '23.5%',
+                      bottom: '1%',
+                      right: '2%',
+                      width: '97%',
                       height: '46%',
                       display: 'flex',
-                      flexDirection: 'column',
-                      gap: '4%'
+                      flexDirection: 'row',
+                      gap: '2%',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}
                   >
                     <img
                       src="/IsoverFile/Interacive/gif-file/1124_1.gif"
                       alt="1124_1 GIF"
-                      className={`w-full h-[48%] rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_1' ? 'border-2 border-yellow-500' : ''}`}
+                      className={`w-[32%] h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_1' ? 'border-2 border-yellow-500' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1124_1.gif");
@@ -2626,9 +2676,24 @@ function IsoverPage({ onBack = null }) {
                       }}
                     />
                     <img
+                      src="/IsoverFile/Interacive/gif-file/1126_1.gif"
+                      alt="1126_1 GIF"
+                      className={`w-[32%] h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1126_1' ? 'border-2 border-yellow-500' : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1126_1.gif");
+                        setIsGifModalOpen(true);
+                      }}
+                      onMouseEnter={() => setHoveredGif('1126_1')}
+                      onMouseLeave={() => setHoveredGif(null)}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    <img
                       src="/IsoverFile/Interacive/gif-file/1124_2.gif"
                       alt="1124_2 GIF"
-                      className={`w-full h-[48%] rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_2' ? 'border-2 border-yellow-500' : ''}`}
+                      className={`w-[32%] h-auto rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity ${hoveredGif === '1124_2' ? 'border-2 border-yellow-500' : ''}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setSelectedGifSrc("/IsoverFile/Interacive/gif-file/1124_2.gif");
