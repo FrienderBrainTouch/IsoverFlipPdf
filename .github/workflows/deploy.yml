@@ -47,9 +47,37 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-            rm -rf ${{ secrets.DEPLOY_PATH }}/*
-            tar -xzf /tmp/dist.tar.gz -C ${{ secrets.DEPLOY_PATH }}
+            # ========================================================
+            # ✅ 안전한 배포 설정 (경로 하드코딩)
+            # 서버의 실제 배포 경로로 아래 값을 수정하세요.
+            # 보통 /var/www/html 또는 /var/www/프로젝트명 입니다.
+            # ========================================================
+            DEPLOY_DIR="/var/www/isover"
+
+            # 🚨 안전장치 1: 경로 변수가 비어있으면 즉시 중단 (rm -rf / 방지)
+            if [ -z "$DEPLOY_DIR" ]; then
+              echo "❌ Error: DEPLOY_DIR is empty! Script aborted."
+              exit 1
+            fi
+
+            echo "🚀 Starting deployment to: $DEPLOY_DIR"
+
+            # 1. 배포 폴더가 없으면 생성 (에러 방지)
+            sudo mkdir -p "$DEPLOY_DIR"
+
+            # 2. 기존 파일 삭제 (따옴표 필수, 변수 사용으로 안전 확보)
+            sudo rm -rf "$DEPLOY_DIR"/*
+
+            # 3. 압축 해제
+            sudo tar -xzf /tmp/dist.tar.gz -C "$DEPLOY_DIR"
+
+            # 4. 임시 파일 정리
             rm /tmp/dist.tar.gz
-            sudo chown -R www-data:www-data ${{ secrets.DEPLOY_PATH }}
+
+            # 5. 권한 설정 (Nginx 기본 사용자인 www-data로 소유권 변경)
+            sudo chown -R www-data:www-data "$DEPLOY_DIR"
+
+            # 6. Nginx 설정 리로드
             sudo systemctl reload nginx
+
             echo "✅ Deployed successfully!"
