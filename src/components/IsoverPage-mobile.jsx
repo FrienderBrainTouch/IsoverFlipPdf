@@ -72,6 +72,9 @@ function IsoverPageMobile({ onBack = null }) {
   const [playingVideo, setPlayingVideo] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
 
+  // 화면 크기 추적 상태
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1920);
+
   const animationRef = useRef(null);
 
   const startImageAnimation = () => {
@@ -159,6 +162,16 @@ function IsoverPageMobile({ onBack = null }) {
       };
     }
   }, [showFrontGif]);
+
+  // 화면 크기 변경 감지
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const startTransition = React.useCallback(() => {
     setWhiteScreenVisible(false);
@@ -2168,7 +2181,21 @@ function IsoverPageMobile({ onBack = null }) {
                   modelPath={currentPartModel || "/IsoverFile/3dmodel/system_with_panel_test.glb"}
                   isModal={true}
                   cameraPosition={currentPartModel ? [3, -2, 8] : [0, 0, 14]}
-                  cameraFov={currentPartModel ? 40 : 45}
+                  cameraFov={
+                    windowWidth <= 300
+                      ? (currentPartModel ? 60 : 65)
+                      : windowWidth <= 500
+                      ? (currentPartModel ? 80 : 85)
+                      : windowWidth <= 600
+                      ? (currentPartModel ? 70 : 75)
+                      : windowWidth <= 700
+                      ? (currentPartModel ? 60 : 65)
+                      : windowWidth <= 800
+                      ? (currentPartModel ? 50 : 55)
+                      : windowWidth <= 900
+                      ? (currentPartModel ? 45 : 50)
+                      : (currentPartModel ? 40 : 45)
+                  }
                   customScale={currentPartModel ? getModelScaleByPart(selectedPart) : 0.8}
                   rotateSpeed={1.0}
                   showWireframe={!currentPartModel}
@@ -2181,7 +2208,7 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 모달 하단 컨트롤 */}
             <div className="absolute bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">마우스로 회전, 휠로 확대/축소 가능</p>
+                <p className="text-sm text-gray-600 mb-2">터치로 드래그하여 회전, 핀치로 확대/축소 가능</p>
                 {currentPartModel && (
                   <p className="text-sm text-blue-600 mb-2">선택된 파트: {getPartName(selectedPart)}</p>
                 )}
@@ -2464,7 +2491,7 @@ function IsoverPageMobile({ onBack = null }) {
         </div>
       )}
 
-      {/* 5페이지 외장재 모달창 */}
+      {/* 6페이지 외장재 모달창 */}
       {isPage5ExteriorModalOpen && selectedExteriorType && (
         <div 
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
@@ -2504,7 +2531,21 @@ function IsoverPageMobile({ onBack = null }) {
                   modelPath={getExteriorModelPath(selectedExteriorType)}
                   isModal={true}
                   cameraPosition={[3, -2, 8]}
-                  cameraFov={40}
+                  cameraFov={
+                    windowWidth <= 300
+                      ? 65
+                      : windowWidth <= 500
+                      ? 85
+                      : windowWidth <= 600
+                      ? 75
+                      : windowWidth <= 700
+                      ? 65
+                      : windowWidth <= 800
+                      ? 55
+                      : windowWidth <= 900
+                      ? 50
+                      : 40
+                  }
                   customScale={getModelScaleByPart(selectedExteriorType - 2)}
                   rotateSpeed={1.0}
                   showWireframe={false}
@@ -2515,7 +2556,7 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 모달 하단 컨트롤 */}
             <div className="absolute bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">마우스로 회전, 휠로 확대/축소 가능</p>
+                <p className="text-sm text-gray-600 mb-2">터치로 드래그하여 회전, 핀치로 확대/축소 가능</p>
                 <p className="text-sm text-blue-600 mb-2">외장재 타입: {getExteriorTypeName(selectedExteriorType)}</p>
                 <div className="flex justify-center space-x-4">
                   <button
@@ -2569,7 +2610,7 @@ function IsoverPageMobile({ onBack = null }) {
             {/* 모달 하단 컨트롤 */}
             <div className="absolute bottom-0 left-0 right-0 z-10 bg-white/90 backdrop-blur-sm border-t border-gray-200 p-4">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">마우스로 회전, 휠로 확대/축소 가능</p>
+                <p className="text-sm text-gray-600 mb-2">터치로 드래그하여 회전, 핀치로 확대/축소 가능</p>
                 <div className="flex justify-center space-x-4">
                   <button
                     onClick={() => setIs3DModalOpen(false)}
