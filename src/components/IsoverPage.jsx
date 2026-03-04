@@ -240,7 +240,7 @@ function IsoverPage({ onBack = null }) {
   };
 
   const handlePrintClick = () => {
-    const pdfUrl = '/IsoverFile/func-pdf/무용접파사드시스템.pdf';
+    const pdfUrl = '/IsoverFile/func-pdf/이소바&유창_무용접파사드시스템_카다로그.pdf';
     const pdfWindow = window.open(pdfUrl, '_blank');
     if (pdfWindow) {
       pdfWindow.onload = () => {
@@ -251,8 +251,8 @@ function IsoverPage({ onBack = null }) {
 
   const handleDownloadClick = () => {
     const link = document.createElement('a');
-    link.href = '/IsoverFile/func-pdf/무용접파사드시스템.pdf';
-    link.download = '무용접파사드시스템.pdf';
+    link.href = '/IsoverFile/func-pdf/이소바&유창_무용접파사드시스템_카다로그.pdf';
+    link.download = '이소바&유창_무용접파사드시스템_카다로그.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
