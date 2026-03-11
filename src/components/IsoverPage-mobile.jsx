@@ -645,8 +645,8 @@ function IsoverPageMobile({ onBack = null }) {
       {/* 본 화면 */}
       {mainScreenVisible && (
         <div className="w-full h-full relative bg-white flex flex-col">
-          {/* 스크롤 컨테이너 - Book.jsx 방식 적용 */}
-          <div className="flex-1 overflow-y-auto pb-20">
+          {/* 스크롤 컨테이너 - 상단 고정 탭 높이만큼 여백 확보 */}
+          <div className="flex-1 overflow-y-auto pt-10">
             {/* 페이지들을 세로로 배치 */}
             <div className="w-full space-y-0">
               {pageImages.map((page, index) => (
@@ -1436,8 +1436,11 @@ function IsoverPageMobile({ onBack = null }) {
             </div>
           </div>
 
-          {/* 하단 기능 탭 - 가로 배치 */}
-          <div className="absolute bottom-0 left-0 right-0 z-40 bg-gray-800 p-3">
+          {/* 상단 기능 탭 - 가로 배치 (고정) */}
+          <div
+            className="fixed top-0 left-0 right-0 z-40 bg-gray-800"
+            style={{ paddingTop: "calc(env(safe-area-inset-top, 0px) + 0px)" }}
+          >
             <div className="flex justify-center items-center gap-4">
               {/* 홈(Isover) 버튼 */}
               <button
