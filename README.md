@@ -1,236 +1,235 @@
-# IsoverPage 프로젝트
+# IsoverFlipPdf
 
-## 📋 프로젝트 개요
+React 기반 인터랙티브 디지털 카탈로그 웹 애플리케이션입니다. **생고방 이소바 코리아(Isover)** 무용접 파사드 시스템 카탈로그를 기본 화면으로 제공하고, VQ Studio·Friender 등 다른 브랜드 카탈로그와 랜딩 페이지를 URL 경로로 전환할 수 있습니다.
 
-IsoverPage는 **생고방이소바코리아(Isover)**의 인터랙티브 디지털 카탈로그 프로젝트입니다. React 기반으로 구현된 플립북 형태의 카탈로그로, 데스크톱과 모바일 환경을 모두 지원하며 3D 모델 뷰어 기능을 포함합니다.
+## 프로젝트 개요
 
-## 🎯 주요 기능
+| 항목 | 내용 |
+|------|------|
+| 패키지명 | `react-book` |
+| 빌드 도구 | Vite 6 |
+| 런타임 | Node.js 18 |
+| 기본 진입 | `/isover` (Isover 카탈로그) |
 
-### 📱 반응형 디자인
-- **데스크톱**: `IsoverPage.jsx` - 플립북 형태의 인터랙티브 카탈로그
-- **모바일**: `IsoverPage-mobile.jsx` - 스크롤 기반 모바일 최적화 버전
-- 화면 크기 1025px 기준으로 자동 전환
+플립북(`react-pageflip`), 3D 모델 뷰어(Three.js), Dialogflow 챗봇, PDF 다운로드·인쇄 기능을 하나의 SPA에서 제공합니다.
 
-### 📖 플립북 기능
-- **7페이지 구성**: 표지 + 6개 내부 페이지
-- **페이지 네비게이션**: 좌우 화살표, 첫/마지막 페이지 이동
-- **터치/마우스 제스처**: 페이지 넘기기 지원
-- **인터랙티브 영역**: 각 페이지별 클릭 가능한 영역
+## 주요 기능
 
-### 🎨 3D 모델 뷰어
-- **Three.js 기반**: `@react-three/fiber`, `@react-three/drei` 사용
-- **GLB 파일 지원**: Draco 압축 모델 자동 로드
-- **파트별 모델**: 4가지 시스템 파트 개별 뷰어
-- **모달 뷰어**: 확대된 3D 모델 상호작용
+### Isover 카탈로그 (기본)
 
-## 🏗️ 프로젝트 구조
+- **9페이지** 플립북: 표지 + 8개 내부 페이지 (`page_1_Front` ~ `page_9`)
+- **반응형**: 1025px 미만 → `IsoverPage-mobile.jsx` (스크롤 UI), 이상 → `IsoverPage.jsx` (플립북)
+- **인터랙티브 핫스팟**: 페이지별 클릭·호버 영역, 모달, 이미지 슬라이더
+- **3D 모델**: GLB + Draco 압축, 파트별 뷰어(파이버시멘트보드, AL 복합판넬 등)
+- **미디어**: GIF 애니메이션, Video.js 비디오, 유튜브·외부 PDF 링크
+- **PDF**: 원본 카탈로그 다운로드 및 인쇄 (`public/IsoverFile/func-pdf/`)
 
-### 핵심 컴포넌트
+### VQ Studio
 
-#### 1. IsoverPage.jsx (데스크톱 버전)
-```javascript
-// 주요 기능
-- HTMLFlipBook을 사용한 플립북 구현
-- 반응형 플립북 크기 계산 (화면의 40% 너비, 최소 400px, 최대 600px)
-- 인트로 애니메이션 (로고 페이드인 → 흰 화면 전환)
-- 7개 페이지의 인터랙티브 영역 관리
-- 3D 모델 모달 뷰어
-```
+| 경로 | 컴포넌트 | 설명 |
+|------|----------|------|
+| `/` 또는 `/vq-main` | `VQMainPage` | VQ Studio 메인 랜딩 |
+| `/catalog` | `IntroScreen` | VQ 인터랙티브 카탈로그 + 챗봇 |
+| `/company` | `CompanyPage` | 회사 소개 |
+| `/contact` | `ContactPage` | 문의 폼 |
+| `/portfolio` | `PortfolioPage` | 포트폴리오 |
+| `/vq` | `VQBook` | VQ 플립북 카탈로그 |
 
-#### 2. IsoverPage-mobile.jsx (모바일 버전)
-```javascript
-// 주요 기능
-- 스크롤 기반 페이지 네비게이션
-- 모바일 최적화된 터치 인터랙션
-- 동일한 7개 페이지 콘텐츠
-- 모바일 전용 UI/UX 최적화
-```
+### Friender
 
-#### 3. Isover3DModel.jsx (3D 모델 뷰어)
-```javascript
-// 주요 기능
-- Three.js 기반 3D 렌더링
-- GLB 모델 로딩 및 표시
-- 파트별 하이라이트 박스 (클릭 가능한 영역)
-- 오빗 컨트롤 (회전, 확대/축소, 팬)
-- 로딩 상태 및 에러 처리
-```
+| 경로 | 컴포넌트 | 설명 |
+|------|----------|------|
+| `/friender` | `Book` | Friender 플립북 카탈로그 |
 
-#### 4. App.jsx (라우팅)
-```javascript
-// 주요 기능
-- URL 기반 라우팅 시스템
-- IsoverPage를 기본 페이지로 설정
-- 다른 프로젝트 페이지들과의 통합
-```
+### 공통
 
-## 📄 페이지 구성
+- **챗봇**: Google Dialogflow Messenger (`Chatbot.jsx`, `useDfMessenger.js`)
+- **3D 뷰어**: `Model3D.jsx` (Friender/VQ), `Isover3DModel.jsx` (Isover)
+- **독립 HTML**: `flipbook.html` — React 앱 외부의 PDF 플립북 뷰어
 
-### 표지 페이지 (1페이지)
-- **인트로 애니메이션**: Isover 로고 페이드인
-- **front.gif**: 4초간 재생 후 SVG 배경으로 전환
-- **3D 모델**: 시스템 전체 모델 표시 (선택적)
-
-### 목차 페이지 (2페이지)
-- **5개 인터랙티브 영역**: 각각 다른 페이지로 직접 이동
-- **유튜브 링크**: 생고방이소바코리아 채널 연결
-
-### 상세 페이지 (3-7페이지)
-- **3페이지**: 10개 영역 (6개 기본 + 4개 추가)
-- **4페이지**: 4개 영역 (각각 상세 정보 모달)
-- **5페이지**: 2개 영역 (3D 모델 뷰어 + 상세 정보)
-- **6페이지**: 6개 영역 (GIF 애니메이션 호버 효과)
-- **7페이지**: 4개 영역 (영상 재생 + 외부 링크)
-
-## 🎮 인터랙션 기능
-
-### 페이지 네비게이션
-- **화살표 버튼**: 이전/다음 페이지
-- **첫/마지막 버튼**: 빠른 이동
-- **터치 영역**: 페이지 좌우 가장자리 터치로 페이지 전환
-
-### 모달 시스템
-- **3페이지 모달**: 6개 기본 영역 + 4개 추가 영역
-- **4페이지 모달**: 각 영역별 상세 정보
-- **5페이지 3D 모달**: 파트별 3D 모델 뷰어
-- **6페이지 GIF 모달**: 시공 과정 애니메이션
-
-### 3D 모델 상호작용
-- **파트 선택**: 4가지 시스템 파트 (파이버시멘트보드, AL 복합판넬, AL 시트판넬, 조적판넬)
-- **하이라이트 박스**: 클릭 가능한 영역 시각화
-- **모달 뷰어**: 확대된 3D 모델 조작
-
-## 🛠️ 기술 스택
+## 기술 스택
 
 ### 프론트엔드
-- **React 19.0.0**: 메인 프레임워크
-- **Vite**: 빌드 도구
-- **Tailwind CSS**: 스타일링
 
-### 3D 렌더링
-- **Three.js 0.180.0**: 3D 그래픽 라이브러리
-- **@react-three/fiber 9.3.0**: React Three.js 바인딩
-- **@react-three/drei 10.7.6**: Three.js 유틸리티
+- React 19, React DOM 19
+- Vite 6, @vitejs/plugin-react
+- Tailwind CSS 4 (@tailwindcss/vite, @tailwindcss/postcss)
+- react-router-dom 7
 
-### 플립북
-- **react-pageflip 2.0.3**: 플립북 컴포넌트
+### 플립북·3D·미디어
 
-### 기타
-- **Lucide React**: 아이콘
-- **Video.js**: 비디오 플레이어
+- react-pageflip 2.0.3
+- Three.js 0.160, @react-three/fiber 9, @react-three/drei 10
+- video.js 8
+- lucide-react
 
-## 📁 파일 구조
+### 챗봇
+
+- Google Dialogflow Messenger (df-messenger 웹 컴포넌트, CDN 로드)
+
+### 개발 도구
+
+- ESLint 9, eslint-plugin-react-hooks
+
+## 프로젝트 구조
 
 ```
-src/
-├── components/
-│   ├── IsoverPage.jsx          # 데스크톱 메인 페이지
-│   ├── IsoverPage-mobile.jsx   # 모바일 메인 페이지
-│   ├── Isover3DModel.jsx       # 3D 모델 뷰어
-│   └── App.jsx                 # 라우팅 및 앱 진입점
-
-public/
-├── IsoverFile/
-│   ├── IsoverPage/             # 페이지 이미지 (SVG)
-│   ├── 3dmodel/                # 3D 모델 파일 (GLB)
-│   ├── Interacive/             # 인터랙티브 요소
-│   │   ├── gif-file/           # GIF 애니메이션
-│   │   └── video/              # 비디오 파일
-│   └── Popup/                  # 모달용 이미지
+IsoverFlipPdf/
+├── index.html              # React 앱 엔트리 (Google Analytics 포함)
+├── flipbook.html           # 독립 PDF 플립북 뷰어
+├── vite.config.js
+├── netlify.toml            # Netlify 배포 설정
+├── .github/workflows/
+│   └── deploy.yml          # main 브랜치 → VPS 자동 배포
+├── pdf_flipbook_spec.md    # PDF 플립북 기능 기획서 (향후 개발)
+├── traffic_calculation.md  # Isover 페이지 리소스·트래픽 산출
+│
+├── public/
+│   ├── IsoverFile/         # Isover 에셋
+│   │   ├── IsoverPage/     # 페이지 SVG·이미지
+│   │   ├── 3dmodel/        # GLB 3D 모델
+│   │   ├── Interacive/     # 화살표 아이콘, GIF, 비디오
+│   │   ├── Popup/          # 모달용 이미지
+│   │   └── func-pdf/       # 원본 PDF 카탈로그
+│   ├── func-file/          # Friender·VQ PDF 등 (배포 시 포함)
+│   └── interacivefile/     # VQ Studio 에셋
+│
+└── src/
+    ├── main.jsx
+    ├── App.jsx             # URL 기반 화면 분기
+    ├── index.css
+    ├── hooks/
+    │   └── useDfMessenger.js
+    └── components/
+        ├── IsoverPage.jsx          # Isover 데스크톱 플립북
+        ├── IsoverPage-mobile.jsx   # Isover 모바일
+        ├── Isover3DModel.jsx       # Isover 3D 뷰어
+        ├── VQMainPage.jsx          # VQ 메인
+        ├── IntroScreen.jsx         # VQ 카탈로그 (데스크톱)
+        ├── IntroScreen-mobile.jsx  # VQ 카탈로그 (모바일)
+        ├── VQBook.jsx              # VQ 플립북
+        ├── Book.jsx                # Friender 플립북
+        ├── CompanyPage.jsx
+        ├── ContactPage.jsx
+        ├── PortfolioPage.jsx
+        ├── Chatbot.jsx
+        ├── Header.jsx
+        ├── Footer.jsx
+        ├── Model3D.jsx
+        └── *-Backup.jsx            # 백업 컴포넌트
 ```
 
-## 🚀 실행 방법
+## URL 라우팅
 
-### 개발 환경
+`App.jsx`에서 `window.location.pathname`으로 화면을 분기합니다. `BrowserRouter`는 사용하지만 실제 전환은 `history.pushState`로 처리합니다.
+
+| URL | 화면 |
+|-----|------|
+| `/isover` | Isover 카탈로그 (기본값) |
+| `/vq-main`, `/` | VQ Studio 메인 |
+| `/catalog` | VQ 인터랙티브 카탈로그 |
+| `/company` | 회사 소개 |
+| `/contact` | 문의하기 |
+| `/portfolio` | 포트폴리오 |
+| `/vq` | VQ 플립북 |
+| `/friender` | Friender 플립북 |
+
+## 실행 방법
+
+### 사전 요구
+
+- Node.js 18+
+- npm
+
+### 개발
+
 ```bash
 npm install
 npm run dev
 ```
 
-### 빌드
+### 빌드·미리보기
+
 ```bash
 npm run build
+npm run preview
 ```
 
-### 배포
-- **Netlify**: 자동 배포 설정 완료
-- **빌드 명령어**: `npm run build`
-- **배포 폴더**: `dist`
+### 린트
 
-## 🎨 디자인 특징
-
-### 반응형 디자인
-- **데스크톱**: 플립북 형태의 전통적인 카탈로그 경험
-- **모바일**: 스크롤 기반의 현대적인 모바일 UX
-- **브레이크포인트**: 1025px
-
-### 애니메이션
-- **인트로**: 로고 페이드인 → 흰 화면 전환
-- **페이지 전환**: 부드러운 플립 애니메이션
-- **호버 효과**: 인터랙티브 영역 하이라이트
-- **3D 모델**: 자동 회전 및 사용자 조작
-
-### 사용자 경험
-- **직관적 네비게이션**: 화살표 버튼 + 터치 제스처
-- **빠른 접근**: 목차에서 직접 페이지 이동
-- **풍부한 콘텐츠**: 이미지, 3D 모델, GIF, 비디오
-- **외부 연동**: 유튜브, 웹사이트 링크
-
-## 📱 모바일 최적화
-
-### IsoverPage-mobile.jsx 특징
-- **스크롤 기반**: 플립북 대신 세로 스크롤
-- **터치 최적화**: 모바일 터치 제스처 지원
-- **성능 최적화**: 모바일 환경에 맞는 리소스 관리
-- **UI 조정**: 모바일 화면에 맞는 버튼 크기 및 간격
-
-## 🔧 설정 및 커스터마이징
-
-### 플립북 크기 조정
-```javascript
-// IsoverPage.jsx의 calculateFlipBookSize 함수
-const targetWidth = Math.max(400, Math.min(600, screenWidth * 0.4));
+```bash
+npm run lint
 ```
 
-### 3D 모델 경로 설정
-```javascript
-// Isover3DModel.jsx의 모델 경로
-modelPath = "/IsoverFile/3dmodel/system_with_panel.glb"
-```
+## 배포
 
-### 반응형 브레이크포인트
-```javascript
-// 화면 크기 감지 (1025px 기준)
-const [isMobile, setIsMobile] = React.useState(window.innerWidth < 1025);
-```
+### Netlify
 
-## 📊 성능 최적화
+`netlify.toml` 설정:
 
-### 3D 모델 최적화
-- **Draco 압축**: GLB 파일 압축으로 로딩 속도 향상
-- **지연 로딩**: 필요시에만 3D 모델 로드
-- **에러 처리**: 모델 로딩 실패 시 대체 이미지
+- 빌드: `npm run build`
+- 출력: `dist`
+- SPA 리다이렉트: `/*` → `/index.html` (200)
+- JS/CSS MIME 타입 헤더 설정
 
-### 이미지 최적화
-- **SVG 사용**: 벡터 이미지로 선명한 표시
-- **적응형 크기**: 화면 크기에 따른 이미지 크기 조정
-- **지연 로딩**: 모달 열릴 때만 이미지 로드
+### VPS (GitHub Actions)
 
-## 🐛 알려진 이슈
+`main` 브랜치 push 시 `.github/workflows/deploy.yml`이 실행됩니다.
 
-1. **3D 모델 로딩**: 일부 모바일 기기에서 GLB 파일 로딩 지연
-2. **터치 제스처**: 일부 브라우저에서 터치 이벤트 충돌 가능성
-3. **메모리 사용량**: 3D 모델 다중 로딩 시 메모리 사용량 증가
+1. `npm ci` → `npm run build`
+2. `dist`를 tar로 압축 후 SCP 업로드
+3. 서버 `/var/www/isover`에 배포, Nginx reload
 
-## 🔄 업데이트 이력
+필요한 GitHub Secrets: `SERVER_HOST`, `SERVER_USER`, `SERVER_PASSWORD`, `SERVER_PORT`
 
-- **v1.0.0**: 초기 릴리스 (플립북 + 3D 모델)
-- **v1.1.0**: 모바일 최적화 추가
-- **v1.2.0**: 3D 모델 파트별 뷰어 추가
-- **v1.3.0**: GIF 애니메이션 및 비디오 기능 추가
+## Isover 카탈로그 상세
 
+### 페이지 구성 (9페이지)
 
+1. **표지** — 로고 인트로, `front.gif`, 3D 시스템 모델(선택)
+2. **목차** — 섹션 바로가기, 유튜브 링크
+3. **3~9페이지** — 핫스팟, 모달, GIF 호버, 3D 파트 뷰어, 영상·외부 링크
+
+### 플립북 크기
+
+화면 너비의 40%, 최소 400px·최대 800px. 높이는 원본 비율(2480×3507)과 화면 80% 높이를 고려해 조정합니다.
+
+### 3D 모델
+
+- Draco 디코더: Google CDN (`gstatic.com/draco/...`)
+- 모델 경로: `public/IsoverFile/3dmodel/` (예: `system_with_panel.glb`)
+- 파트별 GLB 전환 및 하이라이트 박스 클릭 영역
+
+### PDF
+
+- 로컬: `/IsoverFile/func-pdf/이소바&유창_무용접파사드시스템_카다로그.pdf`
+- 외부: isover.co.kr 제품 카탈로그 PDF 링크
+
+## 챗봇
+
+`Chatbot` 컴포넌트는 Dialogflow Messenger를 동적으로 로드합니다.
+
+- 프로젝트: `hani-chatbot`
+- 채팅 제목: "E카탈로그 도우미"
+- `useDfMessenger` 훅으로 사용자·봇 메시지를 CX/ES 형식 모두 파싱
+
+VQ 관련 페이지(`VQMainPage`, `CompanyPage`, `ContactPage`, `PortfolioPage`, `/catalog`)에서 사용됩니다.
+
+## 관련 문서
+
+| 파일 | 내용 |
+|------|------|
+| `pdf_flipbook_spec.md` | PDF 업로드·변환·메모·인쇄 등 **향후** PDF 플립북 뷰어 기획 |
+| `traffic_calculation.md` | Isover 페이지 리소스 크기 및 트래픽 추정 |
+
+## 성능·에셋 참고
+
+`traffic_calculation.md`에 따르면 Isover 필수 리소스(SVG 9장, GIF, 로고 등)는 약 7MB+, 3D GLB는 사용 시 추가 4~5MB per 모델입니다. 모바일·3G 환경에서는 3D 모델 지연 로딩과 에셋 최적화를 권장합니다.
+
+## 브라우저 지원
+
+Chrome, Firefox, Safari, Edge 최신 버전. WebGL(3D), 터치 제스처(플립북·모바일 UI) 필요.
 
 ---
 
-*이 프로젝트는 React와 Three.js를 활용한 인터랙티브 디지털 카탈로그입니다.*
+*React, Three.js, react-pageflip을 활용한 멀티 브랜드 인터랙티브 디지털 카탈로그 플랫폼*
