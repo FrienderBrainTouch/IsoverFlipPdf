@@ -529,7 +529,7 @@ function IsoverPage({ onBack = null }) {
   };
 
   const handleArea5Click = () => {
-    window.open('https://www.youtube.com/@%EC%83%9D%EA%B3%A0%EB%B1%85%EC%9D%B4%EC%86%8C%EB%B0%94%EC%BD%94%EB%A6%AC%EC%95%84/videos', '_blank');
+    window.open('https://www.youtube.com/watch?si=HHwruO6XaYO3CV1W&v=yWW4qD7dh5g&feature=youtu.be', '_blank');
   };
 
   const handleNewAreaClick = () => {
@@ -1311,7 +1311,7 @@ function IsoverPage({ onBack = null }) {
                   onClick={handleArea5Click}
                   onMouseEnter={() => setHoveredArea2(5)}
                   onMouseLeave={() => setHoveredArea2(null)}
-                  title="유튜브 채널 열기"
+                  title="유튜브 영상 열기"
                 >
                 </div>
                 
@@ -2097,10 +2097,10 @@ function IsoverPage({ onBack = null }) {
                     width: '36%',
                     height: '4%'
                   }}
-                  onClick={() => window.open('https://www.youtube.com/@%EC%83%9D%EA%B3%A0%EB%B1%85%EC%9D%B4%EC%86%8C%EB%B0%94%EC%BD%94%EB%A6%AC%EC%95%84/videos', '_blank')}
+                  onClick={() => window.open('https://www.youtube.com/watch?si=HHwruO6XaYO3CV1W&v=yWW4qD7dh5g&feature=youtu.be', '_blank')}
                   onMouseEnter={() => setHoveredArea6(7)}
                   onMouseLeave={() => setHoveredArea6(null)}
-                  title="유튜브 채널 열기"
+                  title="유튜브 영상 열기"
                 >
                 </div>
                 
